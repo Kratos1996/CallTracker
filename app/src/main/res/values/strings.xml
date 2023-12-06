@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">CallTracker</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_mobile">Mobile</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="required_permission">Required Permission</string>
+    <string name="over_lay_permission">Need Overlay Permission</string>
+    <string name="phone_state_permission">Need Phone State Permission</string>
+    <string name="phone_number_permission">Need Phone Number Permission</string>
+    <string name="read_call_log_permission">Need Read Call Logs Permission</string>
+</resources>

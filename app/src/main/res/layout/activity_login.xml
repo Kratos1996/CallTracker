@@ -9,75 +9,80 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.login.ui.login.LoginActivity">
-    <LinearLayout
-        android:elevation="10dp"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:background="@drawable/bg_curve_bottom"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@mipmap/ic_launcher_round"
-            android:layout_marginTop="40dp"/>
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/layEmail"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:elevation="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:errorEnabled="true"
-            android:layout_marginHorizontal="16dp"
-           >
+            android:gravity="center"
+            android:background="@drawable/bg_curve_bottom"
+            android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/username"
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@mipmap/ic_launcher_round"
+                android:layout_marginTop="150dp"/>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/layEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:maxLength="10"
-                android:inputType="number"
-                android:hint="@string/prompt_mobile" />
+                android:layout_marginTop="16dp"
+                app:errorEnabled="true"
+                android:layout_marginHorizontal="16dp"
+                >
 
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/layPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            app:errorEnabled="true"
-            android:layout_marginHorizontal="16dp"
-            >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:maxLength="10"
+                    android:inputType="number"
+                    android:hint="@string/prompt_mobile" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/password"
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/layPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:hint="@string/prompt_password"
-                android:imeActionLabel="@string/action_sign_in_short"
-                android:imeOptions="actionDone"
-                android:inputType="textPassword"
-                android:selectAllOnFocus="true" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginTop="5dp"
+                app:errorEnabled="true"
+                android:layout_marginHorizontal="16dp"
+                >
 
-        <TextView
-            android:id="@+id/loginBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="64dp"
-            android:layout_marginHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:background="@drawable/fill_main_btn"
-            android:text="@string/action_sign_in"
-            />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:hint="@string/prompt_password"
+                    android:imeActionLabel="@string/action_sign_in_short"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:selectAllOnFocus="true" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/loginBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="64dp"
+                android:layout_marginHorizontal="16dp"
+                android:paddingVertical="10dp"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:background="@drawable/fill_main_btn"
+                android:text="@string/action_sign_in"
+                />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
 
 </LinearLayout>

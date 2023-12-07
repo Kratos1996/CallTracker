@@ -27,7 +27,7 @@ import com.ishant.calltracker.utils.Utils.getCellLocationValue
 import com.ishant.calltracker.utils.Utils.getTelephonyManagerValues
 import com.ishant.calltracker.utils.Utils.isLowerThanAndroidQ
 
-data class TelePhoneNumberData(val phoneNumber:String,val carrierName:String,val cardId:String,val simSlotIndex :Int)
+data class TelePhoneNumberData(val phoneNumber:String,val carrierName:String,val cardId:String,val simSlotIndex :String)
 class TelephonyManagerPlus  constructor(private val mContext: Context) {
     private val mTelephonyManager: TelephonyManager?
     private var simSlot2 = 1
@@ -59,14 +59,22 @@ class TelephonyManagerPlus  constructor(private val mContext: Context) {
             Log.e("CallTracker : " , "subscriptionList : ${Gson().toJson(activeSubscriptions)}")
             activeSubscriptions?.forEach { subscriptionInfo: SubscriptionInfo ->
                 val phoneNumber = subscriptionInfo.number
-                phoneNumbers.add(phoneNumber)
-                phoneNumbersDetails.add(TelePhoneNumberData(phoneNumber,subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex))
+
+                if(!phoneNumber.isNullOrEmpty()){
+                    phoneNumbers.add(phoneNumber)
+                    phoneNumbersDetails.add(TelePhoneNumberData(phoneNumber,subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex.toString()))
+                }else{
+                    phoneNumbersDetails.add(TelePhoneNumberData("",subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex.toString()))
+                }
+
             }
         }
        // Log.e("CallTracker : phoneNumbers" , "phoneNumbers ${Gson().toJson(phoneNumbers)}")
         Log.e("CallTracker : phoneNumbers" , "phoneNumbers ${Gson().toJson(phoneNumbersDetails)}")
         return phoneNumbersDetails
     }
+
+
 
     private fun findSimSlot2() {
         if (isPhoneStatePermissionGranted) {

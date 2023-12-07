@@ -1,5 +1,5 @@
 package com.ishant.calltracker.receiver
-
+//009631
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,6 +14,7 @@ import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.ui.home.CallService
 import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.utils.Utils
 import com.ishant.calltracker.utils.navToCallService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -37,60 +38,51 @@ class PhoneCallReceiver : BroadcastReceiver() {
                 var simSlotIndex = intent.getIntExtra("simSlotIndex", -1)
                 Log.e("CallTracker : ", "Call Tracker IncomingCall : $phoneNumber")
                 Log.e("CallTracker : ", "Call Tracker SimSlot: $simSlotIndex")
-                simSlotIndex++
                 // Check SIM details and show notification for SIM 1
                 if (phoneNumber != null) {
-                    Log.e("CallTracker : ", "Call Tracker IncomingCall 2 : $phoneNumber")
-                    if ((simSlotIndex) != -1) {
-                        Log.e("CallTracker : ", "Call Tracker IncomingCall 3 : $phoneNumber")
-                        if (AppPreference.isSim1Selected && simSlotIndex == 0) {
-                            Log.e("CallTracker : ", "Call Tracker IncomingCall 4 : $phoneNumber")
-                            contactUseCase.uploadContact(
-                                sourceMobileNo = AppPreference.simManager.data[simSlotIndex].phoneNumber,
-                                mobile = phoneNumber,
-                                name = AppPreference.user.name ?: ""
-                            ).onEach { result ->
-                                when (result) {
-                                    is Resource.Error -> {
-                                        Log.e("CallTracker : ", "CallTracker: Contact Not Saved")
-                                    }
-
-                                    is Resource.Loading -> {}
-                                    is Resource.Success -> {
-                                        Log.e("CallTracker : ", "CallTracker: Contact Saved")
-                                    }
-                                }
-                            }.launchIn(
-                                CoroutineScope(Dispatchers.IO)
-                            )
-                        }
-                        if (AppPreference.isSim2Selected && simSlotIndex == 1) {
-                            contactUseCase.uploadContact(
-                                sourceMobileNo = AppPreference.simManager.data[simSlotIndex].phoneNumber,
-                                mobile = phoneNumber,
-                                name = AppPreference.user.name ?: ""
-                            ).onEach { result ->
-                                when (result) {
-                                    is Resource.Error -> {
-                                        Log.e("CallTracker : ", "CallTracker: Contact Not Saved")
-                                    }
-
-                                    is Resource.Loading -> {}
-                                    is Resource.Success -> {
-                                        Log.e("CallTracker : ", "CallTracker: Contact Saved")
-                                    }
-                                }
-                            }.launchIn(
-                                CoroutineScope(Dispatchers.IO)
-                            )
-                        }
-
+                    if (AppPreference.isSim1Selected) {
+                        Log.e("CallTracker : ", "Call Tracker IncomingCall 4 : $phoneNumber")
+                        saveContact(phoneNumber, if(AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) AppPreference.simManager.data[1].phoneNumber else AppPreference.simManager.data[0].phoneNumber)
+                    } else if (AppPreference.isSim2Selected) {
+                        saveContact(phoneNumber, if(AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) AppPreference.simManager.data[1].phoneNumber else AppPreference.simManager.data[0].phoneNumber)
+                    }
+                }
+            } else if (state == TelephonyManager.EXTRA_STATE_OFFHOOK) {
+                Log.e("CallTracker : ", "Call Tracker ongoing  ")
+                val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
+                var simSlotIndex = intent.getIntExtra("simSlotIndex", -1)
+                Log.e("CallTracker : ", "Call Tracker outgoing  $phoneNumber")
+                if (phoneNumber != null) {
+                    if (AppPreference.isSim1Selected) {
+                        saveContact(if(AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) AppPreference.simManager.data[1].phoneNumber else AppPreference.simManager.data[0].phoneNumber , phoneNumber)
+                    } else if (AppPreference.isSim2Selected) {
+                        saveContact(if(AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) AppPreference.simManager.data[1].phoneNumber else AppPreference.simManager.data[0].phoneNumber, phoneNumber)
                     }
                 }
             }
         }
     }
 
+    private fun saveContact(phoneNumber: String,sourceMobileNo:String) {
+        contactUseCase.uploadContact(
+            sourceMobileNo = Utils.extractLast10Digits(sourceMobileNo),
+            mobile = Utils.extractLast10Digits(phoneNumber),
+            name = AppPreference.user.name ?: ""
+        ).onEach { result ->
+            when (result) {
+                is Resource.Error -> {
+                    Log.e("CallTracker : ", "CallTracker: Contact Not Saved")
+                }
+
+                is Resource.Loading -> {}
+                is Resource.Success -> {
+                    Log.e("CallTracker : ", "CallTracker: Contact Saved")
+                }
+            }
+        }.launchIn(
+            CoroutineScope(Dispatchers.Default)
+        )
+    }
 
 
     private fun isSim1(context: Context?, simSlotIndex: Int): Boolean {

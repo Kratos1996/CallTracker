@@ -164,6 +164,18 @@ internal object Utils {
         return (getAppTargetSdkVersion(context) < Build.VERSION_CODES.Q
                 || Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
     }
+    fun extractLast10Digits(phoneNumber: String): String {
+        // Remove non-digit characters
+        val digitsOnly = phoneNumber.replace(Regex("[^\\d]"), "")
+
+        // Extract the last 10 digits
+        return if (digitsOnly.length >= 10) {
+            digitsOnly.substring(digitsOnly.length - 10)
+        } else {
+            // Handle the case when the string has less than 10 digits
+            digitsOnly
+        }
+    }
 
     internal interface CellLocationType {
         companion object {

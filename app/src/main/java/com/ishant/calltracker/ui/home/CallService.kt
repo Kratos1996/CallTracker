@@ -44,17 +44,17 @@ class CallService : Service() {
                         when (state) {
                             TelephonyManager.CALL_STATE_RINGING -> {
                                 // Incoming call
-
+                                Log.e("CallTracker", "Call Tracker Service : Call ended")
                             }
 
                             TelephonyManager.CALL_STATE_OFFHOOK -> {
-                                // Call answered
-                                Log.d("CallTracker", "Call answered")
+                               //outgoing
+                                Log.e("CallTracker", "Call Tracker Service  : Call ended")
                             }
 
                             TelephonyManager.CALL_STATE_IDLE -> {
                                 // Call ended
-                                Log.d("CallTracker", "Call ended")
+                                Log.e("CallTracker", "Call Tracker : Call ended")
                             }
                         }
                     }
@@ -68,6 +68,6 @@ class CallService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         // Unregister the listener when the service is destroyed
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
+       /// telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
     }
 }

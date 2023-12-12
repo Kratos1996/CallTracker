@@ -17,6 +17,7 @@ interface ApiInterface {
     suspend fun uploadContact(
         @Field("source_mobile") sourceMobileNo:String,
         @Field("mobile") mobile:String,
+        @Field("type") type:String,
         @Field("name") name:String ): ContactSavedResponse
 
 }

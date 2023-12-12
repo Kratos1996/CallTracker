@@ -8,5 +8,5 @@ interface ContactRepository {
 
     suspend fun loginNow(mobile:String, password:String ): LoginResponse
 
-    suspend fun uploadContact(sourceMobileNo:String, mobile:String, name:String ): ContactSavedResponse
+    suspend fun uploadContact(sourceMobileNo:String, mobile:String, name:String,type:String  ): ContactSavedResponse
 }

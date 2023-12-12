@@ -10,6 +10,12 @@ class ContactRepositoryImpl  @Inject constructor(val api: ApiInterface) :Contact
 
     override suspend fun loginNow(mobile: String, password: String): LoginResponse = api.loginNow(mobile, password)
 
-    override suspend fun uploadContact(sourceMobileNo: String, mobile: String, name: String) = api.uploadContact(sourceMobileNo, mobile,name)
+    override suspend fun uploadContact(sourceMobileNo: String, mobile: String, name: String,type:String ) =
+        api.uploadContact(
+            sourceMobileNo = sourceMobileNo,
+            mobile = mobile,
+            name = name,
+            type = type
+        )
 
 }

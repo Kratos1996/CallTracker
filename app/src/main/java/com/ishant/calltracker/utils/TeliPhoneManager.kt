@@ -36,7 +36,6 @@ class TelephonyManagerPlus  constructor(private val mContext: Context) {
         mTelephonyManager = mContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         mSubscriptionInfoList = subscriptionManager
         findSimSlot2()
-        //printSubscriptionInfo();
     }
 
     fun getSimCardPhoneNumbers(context: Context): List<TelePhoneNumberData> {
@@ -45,33 +44,28 @@ class TelephonyManagerPlus  constructor(private val mContext: Context) {
         val phoneNumbersDetails = mutableListOf<TelePhoneNumberData>()
 
         val subscriptionManager = SubscriptionManager.from(mContext)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            val activeSubscriptions = if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.READ_PHONE_STATE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return arrayListOf()
-            } else {
-                subscriptionManager.activeSubscriptionInfoList
-            }
-
-            Log.e("CallTracker : " , "subscriptionList : ${Gson().toJson(activeSubscriptions)}")
-            activeSubscriptions?.forEach { subscriptionInfo: SubscriptionInfo ->
-                val phoneNumber = subscriptionInfo.number
-
-                if(!phoneNumber.isNullOrEmpty()){
-                    phoneNumbers.add(phoneNumber)
-                    phoneNumbersDetails.add(TelePhoneNumberData(phoneNumber,subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex.toString()))
-                }else{
-                    phoneNumbersDetails.add(TelePhoneNumberData("",subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex.toString()))
-                }
-
-            }
+        val activeSubscriptions = if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_PHONE_STATE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return arrayListOf()
+        } else {
+            subscriptionManager.activeSubscriptionInfoList
         }
-       // Log.e("CallTracker : phoneNumbers" , "phoneNumbers ${Gson().toJson(phoneNumbers)}")
-        Log.e("CallTracker : phoneNumbers" , "phoneNumbers ${Gson().toJson(phoneNumbersDetails)}")
-        return phoneNumbersDetails
+
+        activeSubscriptions?.forEach { subscriptionInfo: SubscriptionInfo ->
+            val phoneNumber = subscriptionInfo.number
+            if(!phoneNumber.isNullOrEmpty()){
+                phoneNumbers.add(phoneNumber)
+                phoneNumbersDetails.add(TelePhoneNumberData(phoneNumber,subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex.toString()))
+            }else{
+                phoneNumbersDetails.add(TelePhoneNumberData("",subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex.toString()))
+            }
+
+        }
+        // Log.e("CallTracker : phoneNumbers" , "phoneNumbers ${Gson().toJson(phoneNumbers)}")
+         return phoneNumbersDetails
     }
 
 

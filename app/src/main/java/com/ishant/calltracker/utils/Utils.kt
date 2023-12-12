@@ -177,6 +177,8 @@ internal object Utils {
         }
     }
 
+
+
     internal interface CellLocationType {
         companion object {
             const val LAC = 0

@@ -39,7 +39,7 @@ class CallService : Service() {
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
                 telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-                phoneStateListener = object : PhoneStateListener() {
+              /*  phoneStateListener = object : PhoneStateListener() {
                     override fun onCallStateChanged(state: Int, phoneNumber: String?) {
                         when (state) {
                             TelephonyManager.CALL_STATE_RINGING -> {
@@ -59,7 +59,7 @@ class CallService : Service() {
                         }
                     }
                 }
-                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
+                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)*/
             })
         })
 

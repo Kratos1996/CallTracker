@@ -33,12 +33,20 @@ fun Context.readPhoneStatePermission(granted:()->Unit, rejected:(() -> Unit)? = 
                 permissionRequest: PermissionRequest,
                 permissionToken: PermissionToken
             ) {
+                rejected?.let { it() }
                 showCommonDialog(title = getString(R.string.required_permission),message = getString(
                     R.string.phone_state_permission),context){
                     navToSetting(context as AppCompatActivity)
                 }
             }
         })
+        .withErrorListener {
+            rejected?.let { it() }
+            showCommonDialog(title = getString(R.string.required_permission),message = getString(
+                R.string.phone_state_permission),context){
+                navToSetting(context as AppCompatActivity)
+            }
+        }
         .check()
 }
 
@@ -51,21 +59,27 @@ fun Context.readPhoneNumberPermission(granted:()->Unit, rejected:(() -> Unit)? =
                 granted()
             }
             override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
-                if (rejected != null) {
-                    rejected()
-                }
+                rejected?.let { it() }
             }
 
             override fun onPermissionRationaleShouldBeShown(
                 permissionRequest: PermissionRequest,
                 permissionToken: PermissionToken
             ) {
+                rejected?.let { it() }
                 showCommonDialog(title = getString(R.string.required_permission),message = getString(
                     R.string.phone_number_permission),context){
                     navToSetting(context as AppCompatActivity)
                 }
             }
         })
+        .withErrorListener {
+            rejected?.let { it() }
+            showCommonDialog(title = getString(R.string.required_permission),message = getString(
+                R.string.phone_number_permission),context){
+                navToSetting(context as AppCompatActivity)
+            }
+        }
         .check()
 }
 
@@ -85,11 +99,52 @@ fun Context.readPhoneLogPermission(granted:()->Unit, rejected:(() -> Unit)? = nu
                 permissionRequest: PermissionRequest,
                 permissionToken: PermissionToken
             ) {
+                rejected?.let { it() }
                 showCommonDialog(title = getString(R.string.required_permission),message = getString(
                     R.string.read_call_log_permission),context){
                     navToSetting(context as AppCompatActivity)
                 }
             }
         })
+        .withErrorListener {
+        rejected?.let { it() }
+            showCommonDialog(title = getString(R.string.required_permission),message = getString(
+                R.string.read_call_log_permission),context){
+                navToSetting(context as AppCompatActivity)
+            }
+    }
+        .check()
+}
+
+fun Context.readPhoneContactPermission(granted:()->Unit, rejected:(() -> Unit)? = null ){
+    val context = this
+    Dexter.withContext(this)
+        .withPermission(Manifest.permission.READ_CONTACTS)
+        .withListener(object : PermissionListener {
+            override fun onPermissionGranted(permissionGrantedResponse: PermissionGrantedResponse) {
+                granted()
+            }
+            override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
+                rejected?.let { it() }
+            }
+
+            override fun onPermissionRationaleShouldBeShown(
+                permissionRequest: PermissionRequest,
+                permissionToken: PermissionToken
+            ) {
+                rejected?.let { it() }
+                showCommonDialog(title = getString(R.string.required_permission),message = getString(
+                    R.string.read_call_log_permission),context){
+                    navToSetting(context as AppCompatActivity)
+                }
+            }
+        })
+        .withErrorListener {
+            rejected?.let { it() }
+            showCommonDialog(title = getString(R.string.required_permission),message = getString(
+                R.string.read_call_log_permission),context){
+                navToSetting(context as AppCompatActivity)
+            }
+        }
         .check()
 }

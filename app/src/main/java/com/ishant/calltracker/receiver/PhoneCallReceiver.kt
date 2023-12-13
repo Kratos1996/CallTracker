@@ -43,15 +43,6 @@ class PhoneCallReceiver : BroadcastReceiver() {
                     val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
 
                 }
-                TelephonyManager.EXTRA_STATE_OFFHOOK -> {
-                    Log.e("CallTracker : ", "Call Tracker ongoing  ")
-                   /* val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
-                    var simSlotIndex = intent.getIntExtra("simSlotIndex", -1)
-                    Log.e("CallTracker : ", "Call Tracker outgoing  $phoneNumber")
-                    if (phoneNumber != null) {
-                        saveContact( phoneNumber,getPhoneNumber(),"Outgoing Call" )
-                    }*/
-                }
                 TelephonyManager.EXTRA_STATE_IDLE -> {
                     val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
                     if (phoneNumber != null) {

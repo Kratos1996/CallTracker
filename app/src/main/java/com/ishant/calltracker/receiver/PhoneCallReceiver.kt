@@ -39,41 +39,53 @@ class PhoneCallReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
             when (intent.getStringExtra(TelephonyManager.EXTRA_STATE)) {
-                TelephonyManager.EXTRA_STATE_RINGING -> {
-                    val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
-
-                }
                 TelephonyManager.EXTRA_STATE_IDLE -> {
-                    val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
-                    if (phoneNumber != null) {
-                        val data = LastCallDetailsCollector()
-                        CoroutineScope(Dispatchers.IO).launch {
-                            delay(2000)
-                            val callerData = data.collectLastCallDetails(context)
-                            callerData.collectLatest { dataCaller ->
-                                if(dataCaller!=null){
-                                    Log.e("CallTracker : ", "Call Tracker CallType :  ${dataCaller.callType}")
-                                    when (dataCaller.callType) {
-                                        "Outgoing" -> {
+                    if(AppPreference.isUserLoggedIn) {
+                        val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
+                        if (phoneNumber != null) {
+                            val data = LastCallDetailsCollector()
+                            CoroutineScope(Dispatchers.IO).launch {
+                                delay(2000)
+                                val callerData = data.collectLastCallDetails(context)
+                                callerData.collectLatest { dataCaller ->
+                                    if (dataCaller != null) {
+                                        Log.e(
+                                            "CallTracker : ",
+                                            "Call Tracker CallType :  ${dataCaller.callType}"
+                                        )
+                                        when (dataCaller.callType) {
+                                            /*"Outgoing" -> {
                                             Log.e("CallTracker : ", "Call Tracker Outgoing ${dataCaller.callerNumber}")
                                             saveContact( phoneNumber = dataCaller.callerNumber,
                                                 sourceMobileNo =  getPhoneNumber(),
                                                 name = AppPreference.user.name?:"",
                                                 type = dataCaller.callType )
-                                        }
-                                        "Unknown" -> {
-                                            Log.e("CallTracker : ", "Call Tracker CallEnded ${dataCaller.callerNumber}")
-                                            saveContact( phoneNumber = getPhoneNumber(),
-                                                sourceMobileNo = dataCaller.callerNumber ,
-                                                name = dataCaller.callerName?:"Unknown",
-                                                type = "Call Ended without Pickup" )
-                                        }
-                                        else -> {
-                                            Log.e("CallTracker : ", "Call Tracker Incoming ${dataCaller.callerNumber}")
-                                            saveContact( phoneNumber = getPhoneNumber(),
-                                                sourceMobileNo = dataCaller.callerNumber ,
-                                                name = dataCaller.callerName?:"Unknown",
-                                                type = dataCaller.callType )
+                                        }*/
+                                            "Unknown" -> {
+                                                Log.e(
+                                                    "CallTracker : ",
+                                                    "Call Tracker CallEnded ${dataCaller.callerNumber}"
+                                                )
+                                                saveContact(
+                                                    phoneNumber = getPhoneNumber(),
+                                                    sourceMobileNo = dataCaller.callerNumber,
+                                                    name = dataCaller.callerName ?: "Unknown",
+                                                    type = "Call Ended without Pickup"
+                                                )
+                                            }
+
+                                            else -> {
+                                                Log.e(
+                                                    "CallTracker : ",
+                                                    "Call Tracker Incoming ${dataCaller.callerNumber}"
+                                                )
+                                                saveContact(
+                                                    phoneNumber = getPhoneNumber(),
+                                                    sourceMobileNo = dataCaller.callerNumber,
+                                                    name = dataCaller.callerName ?: "Unknown",
+                                                    type = dataCaller.callType
+                                                )
+                                            }
                                         }
                                     }
                                 }

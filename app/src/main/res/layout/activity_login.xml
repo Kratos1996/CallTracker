@@ -72,13 +72,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:layout_marginBottom="64dp"
                 android:layout_marginHorizontal="16dp"
                 android:paddingVertical="10dp"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:background="@drawable/fill_main_btn"
                 android:text="@string/action_sign_in"
+                />
+            <TextView
+                android:id="@+id/needWriteContactPermissionText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="64dp"
+                android:layout_marginHorizontal="16dp"
+                android:paddingVertical="10dp"
+                android:textAlignment="center"
+                android:visibility="invisible"
+                android:textColor="@color/btnBlue"
+                android:text="@string/contact_permission"
                 />
 
         </LinearLayout>

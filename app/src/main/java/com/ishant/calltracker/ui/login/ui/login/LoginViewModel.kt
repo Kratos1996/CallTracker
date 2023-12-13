@@ -22,6 +22,9 @@ class LoginViewModel  @Inject constructor(
     private val _loginResponse = MutableStateFlow<Response<LoginResponse>>(Response.Empty)
     val loginResponse = _loginResponse.asSharedFlow()
 
+     val permissionGrantedMain = MutableStateFlow(false)
+     val permissionGranted = permissionGrantedMain.asSharedFlow()
+
     fun login(username: String, password: String) {
         contactUseCase.loginNow(username,password).onEach { result ->
             when(result){

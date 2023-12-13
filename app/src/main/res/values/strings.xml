@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">WappBlaster</string>
+    <string name="app_name">AIWappBlaster</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_mobile">Mobile</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
+    <string name="contact_permission">Are You Given Contact Permission?</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
@@ -14,6 +15,8 @@
     <string name="phone_state_permission">Need Phone State Permission</string>
     <string name="phone_number_permission">Need Phone Number Permission</string>
     <string name="read_call_log_permission">Need Read Call Logs Permission</string>
+    <string name="read_write_contact_permission">Need Write Contact Permission</string>
+    <string name="read_contact_permission">Need Read Contact Permission</string>
     <string name="url">https://wappblaster.in/</string>
     <string name="sim_carrier_name">Sim Carrier Name</string>
     <string name="blank">blank</string>

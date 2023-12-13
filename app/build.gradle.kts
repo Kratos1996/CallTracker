@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         applicationId = "com.ishant.calltracker"
-        minSdk = 29
+        minSdk = 25
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

@@ -22,15 +22,16 @@
 
             <ImageView
                 android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_height="50dp"
                 android:src="@drawable/logo"
+                android:scaleType="centerCrop"
                 android:layout_marginTop="100dp"/>
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:id="@+id/layEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="40dp"
                 app:errorEnabled="true"
                 android:layout_marginHorizontal="16dp"
                 >

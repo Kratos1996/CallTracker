@@ -67,8 +67,8 @@ class PhoneCallReceiver : BroadcastReceiver() {
                                                     "Call Tracker CallEnded ${dataCaller.callerNumber}"
                                                 )
                                                 saveContact(
-                                                    phoneNumber = getPhoneNumber(),
-                                                    sourceMobileNo = dataCaller.callerNumber,
+                                                    phoneNumber =dataCaller.callerNumber  ,
+                                                    sourceMobileNo = getPhoneNumber(),
                                                     name = dataCaller.callerName ?: "Unknown",
                                                     type = "Call Ended without Pickup"
                                                 )
@@ -80,8 +80,8 @@ class PhoneCallReceiver : BroadcastReceiver() {
                                                     "Call Tracker Incoming ${dataCaller.callerNumber}"
                                                 )
                                                 saveContact(
-                                                    phoneNumber = getPhoneNumber(),
-                                                    sourceMobileNo = dataCaller.callerNumber,
+                                                    phoneNumber =dataCaller.callerNumber  ,
+                                                    sourceMobileNo = getPhoneNumber(),
                                                     name = dataCaller.callerName ?: "Unknown",
                                                     type = dataCaller.callType
                                                 )

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AIWappBlaster</string>
+    <string name="app_name">WappBlasterAI</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_mobile">Mobile</string>
     <string name="prompt_password">Password</string>
@@ -20,5 +20,5 @@
     <string name="url">https://wappblaster.in/</string>
     <string name="sim_carrier_name">Sim Carrier Name</string>
     <string name="blank">blank</string>
-    <string name="ver_0_0_1">ver.:0.0.1</string>
+    <string name="ver_0_0_1">ver.:1.0.0</string>
 </resources>

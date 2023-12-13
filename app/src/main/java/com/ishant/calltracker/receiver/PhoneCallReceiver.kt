@@ -53,51 +53,41 @@ class PhoneCallReceiver : BroadcastReceiver() {
                     }*/
                 }
                 TelephonyManager.EXTRA_STATE_IDLE -> {
-                    // Incoming call detected
                     val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
-                    // Check SIM details and show notification for SIM 1
                     if (phoneNumber != null) {
-                       /*if(isMissedCall(context,phoneNumber)) {
-                           Log.e("CallTracker : ", "Call Tracker Missed Call  : $phoneNumber")
-                           saveContact( getPhoneNumber(),phoneNumber,"Missed Call" )
-                       }else {
-                           Log.e("CallTracker : ", "Call Tracker Call Answered  : $phoneNumber")
-                           saveContact( getPhoneNumber(),phoneNumber,"Incoming Call" )
-                       }*/
                         val data = LastCallDetailsCollector()
-
                         CoroutineScope(Dispatchers.IO).launch {
                             delay(2000)
                             val callerData = data.collectLastCallDetails(context)
                             callerData.collectLatest { dataCaller ->
                                 if(dataCaller!=null){
                                     Log.e("CallTracker : ", "Call Tracker CallType :  ${dataCaller.callType}")
-                                    if(dataCaller.callType == "Outgoing"){
-                                        Log.e("CallTracker : ", "Call Tracker Outgoing ${dataCaller.callerNumber}")
-                                        saveContact( phoneNumber = dataCaller.callerNumber,
-                                            sourceMobileNo =  getPhoneNumber(),
-                                            name = AppPreference.user.name?:"",
-                                            type = dataCaller.callType )
-                                    }else if(dataCaller.callType == "Unknown"){
-                                        Log.e("CallTracker : ", "Call Tracker CallEnded ${dataCaller.callerNumber}")
-                                        saveContact( phoneNumber = getPhoneNumber(),
-                                            sourceMobileNo = dataCaller.callerNumber ,
-                                            name = dataCaller.callerName?:"Unknown",
-                                            type = "Call Ended without Pickup" )
+                                    when (dataCaller.callType) {
+                                        "Outgoing" -> {
+                                            Log.e("CallTracker : ", "Call Tracker Outgoing ${dataCaller.callerNumber}")
+                                            saveContact( phoneNumber = dataCaller.callerNumber,
+                                                sourceMobileNo =  getPhoneNumber(),
+                                                name = AppPreference.user.name?:"",
+                                                type = dataCaller.callType )
+                                        }
+                                        "Unknown" -> {
+                                            Log.e("CallTracker : ", "Call Tracker CallEnded ${dataCaller.callerNumber}")
+                                            saveContact( phoneNumber = getPhoneNumber(),
+                                                sourceMobileNo = dataCaller.callerNumber ,
+                                                name = dataCaller.callerName?:"Unknown",
+                                                type = "Call Ended without Pickup" )
+                                        }
+                                        else -> {
+                                            Log.e("CallTracker : ", "Call Tracker Incoming ${dataCaller.callerNumber}")
+                                            saveContact( phoneNumber = getPhoneNumber(),
+                                                sourceMobileNo = dataCaller.callerNumber ,
+                                                name = dataCaller.callerName?:"Unknown",
+                                                type = dataCaller.callType )
+                                        }
                                     }
-                                    else{
-                                        Log.e("CallTracker : ", "Call Tracker Incoming ${dataCaller.callerNumber}")
-                                        saveContact( phoneNumber = getPhoneNumber(),
-                                            sourceMobileNo = dataCaller.callerNumber ,
-                                            name = dataCaller.callerName?:"Unknown",
-                                            type = dataCaller.callType )
-                                    }
-
                                 }
                             }
                         }
-
-
                     }
                 }
             }

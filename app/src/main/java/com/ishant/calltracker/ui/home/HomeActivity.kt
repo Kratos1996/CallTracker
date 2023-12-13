@@ -15,6 +15,7 @@ import com.ishant.calltracker.R
 import com.ishant.calltracker.databinding.ActivityHomeBinding
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.TelephonyManagerPlus
+import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.dataclassesUtils.TelePhoneManager
 import com.ishant.calltracker.utils.readPhoneContactPermission
 import com.ishant.calltracker.utils.readPhoneLogPermission
@@ -34,6 +35,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding =ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        addAutoStartup()
         binding.name.text = AppPreference.user.name?:""
         binding.emailName.text = AppPreference.user.email?:""
         binding.number.text = AppPreference.user.mobile?:""
@@ -125,8 +127,8 @@ class HomeActivity : AppCompatActivity() {
             binding.phoneCallLogsPermission.visibility = View.VISIBLE
         }
         AppPreference.simManager = TelePhoneManager(data)
-        val intent = Intent(this, CallService::class.java)
-        startService(intent)
+        /*val intent = Intent(this, CallService::class.java)
+        startService(intent)*/
     }
 
     private fun takeCallLogsPermission(){

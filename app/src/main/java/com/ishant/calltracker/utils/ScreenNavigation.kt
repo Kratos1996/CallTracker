@@ -19,7 +19,7 @@ val settingApplicationCode = 1996
 fun Context.navToHome(){
     val intent = Intent(this, HomeActivity::class.java)
     startActivity(intent)
-    addAutoStartup()
+
 }
 fun Context.navToLogin(){
     val intent = Intent(this, LoginActivity::class.java)

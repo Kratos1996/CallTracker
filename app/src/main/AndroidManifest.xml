@@ -33,13 +33,25 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:screenOrientation="portrait"
+            android:singleUser="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan|adjustResize"
             android:name=".ui.login.ui.login.LoginActivity"
             android:exported="false"
             android:label="@string/title_activity_login" />
         <activity
+            android:screenOrientation="portrait"
+            android:singleUser="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan|adjustResize"
             android:name=".ui.home.HomeActivity"
             android:exported="false" />
         <activity
+            android:screenOrientation="portrait"
+            android:singleUser="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan|adjustResize"
             android:name=".ui.splash.SplashActivity"
             android:exported="true">
             <intent-filter>

@@ -5,6 +5,7 @@
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
     <string name="contact_permission">Are You Given Contact Permission?</string>
+    <string name="create_account">Create Account</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
@@ -21,4 +22,7 @@
     <string name="sim_carrier_name">Sim Carrier Name</string>
     <string name="blank">blank</string>
     <string name="ver_0_0_1">ver.:1.0.0</string>
+    <string name="create_account_url">https://wappblaster.in/#signup</string>
+    <string name="i_accept_this_terms_condition"><![CDATA[i accept this Terms & Condition]]></string>
+    <string name="terms_and_condition_url">https://docs.google.com/document/d/18t3fc_xrO0-y9cKMmyrnMYk0LYNWaTrX7QlQ0fRQ4lg/edit?usp=sharing</string>
 </resources>

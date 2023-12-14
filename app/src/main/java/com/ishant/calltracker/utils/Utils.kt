@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.telephony.TelephonyManager
 import android.text.TextUtils
+import android.widget.Toast
 import com.ishant.calltracker.utils.Constant.DEFAULT_GSM_CELL_ID_VALUE
 import com.ishant.calltracker.utils.Constant.DEFAULT_TELEPHONY_MANAGER_INT_VALUE
 import com.ishant.calltracker.utils.Constant.DEFAULT_TELEPHONY_MANAGER_STRING_VALUE
@@ -175,6 +176,11 @@ internal object Utils {
             // Handle the case when the string has less than 10 digits
             digitsOnly
         }
+    }
+
+    fun Context.toast(message:String){
+        if(message.isNotEmpty())
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
     }
 
 

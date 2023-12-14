@@ -2,7 +2,14 @@ package com.ishant.calltracker.ui.login.ui.login
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
@@ -36,6 +43,32 @@ class LoginActivity : AppCompatActivity() {
         binding.loginBtn.setOnClickListener {
             requestWriteContact()
         }
+        val termsAndConditionsText = getString(R.string.i_accept_this_terms_condition)
+        val spannableString = SpannableString(termsAndConditionsText)
+        // Customize the spannable text as needed
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                loadUrl(url = getString(R.string.terms_and_condition_url))
+            }
+        }
+
+        binding.createAccount.setOnClickListener {
+            loadUrl(url = getString(R.string.create_account_url))
+        }
+
+        // Specify the start and end index for the clickable part of the text
+        val startIndex = termsAndConditionsText.indexOf("Terms")
+        val endIndex = startIndex + "Terms & Condition".length
+
+        // Set the ClickableSpan to the specified range
+        spannableString.setSpan(clickableSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        // Make the TextView clickable
+        binding.acceptTerms.movementMethod = LinkMovementMethod.getInstance()
+
+        // Set the spannable text to the TextView
+        binding.acceptTerms.text = spannableString
+
        lifecycleScope.launch {
            loginViewModel.loginResponse.collectLatest {
                when(it){
@@ -59,6 +92,11 @@ class LoginActivity : AppCompatActivity() {
        }
     }
 
+    private fun loadUrl(url:String) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(browserIntent)
+    }
+
     private fun requestWriteContact(){
         writePhoneContactPermission(granted = {
             loginViewModel.permissionGrantedMain.value = true
@@ -79,6 +117,9 @@ class LoginActivity : AppCompatActivity() {
             binding.password.text.isNullOrEmpty() -> {
                 binding.layPassword.isErrorEnabled = true
                 binding.layPassword.error = "Please Enter Password"
+            }
+            !binding.acceptTerms.isChecked ->{
+                toast("Please Accept Terms and Condition ")
             }
 
             else -> {

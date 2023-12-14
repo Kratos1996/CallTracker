@@ -58,9 +58,9 @@ class TelephonyManagerPlus  constructor(private val mContext: Context) {
             val phoneNumber = subscriptionInfo.number
             if(!phoneNumber.isNullOrEmpty()){
                 phoneNumbers.add(phoneNumber)
-                phoneNumbersDetails.add(TelePhoneNumberData(phoneNumber,subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex.toString()))
+                phoneNumbersDetails.add(TelePhoneNumberData(phoneNumber,subscriptionInfo.carrierName.toString(),"",""))
             }else{
-                phoneNumbersDetails.add(TelePhoneNumberData("",subscriptionInfo.carrierName.toString(),subscriptionInfo.cardId.toString(),subscriptionInfo.simSlotIndex.toString()))
+                phoneNumbersDetails.add(TelePhoneNumberData("",subscriptionInfo.carrierName.toString(),"",""))
             }
 
         }

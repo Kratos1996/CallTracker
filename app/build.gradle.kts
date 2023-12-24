@@ -88,4 +88,8 @@ dependencies {
 // Retrofit)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    // Room
+    implementation (libs.androidx.room.runtime)
+    implementation (libs.room.ktx )
+    kapt (libs.androidx.room.compiler)
 }

@@ -17,6 +17,7 @@ import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.dataclassesUtils.TelePhoneManager
+import com.ishant.calltracker.utils.navToRestrictContactActivity
 import com.ishant.calltracker.utils.readPhoneContactPermission
 import com.ishant.calltracker.utils.readPhoneLogPermission
 import com.ishant.calltracker.utils.readPhoneNumberPermission
@@ -121,7 +122,8 @@ class HomeActivity : AppCompatActivity() {
                     }
                 }
             }*/
-        }else{
+        }
+        else{
             Log.e("CallTracker ", "telemanager is empty")
             binding.phoneStatePermission.visibility = View.VISIBLE
             binding.phoneCallLogsPermission.visibility = View.VISIBLE
@@ -129,11 +131,15 @@ class HomeActivity : AppCompatActivity() {
         AppPreference.simManager = TelePhoneManager(data)
         /*val intent = Intent(this, CallService::class.java)
         startService(intent)*/
+        binding.addToRestrictedBtn.setOnClickListener {
+            navToRestrictContactActivity()
+        }
     }
 
     private fun takeCallLogsPermission(){
         readPhoneContactPermission(
             granted = {
+                binding.addToRestrictedBtn.visibility = View.VISIBLE
                 readPhoneLogPermission(granted = {
                     binding.phoneCallLogsPermission.visibility = View.GONE
                     takePhoneNetworkPermission()
@@ -142,6 +148,7 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         ){
+            binding.addToRestrictedBtn.visibility = View.GONE
             Toast.makeText(this,"Need Contact Permission",Toast.LENGTH_SHORT).show()
         }
 

@@ -8,6 +8,7 @@ package com.ishant.calltracker.di
 * */
 
 import android.content.Context
+import androidx.room.Room
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.chuckerteam.chucker.api.RetentionManager
@@ -16,6 +17,9 @@ import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.api.ApiInterface
 import com.ishant.calltracker.data.ContactRepository
 import com.ishant.calltracker.data.ContactRepositoryImpl
+import com.ishant.calltracker.database.room.AppDB
+import com.ishant.calltracker.database.room.CallTrackerDao
+import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.domain.ContactUseCaseImpl
 import com.ishant.calltracker.utils.AppPreference
@@ -56,6 +60,18 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun getDeveloperName(): String = "©Copyright Ishant Sharma"
+
+    @Provides
+    fun provideDatabase(@ApplicationContext context: Context): AppDB {
+        return Room.databaseBuilder(context, AppDB::class.java,"CallTrackerIshantDatabase").fallbackToDestructiveMigration().build()
+    }
+
+    @Provides
+    fun providesPostDao(db: AppDB): CallTrackerDao = db.getDao()
+
+    @Provides
+    fun providesDatabaseRepository(@ApplicationContext context: Context,db: AppDB):DatabaseRepository =
+        DatabaseRepository(db,context)
 
 
     @Provides

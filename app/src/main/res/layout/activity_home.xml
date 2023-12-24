@@ -80,6 +80,29 @@
 
 
         </LinearLayout>
+        <androidx.cardview.widget.CardView
+            android:visibility="invisible"
+            android:id="@+id/addToRestrictedBtn"
+            android:layout_width="match_parent"
+            app:cardCornerRadius="16dp"
+            android:layout_marginVertical="5dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="25dp"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:background="@color/material_deep_teal_20">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="@string/add_to_restricted_contact"
+                    />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
         <!--singleSimUi-->
         <androidx.cardview.widget.CardView
             android:id="@+id/singleSimUi"

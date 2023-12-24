@@ -25,4 +25,9 @@
     <string name="create_account_url">https://wappblaster.in/#signup</string>
     <string name="i_accept_this_terms_condition"><![CDATA[i accept this Terms & Condition]]></string>
     <string name="terms_and_condition_url">https://docs.google.com/document/d/18t3fc_xrO0-y9cKMmyrnMYk0LYNWaTrX7QlQ0fRQ4lg/edit?usp=sharing</string>
+    <string name="add_to_restricted_contact">Add To Restricted Contact.</string>
+    <string name="search">Search\n</string>
+    <string name="restricted_contact">Restricted Contacts</string>
+    <string name="no_contacts_found">No Contacts Found</string>
+    <string name="contact">Contacts</string>
 </resources>

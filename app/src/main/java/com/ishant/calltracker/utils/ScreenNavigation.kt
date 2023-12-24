@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat
 import com.ishant.calltracker.ui.home.CallService
 import com.ishant.calltracker.ui.home.HomeActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
+import com.ishant.calltracker.ui.restricted.ContactActivity
+import com.ishant.calltracker.ui.restricted.RestrictedContactActivity
 
 val settingApplicationCode = 1996
 fun Context.navToHome(){
@@ -28,6 +30,14 @@ fun Context.navToLogin(){
 fun Context.navToCallService(){
     val intent = Intent(this, CallService::class.java)
     startService(intent)
+}
+fun Context.navToRestrictContactActivity(){
+    val intent = Intent(this, RestrictedContactActivity::class.java)
+    startActivity(intent)
+}
+fun Context.navToContactActivity(){
+    val intent = Intent(this, ContactActivity::class.java)
+    startActivity(intent)
 }
 
 fun Context.navToSetting(activity: AppCompatActivity){

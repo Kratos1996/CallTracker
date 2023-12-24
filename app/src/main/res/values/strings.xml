@@ -30,4 +30,9 @@
     <string name="restricted_contact">Restricted Contacts</string>
     <string name="no_contacts_found">No Contacts Found</string>
     <string name="contact">Contacts</string>
+    <string name="uploadCallsOnServer">Call uploaded on server</string>
+    <string name="all">All </string>
+    <string name="pending">Pending</string>
+    <string name="completed">Completed</string>
+    <string name="source_name">Source Name :</string>
 </resources>

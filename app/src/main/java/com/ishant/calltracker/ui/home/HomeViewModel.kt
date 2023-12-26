@@ -12,21 +12,32 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.database.room.ContactList
 import com.ishant.calltracker.database.room.DatabaseRepository
+import com.ishant.calltracker.database.room.UploadContact
+import com.ishant.calltracker.database.room.UploadContactType
+import com.ishant.calltracker.domain.ContactUseCase
+import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel  @Inject constructor(
-     private val  databaseRepository: DatabaseRepository
+     private val  databaseRepository: DatabaseRepository,
+     private var contactUseCase: ContactUseCase
 ) : AndroidViewModel(Application()) {
 
     val contactListMutable = MutableStateFlow<List<ContactList>>(arrayListOf())
+    val uploadContactListMutable = MutableStateFlow<List<UploadContact>>(arrayListOf())
     val isLoading = MutableStateFlow<Boolean>(false)
     val restrictedContactList = MutableStateFlow<List<ContactList>>(arrayListOf())
+    var lastApiCall :String = UploadContactType.ALL
     fun loadContact(activity: Activity) {
         isLoading.value = true
       viewModelScope.launch {
@@ -79,11 +90,59 @@ class HomeViewModel  @Inject constructor(
         }
     }
 
-    fun setRestrictedContact(phoneNumber: String?, isRestricted: Boolean) {
+    fun getUploadContactsList(type:String = UploadContactType.ALL){
         viewModelScope.launch {
-            if(phoneNumber?.isNotEmpty() == true)
-            databaseRepository.setRestrictedContact(phoneNumber,isRestricted)
+            uploadContactListMutable.value = databaseRepository.getUploadContactList(type)
         }
+    }
+
+    fun setRestrictedContact(phoneNumber: String, isRestricted: Boolean) {
+        viewModelScope.launch {
+            if(phoneNumber.isNotEmpty()) {
+                databaseRepository.setRestrictedContact(phoneNumber,isRestricted)
+            }
+        }
+    }
+
+     fun saveContact(uploadContact: UploadContact, onMessage : (String) ->Unit) {
+        contactUseCase.uploadContact(
+            sourceMobileNo = Utils.extractLast10Digits(uploadContact.sourceMobileNo),
+            mobile = Utils.extractLast10Digits(uploadContact.mobile),
+            name = /*AppPreference.user.name ?: ""*/uploadContact.name,
+            type = uploadContact.type).onEach { result ->
+            when (result) {
+                is Resource.Error -> {
+                    val data = UploadContact(serialNo = System.currentTimeMillis(),
+                        sourceMobileNo = uploadContact.sourceMobileNo,
+                        mobile = uploadContact.mobile,
+                        name = uploadContact.name,
+                        type = UploadContactType.PENDING,
+                        apiPushed = false
+                    )
+                    databaseRepository.insertUpload(data)
+                    isLoading.value = false
+                    onMessage("Contact Data Not Saved on Server")
+                }
+
+                is Resource.Loading -> {
+                    isLoading.value = true
+                }
+                is Resource.Success -> {
+                    val data = UploadContact(
+                        serialNo = System.currentTimeMillis(),
+                        sourceMobileNo = uploadContact.sourceMobileNo,
+                        mobile = uploadContact.mobile,
+                        name = uploadContact.name,
+                        type = UploadContactType.COMPLETE,
+                        apiPushed = true
+                    )
+                    databaseRepository.insertUpload(data)
+                    isLoading.value = false
+                }
+            }
+        }.launchIn(
+            CoroutineScope(Dispatchers.Default)
+        )
     }
 
 

@@ -18,6 +18,7 @@ import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.dataclassesUtils.TelePhoneManager
 import com.ishant.calltracker.utils.navToRestrictContactActivity
+import com.ishant.calltracker.utils.navToUploadContactActivity
 import com.ishant.calltracker.utils.readPhoneContactPermission
 import com.ishant.calltracker.utils.readPhoneLogPermission
 import com.ishant.calltracker.utils.readPhoneNumberPermission
@@ -133,6 +134,9 @@ class HomeActivity : AppCompatActivity() {
         startService(intent)*/
         binding.addToRestrictedBtn.setOnClickListener {
             navToRestrictContactActivity()
+        }
+        binding.uploadCallonApi.setOnClickListener {
+            navToUploadContactActivity()
         }
     }
 

@@ -28,11 +28,12 @@
     <string name="add_to_restricted_contact">Add To Restricted Contact.</string>
     <string name="search">Search\n</string>
     <string name="restricted_contact">Restricted Contacts</string>
-    <string name="no_contacts_found">No Contacts Found</string>
+    <string name="no_contacts_found">No Data Available</string>
     <string name="contact">Contacts</string>
     <string name="uploadCallsOnServer">Call uploaded on server</string>
     <string name="all">All </string>
     <string name="pending">Pending</string>
     <string name="completed">Completed</string>
     <string name="source_name">Source Name :</string>
+    <string name="source_mobile">Source Mobile :</string>
 </resources>

@@ -14,6 +14,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import com.ishant.calltracker.database.room.DatabaseRepository
+import com.ishant.calltracker.database.room.UploadContact
+import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.ui.home.CallService
@@ -59,7 +61,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                                                     "CallTracker : ",
                                                     "Call Tracker CallEnded ${dataCaller.callerNumber}"
                                                 )
-                                                if(dataContact.isFav == false) {
+                                                if(dataContact == null || dataContact.isFav == false) {
                                                     saveContact(
                                                         phoneNumber = dataCaller.callerNumber,
                                                         sourceMobileNo = getPhoneNumber(),
@@ -70,7 +72,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                                             }
 
                                             else -> {
-                                                if (dataContact.isFav == false) {
+                                                if (dataContact == null ||dataContact.isFav == false) {
                                                     saveContact(
                                                         phoneNumber = dataCaller.callerNumber,
                                                         sourceMobileNo = getPhoneNumber(),
@@ -132,11 +134,28 @@ class PhoneCallReceiver : BroadcastReceiver() {
             when (result) {
                 is Resource.Error -> {
                     Log.e("CallTracker : ", "CallTracker: Contact Not Saved")
+                    val data = UploadContact(serialNo = System.currentTimeMillis(),
+                        sourceMobileNo = sourceMobileNo,
+                        mobile = phoneNumber,
+                        name = name,
+                        type = UploadContactType.PENDING,
+                        apiPushed = false
+                        )
+                    databaseRepository.insertUpload(data)
                 }
 
                 is Resource.Loading -> {}
                 is Resource.Success -> {
                     Log.e("CallTracker : ", "CallTracker: Contact Saved")
+                    val data = UploadContact(
+                        serialNo = System.currentTimeMillis(),
+                        sourceMobileNo = sourceMobileNo,
+                        mobile = phoneNumber,
+                        name = name,
+                        type = UploadContactType.COMPLETE,
+                        apiPushed = true
+                    )
+                    databaseRepository.insertUpload(data)
                 }
             }
         }.launchIn(

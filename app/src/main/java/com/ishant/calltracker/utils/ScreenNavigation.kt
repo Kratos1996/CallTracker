@@ -11,6 +11,7 @@ import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.ishant.calltracker.ui.callupdatecenter.CallUploadCenterActivity
 import com.ishant.calltracker.ui.home.CallService
 import com.ishant.calltracker.ui.home.HomeActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
@@ -37,6 +38,10 @@ fun Context.navToRestrictContactActivity(){
 }
 fun Context.navToContactActivity(){
     val intent = Intent(this, ContactActivity::class.java)
+    startActivity(intent)
+}
+fun Context.navToUploadContactActivity(){
+    val intent = Intent(this, CallUploadCenterActivity::class.java)
     startActivity(intent)
 }
 

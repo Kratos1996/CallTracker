@@ -1,0 +1,56 @@
+package com.ishant.calltracker.ui.restricted
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import androidx.activity.viewModels
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.lifecycleScope
+import com.ishant.calltracker.R
+import com.ishant.calltracker.databinding.ActivityHomeBinding
+import com.ishant.calltracker.databinding.ActivityRestrictedContactBinding
+import com.ishant.calltracker.databinding.ContactActivityBinding
+import com.ishant.calltracker.ui.home.HomeViewModel
+import com.ishant.calltracker.ui.login.ui.login.LoginViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+
+@AndroidEntryPoint
+class ContactActivity : AppCompatActivity() {
+    private val viewModel by viewModels<HomeViewModel>()
+    private lateinit var binding: ContactActivityBinding
+    private lateinit var adapter: ContactAdapter
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ContactActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        viewModel.getContacts("")
+        adapter = ContactAdapter(this, 1, viewModel)
+        binding.ContactListRecycler.adapter = adapter
+        lifecycleScope.launch {
+            viewModel.contactListMutable.collectLatest { it ->
+                if (it.isNotEmpty()) {
+                    binding.emptyContact.visibility = View.GONE
+                    adapter.updateList(it)
+                } else {
+                    binding.emptyContact.visibility = View.VISIBLE
+                }
+            }
+        }
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+        binding.search.addTextChangedListener { search ->
+            when {
+                search.isNullOrEmpty() || search.isBlank() -> {
+                    viewModel.getContacts("")
+                }
+
+                search.isNotEmpty() -> {
+                    viewModel.getContacts(search.toString())
+                }
+            }
+        }
+    }
+}

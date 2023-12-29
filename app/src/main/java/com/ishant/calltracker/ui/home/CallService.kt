@@ -31,6 +31,7 @@ class CallService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

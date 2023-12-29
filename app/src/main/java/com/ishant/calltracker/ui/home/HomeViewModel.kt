@@ -7,6 +7,8 @@ import android.database.Cursor
 import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.ishant.calltracker.api.response.LoginResponse
@@ -21,7 +23,10 @@ import com.ishant.calltracker.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -33,14 +38,14 @@ class HomeViewModel  @Inject constructor(
      private var contactUseCase: ContactUseCase
 ) : AndroidViewModel(Application()) {
 
-    val contactListMutable = MutableStateFlow<List<ContactList>>(arrayListOf())
     val uploadContactListMutable = MutableStateFlow<List<UploadContact>>(arrayListOf())
     val isLoading = MutableStateFlow<Boolean>(false)
-    val restrictedContactList = MutableStateFlow<List<ContactList>>(arrayListOf())
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     var lastApiCall :String = UploadContactType.ALL
+
     fun loadContact(activity: Activity) {
         isLoading.value = true
-      viewModelScope.launch {
+        scope.launch {
             val resolver: ContentResolver = activity.contentResolver
             val cursor = resolver.query(
                 ContactsContract.Contacts.CONTENT_URI, null, null, null,
@@ -68,39 +73,39 @@ class HomeViewModel  @Inject constructor(
                                 phoneCursor.close()
                                 isLoading.value = false
                             }
-
                         }
-
                     }
                 }
             }
-
         }
     }
 
-    fun getRestrictedContacts(search:String){
-        viewModelScope.launch {
-            restrictedContactList.value = databaseRepository.getRestrictedDataList(search)
-        }
+    fun getRestrictedContacts(search:String): LiveData<List<ContactList>> {
+       return databaseRepository.getRestrictedDataList(search)
     }
 
-    fun getContacts(search:String){
-        viewModelScope.launch {
-            contactListMutable.value = databaseRepository.getContactList(search)
-        }
+    fun getContacts(search:String): LiveData<List<ContactList>> {
+        return databaseRepository.getContactList(search)
     }
 
     fun getUploadContactsList(type:String = UploadContactType.ALL){
-        viewModelScope.launch {
-            uploadContactListMutable.value = databaseRepository.getUploadContactList(type)
+        scope.launch {
+            databaseRepository.getUploadContactList(type).collectLatest {
+                uploadContactListMutable.value = it
+            }
         }
     }
 
     fun setRestrictedContact(phoneNumber: String, isRestricted: Boolean) {
-        viewModelScope.launch {
+        scope.launch {
             if(phoneNumber.isNotEmpty()) {
                 databaseRepository.setRestrictedContact(phoneNumber,isRestricted)
             }
+        }
+    }
+    fun updateUploadCall(serialNo:Long,type: String) {
+        scope.launch {
+            databaseRepository.updateUploadContact(serialNo,type)
         }
     }
 
@@ -112,14 +117,6 @@ class HomeViewModel  @Inject constructor(
             type = uploadContact.type).onEach { result ->
             when (result) {
                 is Resource.Error -> {
-                    val data = UploadContact(serialNo = System.currentTimeMillis(),
-                        sourceMobileNo = uploadContact.sourceMobileNo,
-                        mobile = uploadContact.mobile,
-                        name = uploadContact.name,
-                        type = UploadContactType.PENDING,
-                        apiPushed = false
-                    )
-                    databaseRepository.insertUpload(data)
                     isLoading.value = false
                     onMessage("Contact Data Not Saved on Server")
                 }
@@ -128,21 +125,16 @@ class HomeViewModel  @Inject constructor(
                     isLoading.value = true
                 }
                 is Resource.Success -> {
-                    val data = UploadContact(
-                        serialNo = System.currentTimeMillis(),
-                        sourceMobileNo = uploadContact.sourceMobileNo,
-                        mobile = uploadContact.mobile,
-                        name = uploadContact.name,
-                        type = UploadContactType.COMPLETE,
-                        apiPushed = true
-                    )
-                    databaseRepository.insertUpload(data)
+                    updateUploadCall(uploadContact.serialNo,UploadContactType.COMPLETE)
                     isLoading.value = false
                 }
             }
-        }.launchIn(
-            CoroutineScope(Dispatchers.Default)
-        )
+        }.launchIn(scope)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        scope.coroutineContext.cancelChildren()
     }
 
 

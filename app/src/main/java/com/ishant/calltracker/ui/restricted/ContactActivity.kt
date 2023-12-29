@@ -21,35 +21,45 @@ class ContactActivity : AppCompatActivity() {
     private val viewModel by viewModels<HomeViewModel>()
     private lateinit var binding: ContactActivityBinding
     private lateinit var adapter: ContactAdapter
+    private var searchStringData  =""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ContactActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel.getContacts("")
+        viewModel.loadContact(this)
         adapter = ContactAdapter(this, 1, viewModel)
         binding.ContactListRecycler.adapter = adapter
-        lifecycleScope.launch {
-            viewModel.contactListMutable.collectLatest { it ->
-                if (it.isNotEmpty()) {
-                    binding.emptyContact.visibility = View.GONE
-                    adapter.updateList(it)
-                } else {
-                    binding.emptyContact.visibility = View.VISIBLE
-                }
-            }
-        }
         binding.backBtn.setOnClickListener {
             finish()
         }
         binding.search.addTextChangedListener { search ->
             when {
                 search.isNullOrEmpty() || search.isBlank() -> {
-                    viewModel.getContacts("")
+                    observer("")
+                    searchStringData = ""
                 }
 
                 search.isNotEmpty() -> {
-                    viewModel.getContacts(search.toString())
+                    searchStringData = search.toString()
+                    observer(search.toString())
                 }
+            }
+        }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        observer(searchStringData)
+    }
+
+    private fun observer(searchString: String = "") {
+        viewModel.getContacts(searchString).observe(this) { it ->
+            if (it.isNotEmpty()) {
+                binding.emptyContact.visibility = View.GONE
+                adapter.updateList(it)
+            } else {
+                binding.emptyContact.visibility = View.VISIBLE
             }
         }
     }

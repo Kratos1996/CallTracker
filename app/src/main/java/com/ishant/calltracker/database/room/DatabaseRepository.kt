@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,14 +35,14 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
         db.getDao().deleteAllContacts()
     }
 
-    suspend fun getContactList(data:String):List<ContactList>{
+     fun getContactList(data:String):LiveData<List<ContactList>>{
         return if(data.isNotEmpty()){
             db.getDao().getContactList(data)
         }else{
             db.getDao().getContactList()
         }
     }
-    suspend fun getRestrictedDataList(data:String):List<ContactList>{
+     fun getRestrictedDataList(data:String): LiveData<List<ContactList>> {
         return if(data.isNotEmpty()){
             db.getDao().getAllRestrictedContacts(data,isFav = true)
         }else{
@@ -49,10 +50,13 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
         }
     }
 
-    suspend fun getUploadContactList(type:String):List<UploadContact>{
+     fun getUploadContactList(type:String):Flow<List<UploadContact>>{
         return when(type) {
             UploadContactType.ALL -> db.getDao().getUploadContactList()
             else ->  db.getDao().getUploadContactList(type = type)
         }
+    }
+    suspend fun updateUploadContact(serialNo:Long,type: String){
+        db.getDao().updateUploadContact(serialNo,type)
     }
 }

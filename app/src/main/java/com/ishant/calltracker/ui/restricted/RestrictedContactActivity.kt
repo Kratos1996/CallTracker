@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.ishant.calltracker.R
 import com.ishant.calltracker.databinding.ActivityHomeBinding
@@ -32,7 +33,6 @@ class RestrictedContactActivity : AppCompatActivity() {
         setContentView(binding.root)
         adapter = ContactAdapter(this, 2, viewModel)
         binding.allRestrictedContactListRecycler.adapter = adapter
-
         binding.addNewRestrictedBtn.setOnClickListener {
             navToContactActivity()
         }
@@ -44,9 +44,6 @@ class RestrictedContactActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-       // observers()
-        viewModel.getRestrictedContacts("")
-        viewModel.loadContact(this)
     }
 
     private fun observers() {
@@ -60,15 +57,13 @@ class RestrictedContactActivity : AppCompatActivity() {
                 }
             }
         }
-        lifecycleScope.launch {
-            viewModel.restrictedContactList.collectLatest { it ->
-                if (it.isNotEmpty()) {
-                    binding.emptyContact.visibility = View.GONE
-                    adapter.updateList(it)
-                } else {
-                    adapter.updateList(it)
-                    binding.emptyContact.visibility = View.VISIBLE
-                }
+        viewModel.getRestrictedContacts("").observe(this) {
+            if (it.isNotEmpty()) {
+                binding.emptyContact.visibility = View.GONE
+                adapter.updateList(it)
+            } else {
+                adapter.updateList(it)
+                binding.emptyContact.visibility = View.VISIBLE
             }
         }
     }

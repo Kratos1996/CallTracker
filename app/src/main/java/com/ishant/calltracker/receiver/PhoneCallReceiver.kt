@@ -139,7 +139,6 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         mobile = phoneNumber,
                         name = name,
                         type = UploadContactType.PENDING,
-                        apiPushed = false
                         )
                     databaseRepository.insertUpload(data)
                 }
@@ -152,8 +151,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         sourceMobileNo = sourceMobileNo,
                         mobile = phoneNumber,
                         name = name,
-                        type = UploadContactType.COMPLETE,
-                        apiPushed = true
+                        type = UploadContactType.COMPLETE
                     )
                     databaseRepository.insertUpload(data)
                 }

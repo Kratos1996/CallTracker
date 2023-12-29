@@ -21,14 +21,14 @@ interface CallTrackerDao {
     }
 
     @Query("Select * From ContactList where name Like '%' || :data || '%' ")
-    suspend fun getContactList(data:String):List<ContactList>
+    fun getContactList(data:String):LiveData<List<ContactList>>
 
     @Query("Select * From ContactList")
-    suspend fun getContactList():List<ContactList>
+    fun getContactList():LiveData<List<ContactList>>
 
 
     @Query("Select * From ContactList where name Like '%' || :data || '%' and isFav=:isFav ")
-    suspend fun getAllRestrictedContacts(data:String,isFav:Boolean ):List<ContactList>
+    fun getAllRestrictedContacts(data:String,isFav:Boolean ):LiveData<List<ContactList>>
 
     @Query("Delete From ContactList")
     suspend fun deleteAllContacts()
@@ -44,11 +44,14 @@ interface CallTrackerDao {
     suspend fun setContactRestricted(phone:String,isFav:Boolean):Int
 
     @Query("Select * From ContactList Where isFav=:isFav")
-     suspend fun getAllRestrictedContacts(isFav:Boolean):List<ContactList>
+    fun getAllRestrictedContacts(isFav:Boolean):LiveData<List<ContactList>>
 
     @Query("Select * From UploadContact")
-    suspend fun getUploadContactList():List<UploadContact>
+    fun getUploadContactList():Flow<List<UploadContact>>
 
     @Query("Select * From UploadContact where type Like '%' || :type")
-    suspend fun getUploadContactList(type :String):List<UploadContact>
+    fun getUploadContactList(type :String):Flow<List<UploadContact>>
+
+    @Query("Update UploadContact set type=:type Where serialNo=:serialNo")
+    suspend fun updateUploadContact(serialNo:Long,type :String):Int
 }

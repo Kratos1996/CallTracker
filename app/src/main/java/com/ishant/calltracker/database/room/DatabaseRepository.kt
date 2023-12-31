@@ -32,7 +32,7 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
     }
 
     suspend fun setRestrictedContact(phone:String,isFav:Boolean){
-        val int = db.getDao().setContactRestricted(phone, isFav)
+        db.getDao().setContactRestricted(phone, isFav)
     }
 
     suspend fun deleteAll() {

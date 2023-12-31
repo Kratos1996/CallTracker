@@ -12,6 +12,7 @@ import com.ishant.calltracker.databinding.ActivityRestrictedContactBinding
 import com.ishant.calltracker.databinding.ContactActivityBinding
 import com.ishant.calltracker.ui.home.HomeViewModel
 import com.ishant.calltracker.ui.login.ui.login.LoginViewModel
+import com.ishant.calltracker.utils.navToSaveContactActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -26,12 +27,15 @@ class ContactActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ContactActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel.loadContact(this)
         adapter = ContactAdapter(this, 1, viewModel)
         binding.ContactListRecycler.adapter = adapter
         binding.backBtn.setOnClickListener {
             finish()
         }
+        binding.addContact.setOnClickListener {
+            navToSaveContactActivity()
+        }
+
         binding.search.addTextChangedListener { search ->
             when {
                 search.isNullOrEmpty() || search.isBlank() -> {
@@ -44,6 +48,9 @@ class ContactActivity : AppCompatActivity() {
                     observer(search.toString())
                 }
             }
+        }
+        binding.refresh.setOnClickListener {
+            observer(searchStringData)
         }
 
     }
@@ -59,6 +66,7 @@ class ContactActivity : AppCompatActivity() {
                 binding.emptyContact.visibility = View.GONE
                 adapter.updateList(it)
             } else {
+                adapter.updateList(it)
                 binding.emptyContact.visibility = View.VISIBLE
             }
         }

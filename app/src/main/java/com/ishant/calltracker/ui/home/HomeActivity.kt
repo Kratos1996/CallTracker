@@ -4,15 +4,19 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.google.gson.Gson
 import com.ishant.calltracker.R
 import com.ishant.calltracker.databinding.ActivityHomeBinding
+import com.ishant.calltracker.receiver.ContactObserver
+import com.ishant.calltracker.service.CallService
+import com.ishant.calltracker.service.ContactSyncService
+import com.ishant.calltracker.service.ContactUpdateOnServer
+import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.addAutoStartup
@@ -23,6 +27,7 @@ import com.ishant.calltracker.utils.readPhoneContactPermission
 import com.ishant.calltracker.utils.readPhoneLogPermission
 import com.ishant.calltracker.utils.readPhoneNumberPermission
 import com.ishant.calltracker.utils.readPhoneStatePermission
+import com.ishant.calltracker.utils.serviceContactUploadRestarter
 import com.ishant.calltracker.utils.showCommonDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -33,10 +38,13 @@ class HomeActivity : AppCompatActivity() {
     @Inject
     lateinit var managerPlus: TelephonyManagerPlus
     private lateinit var binding: ActivityHomeBinding
+    private lateinit var autoUpdateContactObserver : ContactObserver
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding =ActivityHomeBinding.inflate(layoutInflater)
+        binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        autoUpdateContactObserver =  ContactObserver(this , Handler())
+        autoUpdateContactObserver.registerObserver()
         addAutoStartup()
         binding.name.text = AppPreference.user.name?:""
         binding.emailName.text = AppPreference.user.email?:""
@@ -53,6 +61,11 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        autoUpdateContactObserver.unregisterObserver()
+    }
+
     override fun onResume() {
         super.onResume()
         takeCallLogsPermission()
@@ -61,9 +74,13 @@ class HomeActivity : AppCompatActivity() {
     private fun takePhoneNetworkPermission() {
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
-             loadUi()
+               // binding.uploadCallonApi.visibility = View.VISIBLE
+                binding.addToRestrictedBtn.visibility = View.VISIBLE
+                loadUi()
+                startService(Intent(this, ServiceRestarterService::class.java))
             }) {
                 binding.phoneCallLogsPermission.visibility = View.VISIBLE
+
             }
         }) {
             binding.phoneStatePermission.visibility = View.VISIBLE
@@ -78,64 +95,18 @@ class HomeActivity : AppCompatActivity() {
                 binding.simEmptyView.visibility = View.VISIBLE
                 binding.dualSimUi.visibility = View.GONE
                 binding.singleSimUi.visibility = View.GONE
-            } else  {
-               /* binding.simEmptyView.visibility = View.GONE
-                binding.dualSimUi.visibility = View.GONE
-                binding.singleSimUi.visibility = View.VISIBLE
-                binding.careerName.text = "Carrier : ${data[0].carrierName} "
-                binding.simNumber.text = "SIM No  : ${data[0].phoneNumber} "*/
             }
-            /*else {
-                binding.simEmptyView.visibility = View.GONE
-                binding.dualSimUi.visibility = View.VISIBLE
-                binding.singleSimUi.visibility = View.GONE
-                binding.sim1careerName.text = "${data[0].carrierName}"
-                binding.sim1Number.text = "${data[0].phoneNumber}"
-                binding.sim2careerName.text = " ${data[1].carrierName}"
-                binding.sim2Number.text = "${data[1].phoneNumber}"
-                if (AppPreference.isSim1Selected) {
-                    binding.sim1Image.setImageResource(R.drawable.sim_card_selected)
-                } else {
-                    binding.sim1Image.setImageResource(R.drawable.sim_card_not_seletced)
-                }
-                if (AppPreference.isSim2Selected) {
-                    binding.sim2Image.setImageResource(R.drawable.sim_card_selected)
-                } else {
-                    binding.sim2Image.setImageResource(R.drawable.sim_card_not_seletced)
-                }
-                binding.sim1Image.setOnClickListener {
-                    if (AppPreference.isSim1Selected) {
-                        AppPreference.isSim1Selected = false
-                        binding.sim1Image.setImageResource(R.drawable.sim_card_not_seletced)
-                    } else {
-                        AppPreference.isSim1Selected = true
-                        binding.sim1Image.setImageResource(R.drawable.sim_card_selected)
-                    }
-                }
-
-                binding.sim2Image.setOnClickListener {
-                    if (!AppPreference.isSim2Selected) {
-                        AppPreference.isSim2Selected = true
-                        binding.sim2Image.setImageResource(R.drawable.sim_card_selected)
-                    } else {
-                        AppPreference.isSim2Selected = false
-                        binding.sim2Image.setImageResource(R.drawable.sim_card_not_seletced)
-                    }
-                }
-            }*/
         }
         else{
-            Log.e("CallTracker ", "telemanager is empty")
             binding.phoneStatePermission.visibility = View.VISIBLE
             binding.phoneCallLogsPermission.visibility = View.VISIBLE
         }
         AppPreference.simManager = TelePhoneManager(data)
-        /*val intent = Intent(this, CallService::class.java)
-        startService(intent)*/
         binding.addToRestrictedBtn.setOnClickListener {
             navToRestrictContactActivity()
         }
         binding.uploadCallonApi.setOnClickListener {
+            startService(Intent(this, ServiceRestarterService::class.java))
             navToUploadContactActivity()
         }
     }
@@ -143,11 +114,12 @@ class HomeActivity : AppCompatActivity() {
     private fun takeCallLogsPermission(){
         readPhoneContactPermission(
             granted = {
-                binding.addToRestrictedBtn.visibility = View.VISIBLE
+                startService(Intent(this,ContactSyncService::class.java))
                 readPhoneLogPermission(granted = {
                     binding.phoneCallLogsPermission.visibility = View.GONE
                     takePhoneNetworkPermission()
                 }){
+
                     binding.phoneCallLogsPermission.visibility = View.VISIBLE
                 }
             }
@@ -158,43 +130,4 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
-    private fun startService() {
-        requestOverLayPermissions()
-    }
-
-    private fun requestOverLayPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            showCommonDialog(title = getString(R.string.required_permission),message = getString(R.string.over_lay_permission),this){
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + packageName)
-                )
-                startActivityForResult(intent, 1996)
-            }
-
-
-        } else {
-            val intent = Intent(this, CallService::class.java)
-            startService(intent)
-        }
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        // results of permission checks
-        when (requestCode) {
-            1996 -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (Settings.canDrawOverlays(this)) {
-                        val intent = Intent(this, CallService::class.java)
-                        startService(intent)
-                    }
-                }
-
-            }
-
-            else -> {
-            }
-        }
-    }
 }

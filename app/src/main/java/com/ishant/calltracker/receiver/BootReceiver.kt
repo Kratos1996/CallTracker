@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.ishant.calltracker.ui.home.CallService
+import com.ishant.calltracker.service.CallService
 
 class BootReceiver : BroadcastReceiver() {
 

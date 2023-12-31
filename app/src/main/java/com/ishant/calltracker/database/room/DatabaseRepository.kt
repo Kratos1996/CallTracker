@@ -14,6 +14,10 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
         if(contact.phoneNumber.isNotEmpty())
              db.getDao().insert(contact)
     }
+    suspend fun insertContact(contacts: List<ContactList>) {
+        if(contacts.isNotEmpty())
+            db.getDao().insert(contacts)
+    }
 
     suspend fun insertUpload(uploadContact: UploadContact) {
             db.getDao().insertUploadContact(uploadContact)
@@ -33,6 +37,7 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
 
     suspend fun deleteAll() {
         db.getDao().deleteAllContacts()
+        db.getDao().deleteAllUploadedContacts()
     }
 
      fun getContactList(data:String):LiveData<List<ContactList>>{

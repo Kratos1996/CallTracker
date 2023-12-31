@@ -7,6 +7,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.ishant.calltracker.R
+import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.UploadContact
 import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.databinding.ActivityCallUploadCenterBinding
@@ -71,7 +72,6 @@ class CallUploadCenterActivity : AppCompatActivity() {
             binding.complete.setTextColor(resources.getColor(R.color.black))
             binding.All.setBackgroundResource(R.drawable.fill_main_white_btn)
             binding.All.setTextColor(resources.getColor(R.color.black))
-
         }
         lifecycleScope.launch {
             viewModel.uploadContactListMutable.collectLatest { it ->
@@ -84,12 +84,19 @@ class CallUploadCenterActivity : AppCompatActivity() {
                 }
             }
         }
-        lifecycleScope.launch(Dispatchers.Main) {
+        viewModel.scopeMain.launch {
             viewModel.isLoading.collectLatest {
                 if(it){
                     showLoadingDialog(this@CallUploadCenterActivity, progressDialog).show()
                 }else{
                     showLoadingDialog(this@CallUploadCenterActivity, progressDialog).hide()
+                }
+            }
+        }
+        viewModel.scopeMain.launch {
+            CallTrackerApplication.isRefreshUi.collectLatest {
+                if(it){
+                    refresh()
                 }
             }
         }

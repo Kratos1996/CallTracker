@@ -36,4 +36,7 @@
     <string name="completed">Completed</string>
     <string name="source_name">Source Name :</string>
     <string name="source_mobile">Source Mobile :</string>
+    <string name="saveContact">Save Contact</string>
+    <string name="name">Name</string>
+    <string name="isRistrictedContact">Please Check if this is Your Restricted Contact</string>
 </resources>

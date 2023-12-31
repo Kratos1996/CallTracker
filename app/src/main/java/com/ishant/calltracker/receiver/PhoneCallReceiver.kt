@@ -3,25 +3,17 @@ package com.ishant.calltracker.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.provider.CallLog
-import android.telephony.PhoneStateListener
-import android.telephony.SubscriptionInfo
-import android.telephony.SubscriptionManager
 /*Ishant Sharma*/
 import android.telephony.TelephonyManager
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
+import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
 import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
-import com.ishant.calltracker.ui.home.CallService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Utils
-import com.ishant.calltracker.utils.navToCallService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -141,6 +133,9 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         type = UploadContactType.PENDING,
                         )
                     databaseRepository.insertUpload(data)
+                    CallTrackerApplication.isRefreshUi.value = true
+                    delay(500)
+                    CallTrackerApplication.isRefreshUi.value = false
                 }
 
                 is Resource.Loading -> {}
@@ -154,10 +149,14 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         type = UploadContactType.COMPLETE
                     )
                     databaseRepository.insertUpload(data)
+                    delay(500)
+                    CallTrackerApplication.isRefreshUi.value = true
+                    delay(500)
+                    CallTrackerApplication.isRefreshUi.value = false
                 }
             }
         }.launchIn(
-            CoroutineScope(Dispatchers.Default)
+            CoroutineScope(Dispatchers.Main)
         )
     }
 }

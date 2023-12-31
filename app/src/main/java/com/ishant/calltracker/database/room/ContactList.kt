@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class ContactList(
     @PrimaryKey(autoGenerate = false)
+    @NonNull var contactId: String,
     @NonNull var phoneNumber: String,
     @ColumnInfo var name: String? = null,
     @ColumnInfo var isFav: Boolean? = false

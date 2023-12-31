@@ -54,4 +54,7 @@ interface CallTrackerDao {
 
     @Query("Update UploadContact set type=:type Where serialNo=:serialNo")
     suspend fun updateUploadContact(serialNo:Long,type :String):Int
+
+    @Query("Delete From UploadContact")
+    suspend fun deleteAllUploadedContacts()
 }

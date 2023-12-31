@@ -20,20 +20,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorAccent"
             android:elevation="10dp"
+            android:weightSum="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/backBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".8"
                 android:layout_height="wrap_content"
                 android:paddingVertical="16dp"
                 android:paddingStart="16dp"
@@ -43,7 +44,29 @@
                 android:textStyle="bold"
                 app:drawableLeftCompat="@drawable/back"
                 tools:ignore="RtlSymmetry" />
+            <ImageView
+                android:id="@+id/addContact"
+                android:layout_width="0dp"
+                android:layout_weight=".1"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:src="@drawable/add_new_contact"
+                />
+            <ImageView
+                android:id="@+id/refresh"
+                android:layout_width="0dp"
+                android:layout_weight=".1"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:src="@drawable/baseline_refresh_24"
+                />
         </LinearLayout>
+
+
         <EditText
             android:id="@+id/search"
             style="@style/btnOutline"

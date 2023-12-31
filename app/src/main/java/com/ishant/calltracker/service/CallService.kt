@@ -1,4 +1,4 @@
-package com.ishant.calltracker.ui.home
+package com.ishant.calltracker.service
 
 import android.app.Service
 import android.content.Context

@@ -10,11 +10,13 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.ishant.calltracker.ui.callupdatecenter.CallUploadCenterActivity
-import com.ishant.calltracker.ui.home.CallService
+import com.ishant.calltracker.service.CallService
+import com.ishant.calltracker.service.ContactUpdateOnServer
+import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.home.HomeActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
+import com.ishant.calltracker.ui.restricted.AddNewContact
 import com.ishant.calltracker.ui.restricted.ContactActivity
 import com.ishant.calltracker.ui.restricted.RestrictedContactActivity
 
@@ -43,6 +45,16 @@ fun Context.navToContactActivity(){
 fun Context.navToUploadContactActivity(){
     val intent = Intent(this, CallUploadCenterActivity::class.java)
     startActivity(intent)
+}
+fun Context.navToSaveContactActivity(){
+    val intent = Intent(this, AddNewContact::class.java)
+    startActivity(intent)
+}
+fun Context.serviceContactUploadRestarter(){
+    startService(Intent(this, ServiceRestarterService::class.java))
+}
+fun Context.stopServiceContactUpload(){
+    stopService(Intent(this, ContactUpdateOnServer::class.java))
 }
 
 fun Context.navToSetting(activity: AppCompatActivity){

@@ -44,6 +44,7 @@ class RestrictedContactActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        observers()
     }
 
     private fun observers() {

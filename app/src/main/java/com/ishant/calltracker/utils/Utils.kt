@@ -178,12 +178,6 @@ internal object Utils {
         }
     }
 
-    fun Context.toast(message:String){
-        if(message.isNotEmpty())
-        Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
-    }
-
-
 
     internal interface CellLocationType {
         companion object {

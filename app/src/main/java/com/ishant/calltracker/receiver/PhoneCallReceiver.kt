@@ -46,7 +46,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                                 val callerData = data.collectLastCallDetails(context)
                                 callerData.collectLatest { dataCaller ->
                                     if (dataCaller != null) {
-                                        val dataContact  =  databaseRepository.getRestrictedContact(phone = dataCaller.callerNumber, isFav = true)
+                                        val dataContact  =  databaseRepository.getRestrictedContact(phone = Utils.extractLast10Digits(dataCaller.callerNumber), isFav = true)
                                         when (dataCaller.callType) {
                                             "Unknown" -> {
                                                 Log.e(

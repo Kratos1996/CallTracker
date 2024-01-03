@@ -70,7 +70,7 @@ class HomeActivity : AppCompatActivity() {
                 binding.uploadCallonApi.visibility = View.VISIBLE
                 binding.addToRestrictedBtn.visibility = View.VISIBLE
                 loadUi()
-               serviceContact()
+               //serviceContact()
             }) {
                 binding.phoneCallLogsPermission.visibility = View.VISIBLE
 
@@ -107,7 +107,7 @@ class HomeActivity : AppCompatActivity() {
     private fun takeCallLogsPermission(){
         readPhoneContactPermission(
             granted = {
-                serviceContact()
+                //serviceContact()
                 readPhoneLogPermission(granted = {
                     binding.phoneCallLogsPermission.visibility = View.GONE
                     takePhoneNetworkPermission()

@@ -5,6 +5,9 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.database.Cursor
 import android.provider.ContactsContract
+import android.util.Log
+import com.google.gson.Gson
+import com.wabblaster.wabblasterai.app.CallTrackerApplication.Companion.contactLoading
 import com.wabblaster.wabblasterai.database.room.ContactList
 import com.wabblaster.wabblasterai.database.room.DatabaseRepository
 import com.wabblaster.wabblasterai.utils.Utils
@@ -13,7 +16,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,41 +32,56 @@ class ContactSyncService : IntentService("ContactSyncService") {
 
     @Deprecated("Deprecated in Java")
     override fun onHandleIntent(intent: Intent?) {
-        val contacts = fetchContacts()
-        saveContactsToDatabase(contacts)
+       fetchContacts()
+
     }
 
-    private fun fetchContacts(): List<ContactList> {
-        val contacts = mutableListOf<ContactList>()
-        val contentResolver: ContentResolver = applicationContext.contentResolver
-        val cursor: Cursor? = contentResolver.query(
-            ContactsContract.Contacts.CONTENT_URI,
-            null,
-            null,
-            null,
-            null
-        )
-        cursor?.use {
-            while (it.moveToNext()) {
-                val hasPhoneNumber = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER)).toInt()
-                val contactId = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
-                val name = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY))
-                if (hasPhoneNumber > 0) {
-                    val phoneNumbers = getPhoneNumbersForContact(contactId)
-                    if (phoneNumbers.isNotEmpty())
-                        contacts.add(ContactList(
+    private fun fetchContacts() {
+        Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ContactService >loading contact")
+        scope.launch {
+            contactLoading.value = true
+            val contacts = mutableListOf<ContactList>()
+            val contentResolver: ContentResolver = applicationContext.contentResolver
+            val cursor: Cursor? = contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+            )
+            cursor?.use {
+                while (it.moveToNext()) {
+                    val hasPhoneNumber = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER)).toInt()
+                    val contactId = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                    val name = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY))
+                    if (hasPhoneNumber > 0) {
+                        val phoneNumbers = getPhoneNumbersForContact(contactId)
+                        if (phoneNumbers.isNotEmpty()) {
+                            val dataContact = ContactList(
                                 contactId = contactId,
                                 name = name,
                                 phoneNumber = phoneNumbers[0],
                                 isFav = false
                             )
-                        )
+                            contacts.add(dataContact)
+                            saveContactsToDatabase(dataContact)
+                        }
+                    }
                 }
+
             }
+            closedContactService()
+            cursor?.close()
         }
-        cursor?.close()
-        this@ContactSyncService.stopServiceContact()
-        return contacts
+    }
+
+    private fun closedContactService() {
+        scope.launch {
+            delay(2000)
+            contactLoading.value = false
+        }
+
+       // this@ContactSyncService.stopServiceContact()
     }
 
     private fun getPhoneNumbersForContact(contactId: String): List<String> {
@@ -90,6 +110,16 @@ class ContactSyncService : IntentService("ContactSyncService") {
            databaseRepository.insertContact(contacts)
         }
     }
+    private  fun saveContactsToDatabase(contacts: ContactList) {
+        scope.launch {
+            databaseRepository.insertContact(contacts)
+        }
+        Log.e(
+            ServiceRestarterService.TAG,
+            "CallTracker : Service > ContactService >Contact Saved ${Gson().toJson(contacts)}"
+        )
+    }
+
 
     @Deprecated("Deprecated in Java")
     override fun onDestroy() {

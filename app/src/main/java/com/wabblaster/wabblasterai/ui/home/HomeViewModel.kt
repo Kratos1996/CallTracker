@@ -9,6 +9,7 @@ import com.wabblaster.wabblasterai.database.room.UploadContact
 import com.wabblaster.wabblasterai.database.room.UploadContactType
 import com.wabblaster.wabblasterai.domain.ContactUseCase
 import com.wabblaster.wabblasterai.network.Resource
+import com.wabblaster.wabblasterai.utils.DBResponse
 import com.wabblaster.wabblasterai.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
@@ -29,7 +31,9 @@ class HomeViewModel  @Inject constructor(
      private var contactUseCase: ContactUseCase
 ) : AndroidViewModel(Application()) {
 
+
     val uploadContactListMutable = MutableStateFlow<List<UploadContact>>(arrayListOf())
+    val contactListMutable = MutableStateFlow<DBResponse<List<ContactList>>>(DBResponse.Empty)
     val isLoading = MutableStateFlow<Boolean>(false)
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val scopeMain = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -39,8 +43,17 @@ class HomeViewModel  @Inject constructor(
        return databaseRepository.getRestrictedDataList(search)
     }
 
-    fun getContacts(search:String): LiveData<List<ContactList>> {
-        return databaseRepository.getContactList(search)
+    fun getContacts(search:String) {
+        contactListMutable.value =  DBResponse.Loading(true)
+         databaseRepository.getContactList(search).onEach { result ->
+             if(result.isEmpty()){
+                 contactListMutable.value =  DBResponse.Loading(false)
+                 contactListMutable.value = DBResponse.Message("No Contacts Found")
+             }else{
+                 contactListMutable.value =  DBResponse.Loading(false)
+                 contactListMutable.value = DBResponse.Success(result)
+             }
+         }.launchIn(scope)
     }
 
     fun getUploadContactsList(type:String = UploadContactType.ALL){
@@ -102,8 +115,6 @@ class HomeViewModel  @Inject constructor(
             delay(2000)
             isLoading.value = false
         }
-
-
     }
 
 

@@ -37,7 +37,7 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
         db.getDao().deleteAllUploadedContacts()
     }
 
-     fun getContactList(data:String):LiveData<List<ContactList>>{
+     fun getContactList(data:String):Flow<List<ContactList>>{
         return if(data.isNotEmpty()){
             db.getDao().getContactList(data)
         }else{

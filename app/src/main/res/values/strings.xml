@@ -28,7 +28,7 @@
     <string name="add_to_restricted_contact">Add To Restricted Contact.</string>
     <string name="search">Search\n</string>
     <string name="restricted_contact">Restricted Contacts</string>
-    <string name="no_contacts_found">No Data Available</string>
+    <string name="no_contacts_found">Data Not Available!</string>
     <string name="contact">Contacts</string>
     <string name="uploadCallsOnServer">Call uploaded on server</string>
     <string name="all">All </string>

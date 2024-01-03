@@ -21,10 +21,10 @@ interface CallTrackerDao {
     }
 
     @Query("Select * From ContactList where name Like '%' || :data || '%' ")
-    fun getContactList(data:String):LiveData<List<ContactList>>
+    fun getContactList(data:String):Flow<List<ContactList>>
 
     @Query("Select * From ContactList")
-    fun getContactList():LiveData<List<ContactList>>
+    fun getContactList():Flow<List<ContactList>>
 
 
     @Query("Select * From ContactList where name Like '%' || :data || '%' and isFav=:isFav ")

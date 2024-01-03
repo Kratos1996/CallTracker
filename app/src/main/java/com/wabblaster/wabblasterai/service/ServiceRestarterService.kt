@@ -39,7 +39,7 @@ class ServiceRestarterService : Service() {
         }
         if (!isServiceRunning(ContactSyncService::class.java)) { // Replace with your service class
             Log.e(TAG, "CallTracker : Service > ServiceRestarterService > ContactServiceRestart ")
-            serviceContact()
+          //  serviceContact()
         }
         // Schedule periodic checking
         scheduleServiceCheck()

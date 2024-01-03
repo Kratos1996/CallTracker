@@ -7,8 +7,10 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import com.wabblaster.wabblasterai.app.CallTrackerApplication
 import com.wabblaster.wabblasterai.databinding.ContactActivityBinding
 import com.wabblaster.wabblasterai.ui.home.HomeViewModel
+import com.wabblaster.wabblasterai.utils.DBResponse
 import com.wabblaster.wabblasterai.utils.navToSaveContactActivity
 import com.wabblaster.wabblasterai.utils.serviceContact
 import com.wabblaster.wabblasterai.utils.showLoadingDialog
@@ -26,6 +28,7 @@ class ContactActivity : AppCompatActivity() {
     private var searchStringData  =""
     @Inject
     lateinit var progressDialog: Dialog
+    private var  isFirstTime = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ContactActivityBinding.inflate(layoutInflater)
@@ -35,6 +38,7 @@ class ContactActivity : AppCompatActivity() {
         binding.backBtn.setOnClickListener {
             finish()
         }
+       // observer(searchStringData)
         binding.addContact.setOnClickListener {
             navToSaveContactActivity()
         }
@@ -42,48 +46,73 @@ class ContactActivity : AppCompatActivity() {
         binding.search.addTextChangedListener { search ->
             when {
                 search.isNullOrEmpty() || search.isBlank() -> {
-                    observer("")
+                    searchContact("")
                     searchStringData = ""
                 }
 
                 search.isNotEmpty() -> {
                     searchStringData = search.toString()
-                    observer(search.toString())
+                    searchContact(search.toString())
                 }
             }
         }
         binding.refresh.setOnClickListener {
             serviceContact()
-            viewModel.startGettingContact {
-                observer(searchStringData)
-            }
         }
+        observer()
 
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.isLoading.collectLatest {
-                if(it){
-                    showLoadingDialog(this@ContactActivity, progressDialog).show()
-                }else{
-                    showLoadingDialog(this@ContactActivity, progressDialog).hide()
-                }
-            }
-        }
     }
 
     override fun onResume() {
         super.onResume()
-        observer(searchStringData)
+        searchContact(searchStringData)
     }
 
-    private fun observer(searchString: String = "") {
-        viewModel.getContacts(searchString).observe(this) { it ->
-            if (it.isNotEmpty()) {
-                binding.emptyContact.visibility = View.GONE
-                adapter.updateList(it)
-            } else {
-                adapter.updateList(it)
-                binding.emptyContact.visibility = View.VISIBLE
+    private fun searchContact(searchString: String = "") {
+        viewModel.getContacts(searchString)
+    }
+    private fun observer(){
+        lifecycleScope.launch {
+            viewModel.contactListMutable.collectLatest {result ->
+                when(result){
+                    DBResponse.Empty -> {
+                        binding.emptyContact.text = "Your Contacts is Loading..."
+                        binding.emptyContact.visibility = View.VISIBLE
+                    }
+                    is DBResponse.Loading -> {
+                        showLoadingDialog(this@ContactActivity, progressDialog).show()
+                    }
+                    is DBResponse.Message -> {
+                        showLoadingDialog(this@ContactActivity, progressDialog).hide()
+                        binding.emptyContact.text = result.message
+                        binding.emptyContact.visibility = View.VISIBLE
+                        adapter.updateList(arrayListOf())
+                        if(isFirstTime){
+                            binding.emptyContact.text = "Your Contacts is Loading..."
+                            isFirstTime = false
+                            serviceContact()
+                        }
+                    }
+                    is DBResponse.Success -> {
+                        isFirstTime = false
+                        binding.emptyContact.visibility = View.GONE
+                        showLoadingDialog(this@ContactActivity, progressDialog).hide()
+                        adapter.updateList(result.response?: arrayListOf())
+                    }
+                }
+
             }
         }
+        lifecycleScope.launch(Dispatchers.Main) {
+            CallTrackerApplication.contactLoading.collectLatest {
+                if(it){
+                    showLoadingDialog(this@ContactActivity, progressDialog).show()
+                }else{
+                    searchContact(searchStringData)
+                    showLoadingDialog(this@ContactActivity, progressDialog).hide()
+                }
+            }
+        }
+
     }
 }

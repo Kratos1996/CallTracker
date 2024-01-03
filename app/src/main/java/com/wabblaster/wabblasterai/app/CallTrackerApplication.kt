@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class CallTrackerApplication  : Application(){
     companion object{
         val isRefreshUi = MutableStateFlow<Boolean>(false)
+        val contactLoading = MutableStateFlow<Boolean>(false)
     }
     override fun onCreate() {
         super.onCreate()

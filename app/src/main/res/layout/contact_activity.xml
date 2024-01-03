@@ -70,6 +70,7 @@
         <EditText
             android:id="@+id/search"
             style="@style/btnOutline"
+            android:maxLines="1"
             android:hint="@string/search" />
 
             <androidx.recyclerview.widget.RecyclerView

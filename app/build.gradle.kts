@@ -13,11 +13,11 @@ hilt {
     enableExperimentalClasspathAggregation = true
 }
 android {
-    namespace = "com.ishant.calltracker"
+    namespace = "com.wabblaster.wabblasterai"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ishant.calltracker"
+        applicationId = "com.wabblaster.wabblasterai"
         minSdk = 25
         targetSdk = 34
         versionCode = 1

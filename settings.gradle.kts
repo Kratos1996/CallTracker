@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CallTracker"
+rootProject.name = "WabBlasterAi"
 include(":app")
  

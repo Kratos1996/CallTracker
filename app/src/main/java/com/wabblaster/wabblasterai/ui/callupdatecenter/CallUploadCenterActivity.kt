@@ -99,6 +99,7 @@ class CallUploadCenterActivity : AppCompatActivity() {
             CallTrackerApplication.isRefreshUi.collectLatest {
                 if(it){
                     refresh()
+                    CallTrackerApplication.isRefreshUi.value = false
                 }
             }
         }

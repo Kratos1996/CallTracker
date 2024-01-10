@@ -37,43 +37,51 @@ class PhoneCallReceiver : BroadcastReceiver() {
         if (intent?.action == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
             when (intent.getStringExtra(TelephonyManager.EXTRA_STATE)) {
                 TelephonyManager.EXTRA_STATE_IDLE -> {
-                    if (AppPreference.isUserLoggedIn) {
-                        val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
-                        if (phoneNumber != null) {
-                            val data = LastCallDetailsCollector()
-                            CoroutineScope(Dispatchers.IO).launch {
-                                delay(2000)
-                                val callerData = data.collectLastCallDetails(context)
-                                callerData.collectLatest { dataCaller ->
-                                    if (dataCaller != null) {
-                                        val dataContact  =  databaseRepository.getRestrictedContact(phone = Utils.extractLast10Digits(dataCaller.callerNumber), isFav = true)
-                                        when (dataCaller.callType) {
-                                            "Unknown" -> {
-                                                Log.e(
-                                                    "CallTracker : ",
-                                                    "Call Tracker CallEnded ${dataCaller.callerNumber}"
-                                                )
-                                                if(dataContact == null || dataContact.isFav == false) {
-                                                    saveContact(
-                                                        phoneNumber = dataCaller.callerNumber,
-                                                        sourceMobileNo = getPhoneNumber(),
-                                                        name = dataCaller.callerName ?: "Unknown",
-                                                        type = "Call Ended without Pickup"
-                                                    )
-                                                }
-                                            }
+                    handleCallData(intent, context)
+                }
+            }
+        }
 
-                                            else -> {
-                                                if (dataContact == null ||dataContact.isFav == false) {
-                                                    saveContact(
-                                                        phoneNumber = dataCaller.callerNumber,
-                                                        sourceMobileNo = getPhoneNumber(),
-                                                        name = dataCaller.callerName ?: "Unknown",
-                                                        type = dataCaller.callType
-                                                    )
-                                                }
-                                            }
-                                        }
+    }
+
+    private fun handleCallData(intent: Intent, context: Context) {
+        if (AppPreference.isUserLoggedIn) {
+            val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
+            if (phoneNumber != null) {
+                val data = LastCallDetailsCollector()
+                CoroutineScope(Dispatchers.IO).launch {
+                    delay(2000)
+                    val callerData = data.collectLastCallDetails(context)
+                    callerData.collectLatest { dataCaller ->
+                        if (dataCaller != null) {
+                            val dataContact = databaseRepository.getRestrictedContact(
+                                phone = Utils.extractLast10Digits(dataCaller.callerNumber),
+                                isFav = true
+                            )
+                            when (dataCaller.callType) {
+                                "Unknown" -> {
+                                    Log.e(
+                                        "CallTracker : ",
+                                        "Call Tracker CallEnded ${dataCaller.callerNumber}"
+                                    )
+                                    if (dataContact == null || dataContact.isFav == false) {
+                                        saveContact(
+                                            phoneNumber = dataCaller.callerNumber,
+                                            sourceMobileNo = getPhoneNumber(),
+                                            name = dataCaller.callerName ?: "Unknown",
+                                            type = "Call Ended without Pickup"
+                                        )
+                                    }
+                                }
+
+                                else -> {
+                                    if (dataContact == null || dataContact.isFav == false) {
+                                        saveContact(
+                                            phoneNumber = dataCaller.callerNumber,
+                                            sourceMobileNo = getPhoneNumber(),
+                                            name = dataCaller.callerName ?: "Unknown",
+                                            type = dataCaller.callType
+                                        )
                                     }
                                 }
                             }
@@ -82,7 +90,6 @@ class PhoneCallReceiver : BroadcastReceiver() {
                 }
             }
         }
-
     }
 
     private fun getPhoneNumber(): String {
@@ -133,9 +140,8 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         type = UploadContactType.PENDING,
                         )
                     databaseRepository.insertUpload(data)
+                    delay(1000)
                     CallTrackerApplication.isRefreshUi.value = true
-                    delay(500)
-                    CallTrackerApplication.isRefreshUi.value = false
                 }
 
                 is Resource.Loading -> {}
@@ -149,10 +155,8 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         type = UploadContactType.COMPLETE
                     )
                     databaseRepository.insertUpload(data)
-                    delay(500)
+                    delay(1000)
                     CallTrackerApplication.isRefreshUi.value = true
-                    delay(500)
-                    CallTrackerApplication.isRefreshUi.value = false
                 }
             }
         }.launchIn(

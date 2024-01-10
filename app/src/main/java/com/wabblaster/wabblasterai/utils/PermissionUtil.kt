@@ -1,181 +1,92 @@
-package com.wabblaster.wabblasterai.utils
-
 import android.Manifest
 import android.content.Context
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.wabblaster.wabblasterai.R
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import com.wabblaster.wabblasterai.R
+import com.wabblaster.wabblasterai.utils.navToSetting
+import com.wabblaster.wabblasterai.utils.showCommonDialog
 
 fun Context.readPhoneStatePermission(granted:()->Unit, rejected:(() -> Unit)? = null){
-    val context = this
-    Dexter.withContext(this)
-        .withPermission(Manifest.permission.READ_PHONE_STATE)
-        .withListener(object : PermissionListener {
-            override fun onPermissionGranted(permissionGrantedResponse: PermissionGrantedResponse) {
-                granted()
-            }
-            override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
-                rejected?.let { it() }
-                if(permissionDeniedResponse.isPermanentlyDenied){
-                    showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                        R.string.phone_state_permission),context){
-                        navToSetting(context as AppCompatActivity)
-                    }
-                }
-            }
-
-            override fun onPermissionRationaleShouldBeShown(
-                permissionRequest: PermissionRequest,
-                permissionToken: PermissionToken
-            ) {
-                permissionToken.continuePermissionRequest()
-                rejected?.let { it() }
-                showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                    R.string.phone_state_permission),context){
-                    navToSetting(context as AppCompatActivity)
-                }
-            }
-        })
-        .withErrorListener {
-            rejected?.let { it() }
-            showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                R.string.phone_state_permission),context){
-                navToSetting(context as AppCompatActivity)
-            }
-        }
-        .check()
+    takePermissions(
+        permissions = Manifest.permission.READ_PHONE_STATE,
+        title = getString(R.string.phone_state_permission),
+        granted = granted,
+        rejected =rejected
+    )
 }
+fun Context.readPhoneLogPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
+    takePermissions(
+        permissions = Manifest.permission.READ_CALL_LOG,
+        title = getString(R.string.read_call_log_permission),
+        granted = granted,
+        rejected =rejected
+    )
+}
+
 
 fun Context.readPhoneNumberPermission(granted:()->Unit, rejected:(() -> Unit)? = null ){
-    val context = this
-    Dexter.withContext(this)
-        .withPermission(Manifest.permission.READ_PHONE_NUMBERS)
-        .withListener(object : PermissionListener {
-            override fun onPermissionGranted(permissionGrantedResponse: PermissionGrantedResponse) {
-                granted()
-            }
-            override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
-                rejected?.let { it() }
-                if(permissionDeniedResponse.isPermanentlyDenied){
-                    showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                        R.string.phone_number_permission),context){
-                        navToSetting(context as AppCompatActivity)
-                    }
-                }
-            }
-
-            override fun onPermissionRationaleShouldBeShown(
-                permissionRequest: PermissionRequest,
-                permissionToken: PermissionToken
-            ) {
-                permissionToken.continuePermissionRequest()
-                rejected?.let { it() }
-                showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                    R.string.phone_number_permission),context){
-                    navToSetting(context as AppCompatActivity)
-                }
-            }
-        })
-        .withErrorListener {
-            rejected?.let { it() }
-            showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                R.string.phone_number_permission),context){
-                navToSetting(context as AppCompatActivity)
-            }
-        }
-        .check()
+    takePermissions(
+        permissions = Manifest.permission.READ_PHONE_NUMBERS,
+        title = getString(R.string.phone_number_permission),
+        granted = granted,
+        rejected =rejected
+    )
 }
 
-fun Context.readPhoneLogPermission(granted:()->Unit, rejected:(() -> Unit)? = null ){
-    val context = this
-    Dexter.withContext(this)
-        .withPermission(Manifest.permission.READ_CALL_LOG)
-        .withListener(object : PermissionListener {
-            override fun onPermissionGranted(permissionGrantedResponse: PermissionGrantedResponse) {
-                granted()
-            }
-            override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
-                rejected?.let { it() }
-                if(permissionDeniedResponse.isPermanentlyDenied){
-                    showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                        R.string.read_call_log_permission),context){
-                        navToSetting(context as AppCompatActivity)
-                    }
-                }
-            }
-
-            override fun onPermissionRationaleShouldBeShown(
-                permissionRequest: PermissionRequest,
-                permissionToken: PermissionToken
-            ) {
-                permissionToken.continuePermissionRequest()
-                rejected?.let { it() }
-                showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                    R.string.read_call_log_permission),context){
-                    navToSetting(context as AppCompatActivity)
-                }
-            }
-        })
-        .withErrorListener {
-        rejected?.let { it() }
-            showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                R.string.read_call_log_permission),context){
-                navToSetting(context as AppCompatActivity)
-            }
-    }
-        .check()
+fun Context.readPhoneStorage(granted:()->Unit, rejected:(() -> Unit)? = null ){
+    takePermissions(
+        permissions = Manifest.permission.READ_EXTERNAL_STORAGE,
+        title = getString(R.string.read_device_permission),
+        granted = granted,
+        rejected =rejected
+    )
 }
+fun Context.writePhoneStorage(granted:()->Unit, rejected:(() -> Unit)? = null ){
+    takePermissions(
+        permissions = Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        title = getString(R.string.write_device_permission),
+        granted = granted,
+        rejected =rejected
+    )
+}
+
+fun Context.recordAudioCallPermission(granted:()->Unit, rejected:(() -> Unit)? = null ){
+    takePermissions(
+        permissions = Manifest.permission.RECORD_AUDIO,
+        title = getString(R.string.read_call_record_permission),
+        granted = granted,
+        rejected =rejected
+    )
+}
+
+
 
 fun Context.readPhoneContactPermission(granted:()->Unit, rejected:(() -> Unit)? = null ){
-    val context = this
-    Dexter.withContext(this)
-        .withPermission(Manifest.permission.READ_CONTACTS)
-        .withListener(object : PermissionListener {
-            override fun onPermissionGranted(permissionGrantedResponse: PermissionGrantedResponse) {
-                granted()
-            }
-            override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
-                rejected?.let { it() }
-                if(permissionDeniedResponse.isPermanentlyDenied){
-                    showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                        R.string.read_contact_permission),context){
-                        navToSetting(context as AppCompatActivity)
-                    }
-                }
-            }
-
-            override fun onPermissionRationaleShouldBeShown(
-                permissionRequest: PermissionRequest,
-                permissionToken: PermissionToken
-            ) {
-                permissionToken.continuePermissionRequest()
-                rejected?.let { it() }
-                showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                    R.string.read_contact_permission),context){
-                    navToSetting(context as AppCompatActivity)
-                }
-            }
-        })
-        .withErrorListener {
-            rejected?.let { it() }
-            showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                R.string.read_contact_permission),context){
-                navToSetting(context as AppCompatActivity)
-            }
-        }
-        .check()
+    takePermissions(
+        permissions = Manifest.permission.READ_CONTACTS,
+        title = getString(R.string.read_contact_permission),
+        granted = granted,
+        rejected =rejected
+    )
 }
 
 fun Context.writePhoneContactPermission(granted:()->Unit, rejected:(() -> Unit)? = null ){
+    takePermissions(
+        permissions = Manifest.permission.WRITE_CONTACTS,
+        title = getString(R.string.read_write_contact_permission),
+        granted = granted,
+        rejected =rejected
+    )
+}
+private fun Context.takePermissions(permissions :String, title:String, granted:()->Unit, rejected:(() -> Unit)? = null){
     val context = this
     Dexter.withContext(this)
-        .withPermission(Manifest.permission.WRITE_CONTACTS)
+        .withPermission(permissions)
         .withListener(object : PermissionListener {
             override fun onPermissionGranted(permissionGrantedResponse: PermissionGrantedResponse) {
                 granted()
@@ -183,8 +94,7 @@ fun Context.writePhoneContactPermission(granted:()->Unit, rejected:(() -> Unit)?
             override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
                 rejected?.let { it() }
                 if(permissionDeniedResponse.isPermanentlyDenied){
-                    showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                        R.string.read_write_contact_permission),context){
+                    showCommonDialog(title = getString(R.string.required_permission),message = title ,context){
                         navToSetting(context as AppCompatActivity)
                     }
                 }
@@ -196,17 +106,14 @@ fun Context.writePhoneContactPermission(granted:()->Unit, rejected:(() -> Unit)?
             ) {
                 permissionToken.continuePermissionRequest()
                 rejected?.let { it() }
-                showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                    R.string.read_write_contact_permission),context){
+                showCommonDialog(title = getString(R.string.required_permission),message = title,context){
                     navToSetting(context as AppCompatActivity)
                 }
             }
         })
         .withErrorListener {
-            Log.e("error","error : ${it.name}")
             rejected?.let { it() }
-            showCommonDialog(title = getString(R.string.required_permission),message = getString(
-                R.string.read_write_contact_permission),context){
+            showCommonDialog(title = getString(R.string.required_permission),message = title,context){
                 navToSetting(context as AppCompatActivity)
             }
         }

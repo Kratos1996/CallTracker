@@ -16,13 +16,12 @@ import com.wabblaster.wabblasterai.utils.addAutoStartup
 import com.wabblaster.wabblasterai.utils.dataclassesUtils.TelePhoneManager
 import com.wabblaster.wabblasterai.utils.navToRestrictContactActivity
 import com.wabblaster.wabblasterai.utils.navToUploadContactActivity
-import com.wabblaster.wabblasterai.utils.readPhoneContactPermission
-import com.wabblaster.wabblasterai.utils.readPhoneLogPermission
-import com.wabblaster.wabblasterai.utils.readPhoneNumberPermission
-import com.wabblaster.wabblasterai.utils.readPhoneStatePermission
-import com.wabblaster.wabblasterai.utils.serviceContact
 import com.wabblaster.wabblasterai.utils.serviceContactUploadRestarter
 import dagger.hilt.android.AndroidEntryPoint
+import readPhoneContactPermission
+import readPhoneLogPermission
+import readPhoneNumberPermission
+import readPhoneStatePermission
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -21,10 +21,10 @@ import com.wabblaster.wabblasterai.utils.Response
 import com.wabblaster.wabblasterai.utils.navToHome
 import com.wabblaster.wabblasterai.utils.showLoadingDialog
 import com.wabblaster.wabblasterai.utils.toast
-import com.wabblaster.wabblasterai.utils.writePhoneContactPermission
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import writePhoneContactPermission
 import javax.inject.Inject
 
 @AndroidEntryPoint

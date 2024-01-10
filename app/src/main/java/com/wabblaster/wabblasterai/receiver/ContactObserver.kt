@@ -6,7 +6,7 @@ import android.database.ContentObserver
 import android.os.Handler
 import android.provider.ContactsContract
 import com.wabblaster.wabblasterai.service.ContactSyncService
-import com.wabblaster.wabblasterai.utils.readPhoneContactPermission
+import readPhoneContactPermission
 
 
 class ContactObserver(val context: Context, handler: Handler) : ContentObserver(handler) {

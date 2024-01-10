@@ -9,9 +9,9 @@ import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import androidx.annotation.RequiresApi
 import com.wabblaster.wabblasterai.domain.ContactUseCase
-import com.wabblaster.wabblasterai.utils.readPhoneNumberPermission
-import com.wabblaster.wabblasterai.utils.readPhoneStatePermission
 import dagger.hilt.android.AndroidEntryPoint
+import readPhoneNumberPermission
+import readPhoneStatePermission
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -32,27 +32,6 @@ class CallService : Service() {
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
                 telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-              /*  phoneStateListener = object : PhoneStateListener() {
-                    override fun onCallStateChanged(state: Int, phoneNumber: String?) {
-                        when (state) {
-                            TelephonyManager.CALL_STATE_RINGING -> {
-                                // Incoming call
-                                Log.e("CallTracker", "Call Tracker Service : Call ended")
-                            }
-
-                            TelephonyManager.CALL_STATE_OFFHOOK -> {
-                               //outgoing
-                                Log.e("CallTracker", "Call Tracker Service  : Call ended")
-                            }
-
-                            TelephonyManager.CALL_STATE_IDLE -> {
-                                // Call ended
-                                Log.e("CallTracker", "Call Tracker : Call ended")
-                            }
-                        }
-                    }
-                }
-                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)*/
             })
         })
 

@@ -16,6 +16,10 @@
     <string name="phone_state_permission">Need Phone State Permission</string>
     <string name="phone_number_permission">Need Phone Number Permission</string>
     <string name="read_call_log_permission">Need Read Call Logs Permission</string>
+    <string name="read_device_permission">Need Read Device Permission</string>
+    <string name="write_device_permission">Need Write Device Permission</string>
+    <string name="read_call_record_permission">Need Audio Record Permission</string>
+    <string name="read_microphone_permission">Need Microphone Permission</string>
     <string name="read_write_contact_permission">Need Write Contact Permission</string>
     <string name="read_contact_permission">Need Read Contact Permission</string>
     <string name="url">https://wappblaster.in/</string>

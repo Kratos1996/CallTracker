@@ -43,12 +43,12 @@ class ContactUpdateOnServer : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.e("CallTracker : ", "CallTracker : Service > ContactUpdateOnServer > StartProcess")
-        getUploadContactsList()
+       // getUploadContactsList()
     }
 
     private fun startProcess() {
         val context = this
-        if (currentIndex < uploadContactList.size) {
+        /*if (currentIndex < uploadContactList.size) {
             Log.e(
                 "CallTracker : ",
                 "CallTracker : Service > ContactUpdateOnServer > StartProcess > Current Index : $currentIndex"
@@ -72,7 +72,7 @@ class ContactUpdateOnServer : Service() {
         } else {
             scope.cancel()
             context.stopServiceContactUpload()
-        }
+        }*/
     }
 
     private fun saveContact(uploadContact: UploadContact, onSuccess: (Boolean) -> Unit) {

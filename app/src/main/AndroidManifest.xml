@@ -91,11 +91,11 @@
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="false" />
-        <service
+    <!--    <service
             android:name=".service.ContactUpdateOnServer"
             android:enabled="true"
             android:exported="false"
-            android:stopWithTask="false" />
+            android:stopWithTask="false" />-->
         <service
             android:name=".service.ContactSyncService"
             android:enabled="true"

@@ -13,15 +13,15 @@ hilt {
     enableExperimentalClasspathAggregation = true
 }
 android {
-    namespace = "com.wabblaster.wabblasterai"
+    namespace = "com.ishant.calltracker"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.wabblaster.wabblasterai"
+        applicationId = "com.ishant.calltracker"
         minSdk = 25
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -81,7 +81,6 @@ dependencies {
     kapt(libs.hilt.compiler)
 // WorkManager with Coroutines
     implementation(libs.androidx.work.runtime.ktx)
-
     //OKHTTP
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)

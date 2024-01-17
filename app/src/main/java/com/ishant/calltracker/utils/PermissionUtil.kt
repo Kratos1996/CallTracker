@@ -1,5 +1,10 @@
 import android.Manifest
+import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -19,6 +24,7 @@ fun Context.readPhoneStatePermission(granted:()->Unit, rejected:(() -> Unit)? = 
         rejected =rejected
     )
 }
+
 fun Context.readPhoneLogPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
     takePermissions(
         permissions = Manifest.permission.READ_CALL_LOG,
@@ -27,7 +33,6 @@ fun Context.readPhoneLogPermission(granted:()->Unit, rejected:(() -> Unit)? = nu
         rejected =rejected
     )
 }
-
 
 fun Context.readPhoneNumberPermission(granted:()->Unit, rejected:(() -> Unit)? = null ){
     takePermissions(
@@ -46,6 +51,7 @@ fun Context.readPhoneStorage(granted:()->Unit, rejected:(() -> Unit)? = null ){
         rejected =rejected
     )
 }
+
 fun Context.writePhoneStorage(granted:()->Unit, rejected:(() -> Unit)? = null ){
     takePermissions(
         permissions = Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -62,6 +68,37 @@ fun Context.recordAudioCallPermission(granted:()->Unit, rejected:(() -> Unit)? =
         granted = granted,
         rejected =rejected
     )
+}
+
+fun isNotificationPermissionGranted(context: Context): Boolean {
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        notificationManager.areNotificationsEnabled()
+    } else {
+        // For versions before Oreo, there's no specific notification permission
+        true
+    }
+}
+fun requestNotificationPermission(context: Context) {
+    val intent = Intent().apply {
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
+                action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
+                action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                putExtra("app_package", context.packageName)
+                putExtra("app_uid", context.applicationInfo.uid)
+            }
+            else -> {
+                action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                addCategory(Intent.CATEGORY_DEFAULT)
+                data = Uri.parse("package:" + context.packageName)
+            }
+        }
+    }
+    context.startActivity(intent)
 }
 
 

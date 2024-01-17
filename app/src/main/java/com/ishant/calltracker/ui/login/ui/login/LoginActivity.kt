@@ -22,8 +22,10 @@ import com.ishant.calltracker.utils.navToHome
 import com.ishant.calltracker.utils.showLoadingDialog
 import com.ishant.calltracker.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
+import isNotificationPermissionGranted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import requestNotificationPermission
 import writePhoneContactPermission
 import javax.inject.Inject
 
@@ -85,7 +87,11 @@ class LoginActivity : AppCompatActivity() {
                    }
                    is Response.Success ->{
                        showLoadingDialog(context, progressDialog).hide()
-                       navToHome()
+                       if(isNotificationPermissionGranted(context)) {
+                           navToHome()
+                       }else{
+                           requestNotificationPermission(context)
+                       }
                    }
                }
            }

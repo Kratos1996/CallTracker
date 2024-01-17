@@ -14,14 +14,18 @@ import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.dataclassesUtils.TelePhoneManager
+import com.ishant.calltracker.utils.navToCallService
+import com.ishant.calltracker.utils.navToHome
 import com.ishant.calltracker.utils.navToRestrictContactActivity
 import com.ishant.calltracker.utils.navToUploadContactActivity
 import com.ishant.calltracker.utils.serviceContactUploadRestarter
 import dagger.hilt.android.AndroidEntryPoint
+import isNotificationPermissionGranted
 import readPhoneContactPermission
 import readPhoneLogPermission
 import readPhoneNumberPermission
 import readPhoneStatePermission
+import requestNotificationPermission
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,7 +73,12 @@ class HomeActivity : AppCompatActivity() {
                 binding.uploadCallonApi.visibility = View.VISIBLE
                 binding.addToRestrictedBtn.visibility = View.VISIBLE
                 loadUi()
-               //serviceContact()
+                if(!isNotificationPermissionGranted(this)) {
+                    requestNotificationPermission(this)
+                }else{
+                    navToCallService()
+                }
+
             }) {
                 binding.phoneCallLogsPermission.visibility = View.VISIBLE
 

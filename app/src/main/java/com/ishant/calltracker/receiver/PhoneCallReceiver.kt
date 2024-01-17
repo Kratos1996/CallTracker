@@ -37,7 +37,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
         if (intent?.action == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
             when (intent.getStringExtra(TelephonyManager.EXTRA_STATE)) {
                 TelephonyManager.EXTRA_STATE_IDLE -> {
-                    handleCallData(intent, context)
+                  //  handleCallData(intent, context)
                 }
             }
         }

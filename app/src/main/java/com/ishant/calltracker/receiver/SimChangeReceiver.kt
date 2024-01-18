@@ -6,9 +6,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import android.util.Log
+import com.ishant.calltracker.service.CallService
+import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.dataclassesUtils.TelePhoneManager
+import com.ishant.calltracker.utils.isServiceRunning
+import com.ishant.calltracker.utils.navToCallService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -30,6 +34,12 @@ class SimChangeReceiver : BroadcastReceiver() {
             if (ACTION_SIM_STATE_CHANGED == state) {
                 val data = managerPlus.getSimCardPhoneNumbers(context)
                 AppPreference.simManager = TelePhoneManager(data)
+                if (!context.isServiceRunning(CallService::class.java)) { // Replace with your service class
+                    Log.e(ServiceRestarterService.TAG, "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService is not running. Restarting...")
+                    context.navToCallService()
+                }else{
+                    Log.e(ServiceRestarterService.TAG, "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService service is running....")
+                }
             }
         }
     }

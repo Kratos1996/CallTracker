@@ -1,18 +1,17 @@
 package com.ishant.calltracker.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
+import android.os.PowerManager
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
-import com.ishant.calltracker.R
+import androidx.lifecycle.MutableLiveData
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
@@ -22,6 +21,10 @@ import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.LastCallDetailsCollector
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Utils
+import com.ishant.calltracker.utils.callForegroundService
+import com.ishant.calltracker.utils.isServiceRunning
+import com.ishant.calltracker.utils.navToCallService
+import com.ishant.calltracker.utils.serviceContactUploadRestarter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,76 +37,72 @@ import readPhoneNumberPermission
 import readPhoneStatePermission
 import javax.inject.Inject
 
+
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class CallService : Service() {
+
+    private var wakeLock: PowerManager.WakeLock? = null
+
     @Inject
     lateinit var contactUseCase: ContactUseCase
 
     @Inject
     lateinit var databaseRepository: DatabaseRepository
 
+    private var handler: Handler? = null
+    private var timeoutRunnable: Runnable? = null
+    var counter: MutableLiveData<Int> = MutableLiveData(0)
 
     private lateinit var telephonyManager: TelephonyManager
-    private val notificationId = 1
-    private val channelId = "call_listener_channel"
+
 
     private val phoneStateListener = object : PhoneStateListener() {
         override fun onCallStateChanged(state: Int, phoneNumber: String?) {
-            when(state){
-                TelephonyManager.CALL_STATE_IDLE-> {
-                    handleCallData(phoneNumber?:"",this@CallService)
+            when (state) {
+                TelephonyManager.CALL_STATE_IDLE -> {
+                    handleCallData(phoneNumber ?: "", this@CallService)
                 }
             }
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        try {
+            readPhoneStatePermission(granted = {
+                readPhoneNumberPermission(granted = {
+                    telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                    callForegroundService(){notificationId,notification ->
+                        startForeground(notificationId, notification)
+                    }
+                    registerPhoneStateListener()
+                    serviceContactUploadRestarter()
+                })
+            })
+        } catch (e: Exception) {
+            callForegroundService(){notificationId,notification ->
+                startForeground(notificationId, notification)
+            }
+            registerPhoneStateListener()
+        }
+
+        return START_STICKY
     }
 
+    inner class LocalBinder : Binder() {
+        fun getService(): CallService = this@CallService
+    }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate() {
         super.onCreate()
-        readPhoneStatePermission(granted = {
-            readPhoneNumberPermission(granted = {
-                telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-                startForegroundService()
-                registerPhoneStateListener()
-            })
-        })
-
     }
 
+    private val binder = LocalBinder()
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterPhoneStateListener()
+    override fun onBind(intent: Intent): IBinder {
+        return binder
     }
 
-    private fun startForegroundService() {
-        createNotificationChannel()
-
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText("${getString(R.string.app_name)} is Working... ")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .build()
-
-        startForeground(notificationId, notification)
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Call Listener Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
 
     private fun registerPhoneStateListener() {
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
@@ -113,6 +112,7 @@ class CallService : Service() {
         val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
     }
+
     private fun handleCallData(phoneNumber: String, context: Context) {
         if (phoneNumber.isNotEmpty()) {
             if (AppPreference.isUserLoggedIn) {
@@ -201,7 +201,8 @@ class CallService : Service() {
             when (result) {
                 is Resource.Error -> {
                     Log.e("CallTracker : ", "CallTracker: Contact Not Saved")
-                    val data = UploadContact(serialNo = System.currentTimeMillis(),
+                    val data = UploadContact(
+                        serialNo = System.currentTimeMillis(),
                         sourceMobileNo = sourceMobileNo,
                         mobile = phoneNumber,
                         name = name,
@@ -231,4 +232,30 @@ class CallService : Service() {
             CoroutineScope(Dispatchers.Main)
         )
     }
+
+    private fun startCounter() {
+        val looper: Looper? = Looper.myLooper()
+        looper.let {
+            handler = Handler(looper!!)
+            timeoutRunnable = Runnable {
+                counter.value = counter.value!! + 1
+                timeoutRunnable?.let { it1 -> handler?.postDelayed(it1, 3000) }
+            }
+            timeoutRunnable?.let { handler?.post(it) }
+
+        }
+
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
+            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > CallService > TaskRemoved > CallService is not running. Restarting...")
+            navToCallService()
+        }
+        else{
+            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > CallService > TaskRemoved > CallService service is running....")
+        }
+        super.onTaskRemoved(rootIntent)
+    }
+
 }

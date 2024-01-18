@@ -5,7 +5,7 @@
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
-
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -21,6 +21,8 @@
     <uses-permission android:name="android.permission.REQUEST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
 
     <application
         android:name=".app.CallTrackerApplication"
@@ -87,22 +89,23 @@
             android:name=".service.CallService"
             android:enabled="true"
             android:exported="false"
-            android:stopWithTask="false" />
+            android:foregroundServiceType="phoneCall"
+            />
         <service
             android:name=".service.ServiceRestarterService"
             android:enabled="true"
             android:exported="false"
-            android:stopWithTask="false" />
+             />
         <service
             android:name=".service.ContactUpdateOnServer"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="false" />
-        <service
+       <!-- <service
             android:name=".service.ContactSyncService"
             android:enabled="true"
             android:exported="false"
-            android:stopWithTask="false" />
+            android:stopWithTask="false" />-->
 
         <receiver
             android:name=".receiver.BootReceiver"
@@ -131,6 +134,11 @@
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".receiver.ServiceCheckReceiver"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

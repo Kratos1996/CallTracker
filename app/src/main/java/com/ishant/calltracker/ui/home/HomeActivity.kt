@@ -1,15 +1,28 @@
 package com.ishant.calltracker.ui.home
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.SystemClock
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.room.InvalidationTracker
+import androidx.work.Constraints
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.ishant.calltracker.R
 import com.ishant.calltracker.databinding.ActivityHomeBinding
 import com.ishant.calltracker.receiver.ContactObserver
+import com.ishant.calltracker.receiver.ServiceCheckReceiver
+import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.addAutoStartup
@@ -19,6 +32,7 @@ import com.ishant.calltracker.utils.navToHome
 import com.ishant.calltracker.utils.navToRestrictContactActivity
 import com.ishant.calltracker.utils.navToUploadContactActivity
 import com.ishant.calltracker.utils.serviceContactUploadRestarter
+import com.ishant.calltracker.workmanager.ServiceCheckWorker
 import dagger.hilt.android.AndroidEntryPoint
 import isNotificationPermissionGranted
 import readPhoneContactPermission
@@ -26,6 +40,7 @@ import readPhoneLogPermission
 import readPhoneNumberPermission
 import readPhoneStatePermission
 import requestNotificationPermission
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -70,6 +85,9 @@ class HomeActivity : AppCompatActivity() {
     private fun takePhoneNetworkPermission() {
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
+                startAlarmManager()
+                startWorkManager()
+                serviceContactUploadRestarter()
                 binding.uploadCallonApi.visibility = View.VISIBLE
                 binding.addToRestrictedBtn.visibility = View.VISIBLE
                 loadUi()
@@ -107,7 +125,6 @@ class HomeActivity : AppCompatActivity() {
             navToRestrictContactActivity()
         }
         binding.uploadCallonApi.setOnClickListener {
-            serviceContactUploadRestarter()
             navToUploadContactActivity()
         }
     }
@@ -131,4 +148,41 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
+    private fun startWorkManager(){
+
+        val serviceCheckWorkRequest = PeriodicWorkRequest.Builder(
+            ServiceCheckWorker::class.java,
+            15, // Repeat interval in minutes
+            TimeUnit.MINUTES
+        ).build()
+
+        WorkManager.getInstance(applicationContext)
+            .enqueue(serviceCheckWorkRequest)
+
+// Optional: Observe the result of the worker
+        WorkManager.getInstance(applicationContext)
+            .getWorkInfoByIdLiveData(serviceCheckWorkRequest.id)
+            .observe(this, Observer { workInfo ->
+                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                    Log.e(ServiceRestarterService.TAG, "CallTracker : HomeActivity > ServiceCheckWorker > doWork > CallService service is running....")
+                }
+            })
+    }
+
+    private fun startAlarmManager(){
+        // Schedule the alarm to run every minute
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, ServiceCheckReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+// Use setRepeating for periodic tasks
+// Adjust the intervalMillis based on your requirements
+        val intervalMillis = 60 * 1000L  // 1 minute
+        alarmManager.setRepeating(
+            AlarmManager.ELAPSED_REALTIME,
+            SystemClock.elapsedRealtime() + intervalMillis,
+            intervalMillis,
+            pendingIntent
+        )
+    }
 }

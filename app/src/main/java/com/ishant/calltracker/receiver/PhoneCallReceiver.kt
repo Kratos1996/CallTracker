@@ -12,8 +12,15 @@ import com.ishant.calltracker.database.room.UploadContact
 import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
+import com.ishant.calltracker.service.CallService
+import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Utils
+import com.ishant.calltracker.utils.callForegroundService
+import com.ishant.calltracker.utils.isServiceRunning
+import com.ishant.calltracker.utils.navToCallService
+import com.ishant.calltracker.utils.navToRestrictContactActivity
+import com.ishant.calltracker.utils.serviceContactUploadRestarter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,8 +44,22 @@ class PhoneCallReceiver : BroadcastReceiver() {
         if (intent?.action == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
             when (intent.getStringExtra(TelephonyManager.EXTRA_STATE)) {
                 TelephonyManager.EXTRA_STATE_IDLE -> {
-                  //  handleCallData(intent, context)
+                    //
+                    if (!context.isServiceRunning(CallService::class.java)) { // Replace with your service class
+                        handleCallData(intent, context)
+                        Log.e(
+                            ServiceRestarterService.TAG,
+                            "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService is not running. Restarting..."
+                        )
+                        context.serviceContactUploadRestarter()
+                    } else {
+                        Log.e(
+                            ServiceRestarterService.TAG,
+                            "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService service is running...."
+                        )
+                    }
                 }
+
             }
         }
 

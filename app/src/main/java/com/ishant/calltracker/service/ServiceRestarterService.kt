@@ -5,12 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
+import com.ishant.calltracker.utils.callForegroundService
+import com.ishant.calltracker.utils.isServiceRunning
+import com.ishant.calltracker.utils.navToCallService
 
 class ServiceRestarterService : Service() {
 
     companion object {
         const val TAG = "CallTracker :"
-        const val SERVICE_TO_RESTART = "com.ishant.calltracker.service.ContactUpdateOnServer" // Replace with your service name
+        const val SERVICE_TO_RESTART = "com.ishant.calltracker.service.CallService" // Replace with your service name
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -29,18 +32,13 @@ class ServiceRestarterService : Service() {
     private fun startServiceMonitoring() {
         val intent = Intent(this, ContactUpdateOnServer::class.java) // Replace with your service class
         intent.action = SERVICE_TO_RESTART
-
-        if (!isServiceRunning(ContactUpdateOnServer::class.java)) { // Replace with your service class
-            Log.e(TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > Target service is not running. Restarting...")
-            startService(intent)
-        }else{
-            Log.e(TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > Target service is running....")
+        if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
+            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > CallService is not running. Restarting...")
+            navToCallService()
         }
-        if (!isServiceRunning(ContactSyncService::class.java)) { // Replace with your service class
-            Log.e(TAG, "CallTracker : Service > ServiceRestarterService > ContactServiceRestart ")
-          //  serviceContact()
+        else{
+            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > CallService service is running....")
         }
-        // Schedule periodic checking
         scheduleServiceCheck()
     }
 

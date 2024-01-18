@@ -14,6 +14,7 @@
     <string name="required_permission">Required Permission</string>
     <string name="over_lay_permission">Need Overlay Permission</string>
     <string name="phone_state_permission">Need Phone State Permission</string>
+    <string name="phone_foreground_permission">Need Foreground Service Permission</string>
     <string name="phone_number_permission">Need Phone Number Permission</string>
     <string name="read_call_log_permission">Need Read Call Logs Permission</string>
     <string name="read_device_permission">Need Read Device Permission</string>
@@ -25,7 +26,7 @@
     <string name="url">https://wappblaster.in/</string>
     <string name="sim_carrier_name">Sim Carrier Name</string>
     <string name="blank">blank</string>
-    <string name="ver_0_0_1">ver.:1.0.0</string>
+    <string name="ver_0_0_1">ver.:1.0.4</string>
     <string name="create_account_url">https://wappblaster.in/#signup</string>
     <string name="i_accept_this_terms_condition"><![CDATA[i accept this Terms & Condition]]></string>
     <string name="terms_and_condition_url">https://docs.google.com/document/d/18t3fc_xrO0-y9cKMmyrnMYk0LYNWaTrX7QlQ0fRQ4lg/edit?usp=sharing</string>

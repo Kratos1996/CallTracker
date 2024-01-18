@@ -22,7 +22,6 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
 
     <application
         android:name=".app.CallTrackerApplication"
@@ -89,7 +88,6 @@
             android:name=".service.CallService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="phoneCall"
             />
         <service
             android:name=".service.ServiceRestarterService"

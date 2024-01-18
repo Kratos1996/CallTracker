@@ -26,6 +26,8 @@ import isNotificationPermissionGranted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import requestNotificationPermission
+import takeForegroundCallService
+import takeForegroundService
 import writePhoneContactPermission
 import javax.inject.Inject
 
@@ -87,11 +89,16 @@ class LoginActivity : AppCompatActivity() {
                    }
                    is Response.Success ->{
                        showLoadingDialog(context, progressDialog).hide()
-                       if(isNotificationPermissionGranted(context)) {
-                           navToHome()
-                       }else{
-                           requestNotificationPermission(context)
+                       takeForegroundService(granted = {
+                           if(isNotificationPermissionGranted(context)) {
+                               navToHome()
+                           }else{
+                               requestNotificationPermission(context)
+                           }
+                       }){
+                           context.toast(message = "Need Permission Foreground  Service")
                        }
+
                    }
                }
            }

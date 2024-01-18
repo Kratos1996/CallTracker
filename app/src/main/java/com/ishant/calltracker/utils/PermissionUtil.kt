@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -23,6 +24,32 @@ fun Context.readPhoneStatePermission(granted:()->Unit, rejected:(() -> Unit)? = 
         granted = granted,
         rejected =rejected
     )
+}
+
+fun Context.takeForegroundService(granted:()->Unit, rejected:(() -> Unit)? = null){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        takePermissions(
+            permissions = Manifest.permission.FOREGROUND_SERVICE,
+            title = getString(R.string.phone_foreground_permission),
+            granted = granted,
+            rejected = rejected
+        )
+    }else {
+        granted()
+    }
+}
+
+fun Context.takeForegroundCallService(granted:()->Unit, rejected:(() -> Unit)? = null){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        takePermissions(
+            permissions = Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL,
+            title = getString(R.string.phone_foreground_permission),
+            granted = granted,
+            rejected = rejected
+        )
+    }else{
+        granted()
+    }
 }
 
 fun Context.readPhoneLogPermission(granted:()->Unit, rejected:(() -> Unit)? = null){

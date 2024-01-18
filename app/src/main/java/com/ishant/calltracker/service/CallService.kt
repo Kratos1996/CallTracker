@@ -1,5 +1,6 @@
 package com.ishant.calltracker.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -67,6 +68,7 @@ class CallService : Service() {
         }
     }
 
+    @SuppressLint("ForegroundServiceType")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
             readPhoneStatePermission(granted = {
@@ -80,9 +82,10 @@ class CallService : Service() {
                 })
             })
         } catch (e: Exception) {
-            callForegroundService(){notificationId,notification ->
+            /*callForegroundService(){notificationId,notification ->
                 startForeground(notificationId, notification)
-            }
+            }*/
+            serviceContactUploadRestarter()
             registerPhoneStateListener()
         }
 

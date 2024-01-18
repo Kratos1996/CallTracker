@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.time.Duration
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -90,7 +91,8 @@ class PhoneCallReceiver : BroadcastReceiver() {
                                             phoneNumber = dataCaller.callerNumber,
                                             sourceMobileNo = getPhoneNumber(),
                                             name = dataCaller.callerName ?: "Unknown",
-                                            type = "Call Ended without Pickup"
+                                            type = "Call Ended without Pickup",
+                                            duration = dataCaller.duration
                                         )
                                     }
                                 }
@@ -101,7 +103,8 @@ class PhoneCallReceiver : BroadcastReceiver() {
                                             phoneNumber = dataCaller.callerNumber,
                                             sourceMobileNo = getPhoneNumber(),
                                             name = dataCaller.callerName ?: "Unknown",
-                                            type = dataCaller.callType
+                                            type = dataCaller.callType,
+                                            duration = dataCaller.duration
                                         )
                                     }
                                 }
@@ -143,13 +146,15 @@ class PhoneCallReceiver : BroadcastReceiver() {
         phoneNumber: String,
         name: String,
         sourceMobileNo: String,
-        type: String
+        type: String,
+        duration: String
     ) {
         contactUseCase.uploadContact(
             sourceMobileNo = Utils.extractLast10Digits(sourceMobileNo),
             mobile = Utils.extractLast10Digits(phoneNumber),
             name = /*AppPreference.user.name ?: ""*/name,
-            type = type
+            type = type,
+            duration = duration
         ).onEach { result ->
             when (result) {
                 is Resource.Error -> {
@@ -159,6 +164,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         mobile = phoneNumber,
                         name = name,
                         type = UploadContactType.PENDING,
+                        duration = duration
                         )
                     databaseRepository.insertUpload(data)
                     delay(1000)
@@ -173,7 +179,8 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         sourceMobileNo = sourceMobileNo,
                         mobile = phoneNumber,
                         name = name,
-                        type = UploadContactType.COMPLETE
+                        type = UploadContactType.COMPLETE,
+                        duration = duration
                     )
                     databaseRepository.insertUpload(data)
                     delay(1000)

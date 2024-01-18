@@ -79,7 +79,8 @@ class ContactUpdateOnServer : Service() {
             sourceMobileNo = Utils.extractLast10Digits(uploadContact.sourceMobileNo),
             mobile = Utils.extractLast10Digits(uploadContact.mobile),
             name = /*AppPreference.user.name ?: ""*/uploadContact.name,
-            type = uploadContact.type
+            type = uploadContact.type,
+            duration = uploadContact.duration
         ).onEach { result ->
             when (result) {
                 is Resource.Error -> {

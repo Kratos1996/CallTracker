@@ -10,11 +10,12 @@ import android.provider.CallLog
 import android.provider.ContactsContract
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.time.Duration
 
 
 class LastCallDetailsCollector {
 
-    data class ContactData( val callerNumber : String,val callerName :String , val callType :String)
+    data class ContactData( val callerNumber : String,val callerName :String , val callType :String , val duration: String)
 
     fun collectLastCallDetails(context: Context): MutableStateFlow<ContactData?> {
         val dataCaller = MutableStateFlow<ContactData?>(null)
@@ -41,7 +42,7 @@ class LastCallDetailsCollector {
                     // Add more details as needed
                     // Implement your logic to save or use the call details
 
-                    dataCaller.value = ( ContactData(callType = callType, callerName = callerName, callerNumber = callerNumber))
+                    dataCaller.value = ( ContactData(callType = callType, callerName = callerName, callerNumber = callerNumber , duration = callDuration))
                     return  dataCaller
                 }
         }
@@ -59,14 +60,14 @@ class LastCallDetailsCollector {
                     val callerNumber = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
                     val callerName = getContactName(context, callerNumber)
                     val callType = getCallType(it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.TYPE)))
-
+                    val callDuration: String = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.DURATION))
                     Log.d("LastCallDetails", "CallTracker:  Caller Name: $callerName")
                     Log.d("LastCallDetails", "CallTracker:  Caller Number: $callerNumber")
                     Log.d("LastCallDetails", "CallTracker:  Call Type: $callType")
                     // Add more details as needed
                     // Implement your logic to save or use the call details
 
-                    dataCaller.value = ( ContactData(callType = callType, callerName = callerName, callerNumber = callerNumber))
+                    dataCaller.value = ( ContactData(callType = callType, callerName = callerName, callerNumber = callerNumber, duration = callDuration))
                     return  dataCaller
                 }
             }

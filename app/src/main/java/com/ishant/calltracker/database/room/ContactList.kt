@@ -21,7 +21,8 @@ data class UploadContact(@PrimaryKey(autoGenerate = false )
                            @ColumnInfo var  sourceMobileNo:String,
                            @ColumnInfo var  mobile:String,
                            @ColumnInfo var name:String ,
-                           @ColumnInfo var type:String
+                           @ColumnInfo var type:String,
+                           @ColumnInfo var duration:String,
 )
 
 

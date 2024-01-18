@@ -140,7 +140,8 @@ class CallService : Service() {
                                             phoneNumber = dataCaller.callerNumber,
                                             sourceMobileNo = getPhoneNumber(),
                                             name = dataCaller.callerName ?: "Unknown",
-                                            type = "Call Ended without Pickup"
+                                            type = "Call Ended without Pickup",
+                                            duration = dataCaller.duration
                                         )
                                     }
                                 }
@@ -151,7 +152,8 @@ class CallService : Service() {
                                             phoneNumber = dataCaller.callerNumber,
                                             sourceMobileNo = getPhoneNumber(),
                                             name = dataCaller.callerName ?: "Unknown",
-                                            type = dataCaller.callType
+                                            type = dataCaller.callType,
+                                            duration = dataCaller.duration
                                         )
                                     }
                                 }
@@ -193,13 +195,15 @@ class CallService : Service() {
         phoneNumber: String,
         name: String,
         sourceMobileNo: String,
-        type: String
+        type: String,
+        duration:String
     ) {
         contactUseCase.uploadContact(
             sourceMobileNo = Utils.extractLast10Digits(sourceMobileNo),
             mobile = Utils.extractLast10Digits(phoneNumber),
             name = /*AppPreference.user.name ?: ""*/name,
-            type = type
+            type = type,
+            duration = duration
         ).onEach { result ->
             when (result) {
                 is Resource.Error -> {
@@ -210,6 +214,7 @@ class CallService : Service() {
                         mobile = phoneNumber,
                         name = name,
                         type = UploadContactType.PENDING,
+                        duration = duration
                     )
                     databaseRepository.insertUpload(data)
                     delay(1000)
@@ -224,7 +229,8 @@ class CallService : Service() {
                         sourceMobileNo = sourceMobileNo,
                         mobile = phoneNumber,
                         name = name,
-                        type = UploadContactType.COMPLETE
+                        type = UploadContactType.COMPLETE,
+                        duration = duration
                     )
                     databaseRepository.insertUpload(data)
                     delay(1000)

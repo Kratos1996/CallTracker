@@ -25,14 +25,16 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
         }
     }
 
-    override fun uploadContact(sourceMobileNo: String, mobile: String, name: String,type:String ):Flow<Resource<ContactSavedResponse>> = flow {
+    override fun uploadContact(sourceMobileNo: String, mobile: String, name: String,type:String,duration:String ):Flow<Resource<ContactSavedResponse>> = flow {
         try {
             emit(Resource.Loading<ContactSavedResponse>())
             val response= repository.uploadContact(
                 sourceMobileNo = sourceMobileNo,
                 mobile = mobile,
                 name = name,
-                type = type)
+                type = type,
+                duration =duration
+            )
 
             emit(Resource.Success<ContactSavedResponse>(response))
 

@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface ContactUseCase {
     fun loginNow(mobile:String, password:String ): Flow<Resource<LoginResponse>>
 
-     fun uploadContact(sourceMobileNo:String, mobile:String, name:String ,type:String ):Flow<Resource<ContactSavedResponse>>
+     fun uploadContact(sourceMobileNo:String, mobile:String, name:String ,type:String,duration:String ):Flow<Resource<ContactSavedResponse>>
 }

@@ -18,6 +18,7 @@ interface ApiInterface {
         @Field("source_mobile") sourceMobileNo:String,
         @Field("mobile") mobile:String,
         @Field("type") type:String,
+        @Field("duration") duration:String,
         @Field("name") name:String ): ContactSavedResponse
 
 }

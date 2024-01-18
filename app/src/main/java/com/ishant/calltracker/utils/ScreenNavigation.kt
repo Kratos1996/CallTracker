@@ -65,8 +65,8 @@ fun Context.navToSaveContactActivity(){
     startActivity(intent)
 }
 fun Context.serviceContactUploadRestarter(){
-    val intent = Intent(this, ServiceRestarterService::class.java)
-    startService(intent)
+    /*val intent = Intent(this, ServiceRestarterService::class.java)
+    startService(intent)*/
 
 }
 fun Context.serviceContact(){

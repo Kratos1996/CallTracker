@@ -22,11 +22,13 @@ import com.ishant.calltracker.R
 import com.ishant.calltracker.databinding.ActivityHomeBinding
 import com.ishant.calltracker.receiver.ContactObserver
 import com.ishant.calltracker.receiver.ServiceCheckReceiver
+import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.dataclassesUtils.TelePhoneManager
+import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.navToCallService
 import com.ishant.calltracker.utils.navToHome
 import com.ishant.calltracker.utils.navToRestrictContactActivity
@@ -80,22 +82,17 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         takeCallLogsPermission()
+
     }
 
     private fun takePhoneNetworkPermission() {
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
                 startAlarmManager()
-                startWorkManager()
-                serviceContactUploadRestarter()
+                //startWorkManager()
                 binding.uploadCallonApi.visibility = View.VISIBLE
                 binding.addToRestrictedBtn.visibility = View.VISIBLE
                 loadUi()
-                if(!isNotificationPermissionGranted(this)) {
-                    requestNotificationPermission(this)
-                }else{
-                    navToCallService()
-                }
 
             }) {
                 binding.phoneCallLogsPermission.visibility = View.VISIBLE
@@ -137,7 +134,13 @@ class HomeActivity : AppCompatActivity() {
                     binding.phoneCallLogsPermission.visibility = View.GONE
                     takePhoneNetworkPermission()
                 }){
-
+                    if(!isNotificationPermissionGranted(this)) {
+                        requestNotificationPermission(this)
+                    }else{
+                        if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
+                             navToCallService()
+                        }
+                    }
                     binding.phoneCallLogsPermission.visibility = View.VISIBLE
                 }
             }
@@ -148,7 +151,7 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
-    private fun startWorkManager(){
+   /* private fun startWorkManager(){
 
         val serviceCheckWorkRequest = PeriodicWorkRequest.Builder(
             ServiceCheckWorker::class.java,
@@ -167,16 +170,13 @@ class HomeActivity : AppCompatActivity() {
                     Log.e(ServiceRestarterService.TAG, "CallTracker : HomeActivity > ServiceCheckWorker > doWork > CallService service is running....")
                 }
             })
-    }
+    }*/
 
     private fun startAlarmManager(){
         // Schedule the alarm to run every minute
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, ServiceCheckReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-// Use setRepeating for periodic tasks
-// Adjust the intervalMillis based on your requirements
         val intervalMillis = 60 * 1000L  // 1 minute
         alarmManager.setRepeating(
             AlarmManager.ELAPSED_REALTIME,

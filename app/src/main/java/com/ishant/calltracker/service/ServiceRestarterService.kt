@@ -32,13 +32,13 @@ class ServiceRestarterService : Service() {
     private fun startServiceMonitoring() {
         val intent = Intent(this, ContactUpdateOnServer::class.java) // Replace with your service class
         intent.action = SERVICE_TO_RESTART
-        if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
+        /*if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
             Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > CallService is not running. Restarting...")
             navToCallService()
         }
         else{
             Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > CallService service is running....")
-        }
+        }*/
         scheduleServiceCheck()
     }
 

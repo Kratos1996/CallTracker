@@ -78,14 +78,9 @@ class CallService : Service() {
                         startForeground(notificationId, notification)
                     }
                     registerPhoneStateListener()
-                    serviceContactUploadRestarter()
                 })
             })
         } catch (e: Exception) {
-            /*callForegroundService(){notificationId,notification ->
-                startForeground(notificationId, notification)
-            }*/
-            serviceContactUploadRestarter()
             registerPhoneStateListener()
         }
 

@@ -1,7 +1,10 @@
 package com.ishant.calltracker.api
 
+import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.api.response.ContactSavedResponse
 import com.ishant.calltracker.api.response.LoginResponse
+import com.ishant.calltracker.api.response.UploadContactResponse
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -21,4 +24,7 @@ interface ApiInterface {
         @Field("duration") duration:String,
         @Field("name") name:String ): ContactSavedResponse
 
+
+    @POST("v2/contact")
+    suspend fun uploadContacts(@Body request : UploadContactRequest): UploadContactResponse
 }

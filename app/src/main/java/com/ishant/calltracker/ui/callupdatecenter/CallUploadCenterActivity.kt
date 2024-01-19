@@ -43,38 +43,8 @@ class CallUploadCenterActivity : AppCompatActivity() {
                 refresh()
             }
         }
-        binding.All.setOnClickListener {
-            viewModel.lastApiCall = UploadContactType.ALL
-            viewModel.getUploadContactsList()
-            binding.All.setBackgroundResource(R.drawable.fill_main_btn)
-            binding.complete.setBackgroundResource(R.drawable.fill_main_white_btn)
-            binding.pending.setBackgroundResource(R.drawable.fill_main_white_btn)
-            binding.All.setTextColor(resources.getColor(R.color.white))
-            binding.complete.setTextColor(resources.getColor(R.color.black))
-            binding.pending.setTextColor(resources.getColor(R.color.black))
-        }
 
-        binding.complete.setOnClickListener {
-            viewModel.lastApiCall = UploadContactType.COMPLETE
-            viewModel.getUploadContactsList(type = UploadContactType.COMPLETE)
-            binding.complete.setBackgroundResource(R.drawable.fill_main_btn)
-            binding.complete.setTextColor(resources.getColor(R.color.white))
-            binding.All.setBackgroundResource(R.drawable.fill_main_white_btn)
-            binding.pending.setTextColor(resources.getColor(R.color.black))
-            binding.pending.setBackgroundResource(R.drawable.fill_main_white_btn)
-            binding.All.setTextColor(resources.getColor(R.color.black))
-        }
 
-        binding.pending.setOnClickListener {
-            viewModel.lastApiCall = UploadContactType.PENDING
-            viewModel.getUploadContactsList(type = UploadContactType.PENDING)
-            binding.pending.setBackgroundResource(R.drawable.fill_main_btn)
-            binding.pending.setTextColor(resources.getColor(R.color.white))
-            binding.complete.setBackgroundResource(R.drawable.fill_main_white_btn)
-            binding.complete.setTextColor(resources.getColor(R.color.black))
-            binding.All.setBackgroundResource(R.drawable.fill_main_white_btn)
-            binding.All.setTextColor(resources.getColor(R.color.black))
-        }
         lifecycleScope.launch {
             viewModel.uploadContactListMutable.collectLatest { it ->
                 if (it.isNotEmpty()) {
@@ -106,15 +76,7 @@ class CallUploadCenterActivity : AppCompatActivity() {
     }
 
     private fun refresh() {
-        when (viewModel.lastApiCall) {
-            UploadContactType.ALL -> {
-                viewModel.getUploadContactsList()
-            }
-
-            else -> {
-                viewModel.getUploadContactsList(type = viewModel.lastApiCall)
-            }
-        }
+        viewModel.getUploadContactsList(type = viewModel.lastApiCall)
     }
 
 

@@ -57,4 +57,9 @@ interface CallTrackerDao {
 
     @Query("Delete From UploadContact")
     suspend fun deleteAllUploadedContacts()
+
+    @Query("Delete From UploadContact where serialNo =:serialNo")
+    suspend fun deleteUploadCallData(serialNo: Long)
+
+
 }

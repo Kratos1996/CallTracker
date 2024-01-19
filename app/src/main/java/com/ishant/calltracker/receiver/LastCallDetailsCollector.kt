@@ -9,75 +9,148 @@ import android.os.Bundle
 import android.provider.CallLog
 import android.provider.ContactsContract
 import android.util.Log
+import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.database.room.DatabaseRepository
+import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.text.SimpleDateFormat
 import java.time.Duration
+import java.util.Date
+import java.util.Locale
 
 
-class LastCallDetailsCollector {
+class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
 
-    data class ContactData( val callerNumber : String,val callerName :String , val callType :String , val duration: String)
 
-    fun collectLastCallDetails(context: Context): MutableStateFlow<ContactData?> {
-        val dataCaller = MutableStateFlow<ContactData?>(null)
+    suspend fun collectLastCallDetails(context: Context): UploadContactRequest {
+        val dataCaller = UploadContactRequest()
         val sortOrder = CallLog.Calls.DATE
+        val callsToShow = 10
+        var callsCount = 0
+        val dataUploadList = ArrayList<UploadContactRequest.UploadContactData>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val bundle = Bundle()
             bundle.putStringArray(ContentResolver.QUERY_ARG_SORT_COLUMNS, arrayOf(sortOrder))
-            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
-            bundle.putString(ContentResolver.QUERY_ARG_LIMIT, "1")
-
-            val cursor: Cursor? = context.contentResolver.query(
-                CallLog.Calls.CONTENT_URI, null,bundle, null
+            bundle.putInt(
+                ContentResolver.QUERY_ARG_SORT_DIRECTION,
+                ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
             )
-            cursor?.use {
-                if (it.moveToFirst()) {
-                    val callerNumber = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
+            bundle.putString(ContentResolver.QUERY_ARG_LIMIT, "10")
+            val cursor: Cursor? = context.contentResolver.query(
+                CallLog.Calls.CONTENT_URI, null, bundle, null
+            )
+
+            cursor?.use { cursor ->
+                if (cursor.moveToNext() && callsCount < callsToShow) {
+                    val callerNumber = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
                     val callerName = getContactName(context, callerNumber)
-                    val callType = getCallType(it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.TYPE)))
-                    val callDuration: String = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.DURATION))
+                    val callType = getCallType(cursor.getInt(cursor.getColumnIndexOrThrow(CallLog.Calls.TYPE)))
+                    val callDuration: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DURATION))
+                    val callDateTime: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))
+                    val name: String = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME))
+                    val dataContactDatabase = databaseRepository.getRestrictedContact(
+                        phone = Utils.extractLast10Digits(callerName),
+                        isFav = true
+                    )
                     Log.d("LastCallDetails", "CallTracker:  Caller Name: $callerName")
                     Log.d("LastCallDetails", "CallTracker:  Caller Number: $callerNumber")
                     Log.d("LastCallDetails", "CallTracker:  Call Type: $callType")
                     Log.d("LastCallDetails", "CallTracker:  Call Duration: $callDuration")
+                    Log.d("LastCallDetails", "CallTracker:  Call name: $name")
                     // Add more details as needed
                     // Implement your logic to save or use the call details
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+                    val callDate = dateFormat.format(Date(callDateTime))
+                    val durationFormat = String.format(
+                        "%02d:%02d:%02d",
+                        callDuration / 3600,
+                        callDuration % 3600 / 60,
+                        callDuration % 60
+                    )
 
-                    dataCaller.value = ( ContactData(callType = callType, callerName = callerName, callerNumber = callerNumber , duration = callDuration))
-                    return  dataCaller
+                    if (dataContactDatabase == null ||  dataContactDatabase.isFav == false) {
+                        dataUploadList.add(
+                            UploadContactRequest.UploadContactData(
+                                sourceMobileNo = Utils.extractLast10Digits(getPhoneNumber()),
+                                mobile = Utils.extractLast10Digits(callerNumber),
+                                type = callType,
+                                duration = durationFormat,
+                                name = callerName,
+                                dateTime = callDate ?: ""
+                            )
+                        )
+                    }
+                    callsCount++
                 }
-        }
-        }else{
+                dataCaller.data?.addAll(dataUploadList)
+            }
+            cursor?.close()
+        } else {
             val cursor: Cursor? = context.contentResolver.query(
                 CallLog.Calls.CONTENT_URI,
                 null,
                 null,
                 null,
-                CallLog.Calls.DATE + " DESC LIMIT 1"
+                CallLog.Calls.DATE + " DESC LIMIT 10"
             )
 
             cursor?.use {
-                if (it.moveToFirst()) {
+                if (it.moveToNext() && callsCount < callsToShow) {
                     val callerNumber = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
                     val callerName = getContactName(context, callerNumber)
                     val callType = getCallType(it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.TYPE)))
-                    val callDuration: String = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.DURATION))
+                    val callDuration: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DURATION))
+                    val callDateTime: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))
+                    val name: String = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME))
+                    val dataContactDatabase = databaseRepository.getRestrictedContact(
+                        phone = Utils.extractLast10Digits(callerName),
+                        isFav = true
+                    )
                     Log.d("LastCallDetails", "CallTracker:  Caller Name: $callerName")
                     Log.d("LastCallDetails", "CallTracker:  Caller Number: $callerNumber")
                     Log.d("LastCallDetails", "CallTracker:  Call Type: $callType")
+                    Log.d("LastCallDetails", "CallTracker:  Call Duration: $callDuration")
+                    Log.d("LastCallDetails", "CallTracker:  Call name: $name")
                     // Add more details as needed
                     // Implement your logic to save or use the call details
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+                    val callDate = dateFormat.format(Date(callDateTime))
+                    val durationFormat = String.format(
+                        "%02d:%02d:%02d",
+                        callDuration / 3600,
+                        callDuration % 3600 / 60,
+                        callDuration % 60
+                    )
 
-                    dataCaller.value = ( ContactData(callType = callType, callerName = callerName, callerNumber = callerNumber, duration = callDuration))
-                    return  dataCaller
+                    if (dataContactDatabase == null ||  dataContactDatabase.isFav == false) {
+                            dataUploadList.add(
+                                UploadContactRequest.UploadContactData(
+                                    sourceMobileNo = Utils.extractLast10Digits(getPhoneNumber()),
+                                    mobile = Utils.extractLast10Digits(callerNumber),
+                                    type = callType,
+                                    duration = durationFormat,
+                                    name = callerName,
+                                    dateTime = callDate ?: ""
+                                )
+                            )
+                        }
+                    callsCount++
                 }
+                dataCaller.data?.addAll(dataUploadList)
             }
+            cursor?.close()
         }
+
 
         return dataCaller
     }
 
     private fun getContactName(context: Context, phoneNumber: String): String {
-        val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber))
+        val uri = Uri.withAppendedPath(
+            ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+            Uri.encode(phoneNumber)
+        )
         val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
 
         context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
@@ -93,7 +166,33 @@ class LastCallDetailsCollector {
             CallLog.Calls.INCOMING_TYPE -> "Incoming"
             CallLog.Calls.OUTGOING_TYPE -> "Outgoing"
             CallLog.Calls.MISSED_TYPE -> "Missed"
-            else -> "Unknown"
+            else -> "Call Ended without Pickup"
+        }
+    }
+
+    private fun getPhoneNumber(): String {
+        when (AppPreference.simManager.data.size) {
+            1 -> {
+                return if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) {
+                    AppPreference.user.mobile ?: ""
+                } else {
+                    AppPreference.simManager.data[0].phoneNumber
+                }
+            }
+
+            2 -> {
+                return if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty() && AppPreference.simManager.data[1].phoneNumber.isNullOrEmpty()) {
+                    AppPreference.user.mobile ?: ""
+                } else if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) {
+                    AppPreference.user.mobile ?: ""
+                } else {
+                    AppPreference.simManager.data[0].phoneNumber
+                }
+            }
+
+            else -> {
+                return AppPreference.user.mobile ?: ""
+            }
         }
     }
 }

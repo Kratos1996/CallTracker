@@ -1,8 +1,10 @@
 package com.ishant.calltracker.domain
 
 import com.google.gson.Gson
+import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.api.response.ContactSavedResponse
 import com.ishant.calltracker.api.response.LoginResponse
+import com.ishant.calltracker.api.response.UploadContactResponse
 import com.ishant.calltracker.data.ContactRepository
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.network.catchExceptions
@@ -22,6 +24,18 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
 
         } catch (e: Exception) {
             catchExceptions<LoginResponse>(e,Gson())
+        }
+    }
+
+    override fun uploadContacts(request: UploadContactRequest): Flow<Resource<UploadContactResponse>> = flow {
+        try {
+            emit(Resource.Loading<UploadContactResponse>())
+            val response= repository.uploadContacts(request)
+
+            emit(Resource.Success<UploadContactResponse>(response))
+
+        } catch (e: Exception) {
+            catchExceptions<UploadContactResponse>(e,Gson())
         }
     }
 

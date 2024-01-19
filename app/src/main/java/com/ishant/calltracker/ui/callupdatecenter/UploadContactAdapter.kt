@@ -8,6 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ishant.calltracker.database.room.UploadContact
 import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.databinding.CallUploadedOnServerItemBinding
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.collections.ArrayList
 
 class UploadContactAdapter(
@@ -21,25 +24,24 @@ class UploadContactAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(list: List<UploadContact>) {
-        this.getAllUploadContact=list
+        this.getAllUploadContact = list
         notifyDataSetChanged()
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UploadContactViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = CallUploadedOnServerItemBinding.inflate( inflater,  parent,  false)
+        val binding = CallUploadedOnServerItemBinding.inflate(inflater, parent, false)
         return UploadContactViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: UploadContactViewHolder, position: Int) {
-        holder.binding.sourceNameTitleText.text = getAllUploadContact[position].name
-        holder.binding.sourceMobileTitleText.text = getAllUploadContact[position].sourceMobileNo
+        holder.binding.sourceNameTitleText.text = getCorrectDate(getAllUploadContact[position].date)
         holder.binding.mainViewBtn.text = getAllUploadContact[position].type.capitalize()
         holder.binding.mainViewBtn.setOnClickListener {
-            if(getAllUploadContact[position].type == UploadContactType.PENDING) {
+            if (getAllUploadContact[position].type == UploadContactType.PENDING) {
                 uploadContact(getAllUploadContact[position])
-            }else{
+            } else {
                 message("This Call Detail is Already Saved")
             }
         }
@@ -49,9 +51,15 @@ class UploadContactAdapter(
         return getAllUploadContact.size
     }
 
-    inner class UploadContactViewHolder(val binding: CallUploadedOnServerItemBinding) : RecyclerView.ViewHolder(
-        binding.root
-    )
+    inner class UploadContactViewHolder(val binding: CallUploadedOnServerItemBinding) :
+        RecyclerView.ViewHolder(
+            binding.root
+        )
+
+    fun getCorrectDate(date: Long): String {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+        return dateFormat.format(Date(date))
+    }
 
 }
 

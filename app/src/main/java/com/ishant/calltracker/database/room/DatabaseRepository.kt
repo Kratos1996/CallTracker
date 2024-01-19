@@ -61,4 +61,8 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
     suspend fun updateUploadContact(serialNo:Long,type: String){
         db.getDao().updateUploadContact(serialNo,type)
     }
+
+    suspend fun deleteUploadCallData(serialNo: Long) {
+        db.getDao().deleteUploadCallData(serialNo)
+    }
 }

@@ -30,3 +30,5 @@ data class ContactSavedResponse(
         var userId: Int?
     )
 }
+
+data class UploadContactResponse(var status: Any?=null)

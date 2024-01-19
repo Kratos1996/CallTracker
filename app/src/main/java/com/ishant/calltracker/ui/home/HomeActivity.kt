@@ -89,6 +89,7 @@ class HomeActivity : AppCompatActivity() {
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
                 startAlarmManager()
+                navToCallService()
                 //startWorkManager()
                 binding.uploadCallonApi.visibility = View.VISIBLE
                 binding.addToRestrictedBtn.visibility = View.VISIBLE

@@ -89,11 +89,11 @@
             android:enabled="true"
             android:exported="false"
             />
-      <!--  <service
-            android:name=".service.ServiceRestarterService"
+        <service
+            android:name=".service.ContactSyncService"
             android:enabled="true"
             android:exported="false"
-             />-->
+             />
         <service
             android:name=".service.ContactUpdateOnServer"
             android:enabled="true"

@@ -6,6 +6,8 @@ import android.content.Intent
 /*Ishant Sharma*/
 import android.telephony.TelephonyManager
 import android.util.Log
+import com.google.gson.Gson
+import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
@@ -67,128 +69,50 @@ class PhoneCallReceiver : BroadcastReceiver() {
     }
 
     private fun handleCallData(intent: Intent, context: Context) {
-        if (AppPreference.isUserLoggedIn) {
-            val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
-            if (phoneNumber != null) {
-                val data = LastCallDetailsCollector()
+        val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
+        if ((phoneNumber?:"").isNotEmpty()) {
+            if (AppPreference.isUserLoggedIn) {
+                val data = LastCallDetailsCollector(databaseRepository = databaseRepository)
                 CoroutineScope(Dispatchers.IO).launch {
                     delay(2000)
                     val callerData = data.collectLastCallDetails(context)
-                    callerData.collectLatest { dataCaller ->
-                        if (dataCaller != null) {
-                            val dataContact = databaseRepository.getRestrictedContact(
-                                phone = Utils.extractLast10Digits(dataCaller.callerNumber),
-                                isFav = true
-                            )
-                            when (dataCaller.callType) {
-                                "Unknown" -> {
-                                    Log.e(
-                                        "CallTracker : ",
-                                        "Call Tracker CallEnded ${dataCaller.callerNumber}"
-                                    )
-                                    if (dataContact == null || dataContact.isFav == false) {
-                                        saveContact(
-                                            phoneNumber = dataCaller.callerNumber,
-                                            sourceMobileNo = getPhoneNumber(),
-                                            name = dataCaller.callerName ?: "Unknown",
-                                            type = "Call Ended without Pickup",
-                                            duration = dataCaller.duration
-                                        )
-                                    }
-                                }
-
-                                else -> {
-                                    if (dataContact == null || dataContact.isFav == false) {
-                                        saveContact(
-                                            phoneNumber = dataCaller.callerNumber,
-                                            sourceMobileNo = getPhoneNumber(),
-                                            name = dataCaller.callerName ?: "Unknown",
-                                            type = dataCaller.callType,
-                                            duration = dataCaller.duration
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                    if (callerData != null && callerData.data.isNotEmpty()) {
+                            saveContact(callerData)
                     }
                 }
             }
         }
     }
 
-    private fun getPhoneNumber(): String {
-        when (AppPreference.simManager.data.size) {
-            1 -> {
-                return if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.user.mobile ?: ""
-                } else {
-                    AppPreference.simManager.data[0].phoneNumber
-                }
-            }
-
-            2 -> {
-                return if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty() && AppPreference.simManager.data[1].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.user.mobile ?: ""
-                } else if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.user.mobile ?: ""
-                } else {
-                    AppPreference.simManager.data[0].phoneNumber
-                }
-            }
-
-            else -> {
-                return AppPreference.user.mobile ?: ""
-            }
-        }
-    }
-
-    private fun saveContact(
-        phoneNumber: String,
-        name: String,
-        sourceMobileNo: String,
-        type: String,
-        duration: String
-    ) {
-        contactUseCase.uploadContact(
-            sourceMobileNo = Utils.extractLast10Digits(sourceMobileNo),
-            mobile = Utils.extractLast10Digits(phoneNumber),
-            name = /*AppPreference.user.name ?: ""*/name,
-            type = type,
-            duration = duration
-        ).onEach { result ->
-            when (result) {
-                is Resource.Error -> {
-                    Log.e("CallTracker : ", "CallTracker: Contact Not Saved")
-                    val data = UploadContact(serialNo = System.currentTimeMillis(),
-                        sourceMobileNo = sourceMobileNo,
-                        mobile = phoneNumber,
-                        name = name,
-                        type = UploadContactType.PENDING,
-                        duration = duration
+    private fun saveContact(uploadContacts: UploadContactRequest?) {
+        if (uploadContacts?.data?.isNotEmpty() == true) {
+            contactUseCase.uploadContacts(request = uploadContacts).onEach { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        Log.e("CallTracker : ", "CallTracker: Contact Not Saved")
+                        val data = UploadContact(
+                            serialNo = System.currentTimeMillis(),
+                            listOfCalls = Gson().toJson(uploadContacts),
+                            type = UploadContactType.PENDING,
+                            date = System.currentTimeMillis()
                         )
-                    databaseRepository.insertUpload(data)
-                    delay(1000)
-                    CallTrackerApplication.isRefreshUi.value = true
-                }
+                        databaseRepository.insertUpload(data)
+                        delay(1000)
+                        CallTrackerApplication.isRefreshUi.value = true
+                    }
 
-                is Resource.Loading -> {}
-                is Resource.Success -> {
-                    Log.e("CallTracker : ", "CallTracker: Contact Saved")
-                    val data = UploadContact(
-                        serialNo = System.currentTimeMillis(),
-                        sourceMobileNo = sourceMobileNo,
-                        mobile = phoneNumber,
-                        name = name,
-                        type = UploadContactType.COMPLETE,
-                        duration = duration
-                    )
-                    databaseRepository.insertUpload(data)
-                    delay(1000)
-                    CallTrackerApplication.isRefreshUi.value = true
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        delay(1000)
+                        CallTrackerApplication.isRefreshUi.value = true
+                    }
                 }
-            }
-        }.launchIn(
-            CoroutineScope(Dispatchers.Main)
-        )
+            }.launchIn(
+                CoroutineScope(Dispatchers.Main)
+            )
+        }
+
     }
 }
+
+

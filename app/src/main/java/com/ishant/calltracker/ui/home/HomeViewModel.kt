@@ -3,6 +3,8 @@ package com.ishant.calltracker.ui.home
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import com.google.gson.Gson
+import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.database.room.ContactList
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
@@ -36,7 +38,7 @@ class HomeViewModel  @Inject constructor(
     val isLoading = MutableStateFlow<Boolean>(false)
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val scopeMain = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    var lastApiCall :String = UploadContactType.ALL
+    var lastApiCall :String = UploadContactType.PENDING
 
     fun getRestrictedContacts(search:String): LiveData<List<ContactList>> {
        return databaseRepository.getRestrictedDataList(search)
@@ -55,7 +57,7 @@ class HomeViewModel  @Inject constructor(
          }.launchIn(scope)
     }
 
-    fun getUploadContactsList(type:String = UploadContactType.ALL){
+    fun getUploadContactsList(type:String = UploadContactType.PENDING){
         scope.launch {
             databaseRepository.getUploadContactList(type).collectLatest {
                 uploadContactListMutable.value = it
@@ -77,13 +79,7 @@ class HomeViewModel  @Inject constructor(
     }
 
      fun saveContact(uploadContact: UploadContact, onMessage : (String) ->Unit) {
-        contactUseCase.uploadContact(
-            sourceMobileNo = Utils.extractLast10Digits(uploadContact.sourceMobileNo),
-            mobile = Utils.extractLast10Digits(uploadContact.mobile),
-            name = /*AppPreference.user.name ?: ""*/uploadContact.name,
-            type = uploadContact.type,
-            duration = uploadContact.duration
-        ).onEach { result ->
+        contactUseCase.uploadContacts(request = Gson().fromJson(uploadContact.listOfCalls, UploadContactRequest::class.java)).onEach { result ->
             when (result) {
                 is Resource.Error -> {
                     isLoading.value = false
@@ -94,7 +90,7 @@ class HomeViewModel  @Inject constructor(
                     isLoading.value = true
                 }
                 is Resource.Success -> {
-                    updateUploadCall(uploadContact.serialNo,UploadContactType.COMPLETE)
+                    databaseRepository.deleteUploadCallData(uploadContact.serialNo)
                     isLoading.value = false
                 }
             }
@@ -117,7 +113,4 @@ class HomeViewModel  @Inject constructor(
             isLoading.value = false
         }
     }
-
-
-
 }

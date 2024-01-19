@@ -11,13 +11,13 @@
         android:id="@+id/sourceNameLableText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:paddingVertical="5dp"
         android:paddingStart="16dp"
-        android:text="@string/source_name"
+        android:text="@string/lastMissedCalls"
         android:textColor="@color/black"
         android:textSize="12sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="RtlSymmetry,SmallSp" />
@@ -27,45 +27,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
         android:paddingVertical="5dp"
         android:paddingStart="5dp"
         android:textColor="@color/black"
         android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/sourceNameLableText"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="RtlSymmetry,SmallSp" />
 
-    <TextView
-        android:id="@+id/sourceMobileLableText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:paddingVertical="5dp"
-        android:paddingStart="16dp"
-        android:text="@string/source_mobile"
-        android:textColor="@color/black"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sourceNameLableText"
-        tools:ignore="RtlSymmetry,SmallSp" />
-
-    <TextView
-        android:id="@+id/sourceMobileTitleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:paddingVertical="5dp"
-        android:paddingStart="5dp"
-        android:textColor="@color/black"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/sourceMobileLableText"
-        app:layout_constraintStart_toEndOf="@+id/sourceMobileLableText"
-        app:layout_constraintTop_toTopOf="@+id/sourceMobileLableText"
-        tools:ignore="RtlSymmetry,SmallSp" />
 
     <TextView
         android:id="@+id/mainViewBtn"

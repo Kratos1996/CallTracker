@@ -4,6 +4,9 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
+import com.google.gson.Gson
+import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.app.CallTrackerApplication.Companion.isRefreshUi
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
@@ -45,7 +48,7 @@ class ContactUpdateOnServer : Service() {
         getUploadContactsList()
     }
 
-    private fun startProcess() {
+/*    private fun startProcess() {
         val context = this
         if (currentIndex < uploadContactList.size) {
             Log.e(
@@ -72,44 +75,36 @@ class ContactUpdateOnServer : Service() {
             scope.cancel()
             context.stopServiceContactUpload()
         }
-    }
+    }*/
 
-    private fun saveContact(uploadContact: UploadContact, onSuccess: (Boolean) -> Unit) {
-        contactUseCase.uploadContact(
-            sourceMobileNo = Utils.extractLast10Digits(uploadContact.sourceMobileNo),
-            mobile = Utils.extractLast10Digits(uploadContact.mobile),
-            name = /*AppPreference.user.name ?: ""*/uploadContact.name,
-            type = uploadContact.type,
-            duration = uploadContact.duration
-        ).onEach { result ->
-            when (result) {
-                is Resource.Error -> {
-                    Log.e(
-                        "CallTracker : ",
-                        "CallTracker : Service > ContactUpdateOnServer > StartProcess > saveContact > onError"
-                    )
-                    onSuccess(false)
+    private fun saveContact(uploadContacts: UploadContactRequest?) {
+        if (uploadContacts?.data?.isNotEmpty() == true) {
+            contactUseCase.uploadContacts(request = uploadContacts).onEach { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        Log.e("CallTracker : ", "CallTracker: Contact Not Saved")
+                        val data = UploadContact(
+                            serialNo = System.currentTimeMillis(),
+                            listOfCalls = Gson().toJson(uploadContacts),
+                            type = UploadContactType.PENDING,
+                            date = System.currentTimeMillis()
+                        )
+                        databaseRepository.insertUpload(data)
+                        delay(1000)
+                        CallTrackerApplication.isRefreshUi.value = true
+                    }
+
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        delay(1000)
+                        CallTrackerApplication.isRefreshUi.value = true
+                    }
                 }
+            }.launchIn(
+                CoroutineScope(Dispatchers.Main)
+            )
+        }
 
-                is Resource.Success -> {
-                    Log.e(
-                        "CallTracker : ",
-                        "CallTracker : Service > ContactUpdateOnServer > saveContact > Call Saved On Server"
-                    )
-                    updateUploadCall(uploadContact.serialNo, UploadContactType.COMPLETE)
-                    delay(4000)
-                    onSuccess(true)
-
-                }
-
-                else -> {
-                    Log.e(
-                        "CallTracker : ",
-                        "CallTracker : Service > ContactUpdateOnServer > StartProcess > saveContact > elsePart"
-                    )
-                }
-            }
-        }.launchIn(scope)
     }
 
     private suspend fun updateUploadCall(serialNo: Long, type: String) {
@@ -129,7 +124,7 @@ class ContactUpdateOnServer : Service() {
                 currentIndex = 0
                 uploadContactList = it
                 delay(4000)
-                startProcess()
+                //startProcess()
             }
             Log.e(TAG, "CallTracker : Service > ContactUpdateOnServer > GetAllPendingList")
 

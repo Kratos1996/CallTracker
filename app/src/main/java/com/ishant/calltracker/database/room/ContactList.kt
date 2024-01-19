@@ -15,6 +15,7 @@ data class ContactList(
 )
 
 
+/*
 @Entity
 data class UploadContact(@PrimaryKey(autoGenerate = false )
                          @NonNull val serialNo :Long ,
@@ -24,6 +25,15 @@ data class UploadContact(@PrimaryKey(autoGenerate = false )
                            @ColumnInfo var type:String,
                            @ColumnInfo var duration:String,
 )
+*/
+
+@Entity("UploadContact")
+data class UploadContact(@PrimaryKey(autoGenerate = false )
+                         @NonNull val serialNo :Long,
+                         @ColumnInfo var  listOfCalls:String,
+                         @ColumnInfo var  date:Long,
+                         @ColumnInfo var type:String,
+    )
 
 
 object UploadContactType {

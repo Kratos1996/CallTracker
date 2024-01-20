@@ -30,6 +30,12 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
         var callsCount = 0
         val dataUploadList = ArrayList<UploadContactRequest.UploadContactData>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val projection = arrayOf(
+                CallLog.Calls.NUMBER,
+                CallLog.Calls.TYPE,
+                CallLog.Calls.DATE,
+                CallLog.Calls.DURATION
+            )
             val bundle = Bundle()
             bundle.putStringArray(ContentResolver.QUERY_ARG_SORT_COLUMNS, arrayOf(sortOrder))
             bundle.putInt(
@@ -37,18 +43,14 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                 ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
             )
             bundle.putString(ContentResolver.QUERY_ARG_LIMIT, "10")
-            val cursor: Cursor? = context.contentResolver.query(
-                CallLog.Calls.CONTENT_URI, null, bundle, null
-            )
-
-            cursor?.use { cursor ->
-                if (cursor.moveToNext() && callsCount < callsToShow) {
-                    val callerNumber = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
+            val cursor: Cursor? = context.contentResolver.query(CallLog.Calls.CONTENT_URI, projection, bundle, null)
+            cursor?.use { cursorData ->
+                while (cursorData.moveToNext() && callsCount < callsToShow) {
+                    val callerNumber = cursorData.getString(cursorData.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
                     val callerName = getContactName(context, callerNumber)
-                    val callType = getCallType(cursor.getInt(cursor.getColumnIndexOrThrow(CallLog.Calls.TYPE)))
-                    val callDuration: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DURATION))
-                    val callDateTime: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))
-                    val name: String = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME))
+                    val callType = getCallType(cursorData.getInt(cursorData.getColumnIndexOrThrow(CallLog.Calls.TYPE)))
+                    val callDuration: Long = cursorData.getLong(cursorData.getColumnIndexOrThrow(CallLog.Calls.DURATION))
+                    val callDateTime: Long = cursorData.getLong(cursorData.getColumnIndexOrThrow(CallLog.Calls.DATE))
                     val dataContactDatabase = databaseRepository.getRestrictedContact(
                         phone = Utils.extractLast10Digits(callerName),
                         isFav = true
@@ -57,7 +59,6 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     Log.d("LastCallDetails", "CallTracker:  Caller Number: $callerNumber")
                     Log.d("LastCallDetails", "CallTracker:  Call Type: $callType")
                     Log.d("LastCallDetails", "CallTracker:  Call Duration: $callDuration")
-                    Log.d("LastCallDetails", "CallTracker:  Call name: $name")
                     // Add more details as needed
                     // Implement your logic to save or use the call details
                     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
@@ -84,25 +85,31 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     callsCount++
                 }
                 dataCaller.data?.addAll(dataUploadList)
+                return dataCaller
             }
             cursor?.close()
-        } else {
+        }
+        else {
+            val projection = arrayOf(
+                CallLog.Calls.NUMBER,
+                CallLog.Calls.TYPE,
+                CallLog.Calls.DATE,
+                CallLog.Calls.DURATION
+            )
             val cursor: Cursor? = context.contentResolver.query(
                 CallLog.Calls.CONTENT_URI,
-                null,
+                projection,
                 null,
                 null,
                 CallLog.Calls.DATE + " DESC LIMIT 10"
             )
-
             cursor?.use {
-                if (it.moveToNext() && callsCount < callsToShow) {
+                while (it.moveToNext() && callsCount < callsToShow) {
                     val callerNumber = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
                     val callerName = getContactName(context, callerNumber)
                     val callType = getCallType(it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.TYPE)))
                     val callDuration: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DURATION))
                     val callDateTime: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))
-                    val name: String = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME))
                     val dataContactDatabase = databaseRepository.getRestrictedContact(
                         phone = Utils.extractLast10Digits(callerName),
                         isFav = true
@@ -111,7 +118,7 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     Log.d("LastCallDetails", "CallTracker:  Caller Number: $callerNumber")
                     Log.d("LastCallDetails", "CallTracker:  Call Type: $callType")
                     Log.d("LastCallDetails", "CallTracker:  Call Duration: $callDuration")
-                    Log.d("LastCallDetails", "CallTracker:  Call name: $name")
+
                     // Add more details as needed
                     // Implement your logic to save or use the call details
                     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
@@ -138,11 +145,10 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     callsCount++
                 }
                 dataCaller.data?.addAll(dataUploadList)
+                return dataCaller
             }
             cursor?.close()
         }
-
-
         return dataCaller
     }
 

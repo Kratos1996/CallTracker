@@ -101,21 +101,28 @@ class CallService : Service() {
 
 
     private fun registerPhoneStateListener() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val extras = telephonyManager.currentCallExtras
             telephonyManager.registerTelephonyCallback(
                 this.mainExecutor,
                 object : TelephonyCallback(), TelephonyCallback.CallStateListener {
                     override fun onCallStateChanged(state: Int) {
                         when (state) {
                             TelephonyManager.CALL_STATE_IDLE -> {
+                                val incomingNumber = extras.getString(TelephonyManager.EXTRA_INCOMING_NUMBER)
+                                if (incomingNumber != null) {
+                                    // Log or handle the incoming call number
+                                    println("Incoming call number: $incomingNumber")
+                                }
                                 handleCallData( "", this@CallService)
                             }
                         }
                     }
                 })
         } else {
-            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
-        }
+
+        }*/
+        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
     }
 
     private fun unregisterPhoneStateListener() {
@@ -123,8 +130,8 @@ class CallService : Service() {
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
     }
 
-    private fun handleCallData(phoneNumber: String, context: Context) {
-        if (AppPreference.isUserLoggedIn) {
+    private fun handleCallData(phoneNumber: String, context: Context){
+        if (AppPreference.isUserLoggedIn && phoneNumber.isNotEmpty()) {
             val data = LastCallDetailsCollector(databaseRepository = databaseRepository)
             CoroutineScope(Dispatchers.IO).launch {
                 delay(2000)

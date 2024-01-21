@@ -16,7 +16,8 @@ import kotlin.collections.ArrayList
 class UploadContactAdapter(
     var context: Context,
     val uploadContact: (UploadContact) -> Unit,
-    val message: (String) -> Unit
+    val message: (String) -> Unit,
+    val callLogsActivity: (String) -> Unit
 ) :
     RecyclerView.Adapter<UploadContactAdapter.UploadContactViewHolder>() {
     private var getAllUploadContact: List<UploadContact> = ArrayList()
@@ -44,6 +45,9 @@ class UploadContactAdapter(
             } else {
                 message("This Call Detail is Already Saved")
             }
+        }
+        holder.binding.root.setOnClickListener {
+            callLogsActivity(getAllUploadContact[position].listOfCalls)
         }
     }
 

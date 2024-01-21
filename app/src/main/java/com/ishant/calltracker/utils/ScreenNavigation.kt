@@ -17,6 +17,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.ishant.calltracker.R
+import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.ui.callupdatecenter.CallUploadCenterActivity
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ContactSyncService
@@ -24,6 +25,7 @@ import com.ishant.calltracker.service.ContactUpdateOnServer
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.home.HomeActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
+import com.ishant.calltracker.ui.logs.CallLogsActivity
 import com.ishant.calltracker.ui.restricted.AddNewContact
 import com.ishant.calltracker.ui.restricted.ContactActivity
 import com.ishant.calltracker.ui.restricted.RestrictedContactActivity
@@ -38,6 +40,11 @@ fun Context.navToHome(){
 }
 fun Context.navToLogin(){
     val intent = Intent(this, LoginActivity::class.java)
+    startActivity(intent)
+}
+fun Context.navToCallLogs(uploadContactRequest:String){
+    val intent = Intent(this, CallLogsActivity::class.java)
+    intent.putExtra("logs", uploadContactRequest)
     startActivity(intent)
 }
 fun Context.navToCallService(){

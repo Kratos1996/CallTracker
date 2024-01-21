@@ -6,12 +6,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.ishant.calltracker.R
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.UploadContact
-import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.databinding.ActivityCallUploadCenterBinding
 import com.ishant.calltracker.ui.home.HomeViewModel
+import com.ishant.calltracker.utils.navToCallLogs
 import com.ishant.calltracker.utils.showLoadingDialog
 import com.ishant.calltracker.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +32,7 @@ class CallUploadCenterActivity : AppCompatActivity() {
         binding= ActivityCallUploadCenterBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel.getUploadContactsList()
-        adapter = UploadContactAdapter(this,::uploadCallNow ,::showMessage)
+        adapter = UploadContactAdapter(this,::uploadCallNow ,::showMessage,::navToCallLogsActivity)
         binding.allRestrictedContactListRecycler.adapter = adapter
         binding.backBtn.setOnClickListener {
             finish()
@@ -87,6 +86,10 @@ class CallUploadCenterActivity : AppCompatActivity() {
                 refresh()
             }
         }
+    }
+
+    private fun navToCallLogsActivity(data:String){
+        navToCallLogs(uploadContactRequest = data)
     }
     private fun showMessage(message: String){
         this.toast(message)

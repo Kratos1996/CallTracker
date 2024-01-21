@@ -44,5 +44,6 @@
     <string name="saveContact">Save Contact</string>
     <string name="name">Name</string>
     <string name="isRistrictedContact">Please Check if this is Your Restricted Contact</string>
-    <string name="lastMissedCalls">Missed Uploaded Calls :</string>
+    <string name="lastMissedCalls">Last Missed Uploaded Calls</string>
+
 </resources>

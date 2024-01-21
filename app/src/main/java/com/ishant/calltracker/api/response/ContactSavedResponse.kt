@@ -31,4 +31,4 @@ data class ContactSavedResponse(
     )
 }
 
-data class UploadContactResponse(var status: Any?=null)
+data class UploadContactResponse(var status: Int?=null)

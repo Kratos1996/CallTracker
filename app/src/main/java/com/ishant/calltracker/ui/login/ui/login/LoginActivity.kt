@@ -9,13 +9,17 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.ishant.calltracker.R
+import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.databinding.ActivityLoginBinding
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.ContactSaver
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.navToHome
@@ -29,6 +33,8 @@ import requestNotificationPermission
 import takeForegroundCallService
 import takeForegroundService
 import writePhoneContactPermission
+import java.net.URI
+import java.net.URISyntaxException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,6 +43,8 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val loginViewModel by viewModels<LoginViewModel>()
     lateinit var context: Context
+    lateinit var spinnerAdapter:UrlAdapter
+    var urlResponseData: List<UrlResponse.Data> = arrayListOf()
     @Inject
     lateinit var progressDialog:Dialog
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,37 +80,93 @@ class LoginActivity : AppCompatActivity() {
 
         // Set the spannable text to the TextView
         binding.acceptTerms.text = spannableString
+        lifecycleLoginResponse()
+        binding.domainSpinner.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                binding.domains.text = urlResponseData[position].urlName
+                AppPreference.baseUrl = getHostFromUrl(urlResponseData[position].urlValue?:"https://wappblaster.in/api/")?:"wappblaster.in"
+                Log.e("Login","BaseUrl : ${AppPreference.baseUrl}")
+                loginViewModel.baseUrlInterceptor.setBaseUrl(AppPreference.baseUrl)
+            }
 
-       lifecycleScope.launch {
-           loginViewModel.loginResponse.collectLatest {
-               when(it){
-                   Response.Empty -> {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
 
-                   }
-                   is Response.Loading -> {
-                       showLoadingDialog(context, progressDialog).show()
-                   }
-                   is Response.Message -> {
-                       showLoadingDialog(context, progressDialog).hide()
-                       context.toast(message = "Credentials Mismatched,Please Check your Phone or password ")
+    private fun lifecycleLoginResponse() {
+        lifecycleScope.launch {
+            loginViewModel.domain.collectLatest { domains ->
+                when (domains) {
+                    Response.Empty -> {}
+                    is Response.Loading -> showLoadingDialog(context, progressDialog).show()
+                    is Response.Message -> {
+                        showLoadingDialog(context, progressDialog).hide()
+                        context.toast(message = "Not Authorize")
 
-                   }
-                   is Response.Success ->{
-                       showLoadingDialog(context, progressDialog).hide()
-                       takeForegroundService(granted = {
-                           if(isNotificationPermissionGranted(context)) {
-                               navToHome()
-                           }else{
-                               requestNotificationPermission(context)
-                           }
-                       }){
-                           context.toast(message = "Need Permission Foreground  Service")
-                       }
+                    }
 
-                   }
-               }
-           }
-       }
+                    is Response.Success -> {
+                        showLoadingDialog(context, progressDialog).hide()
+                        urlResponseData = domains.response?.urlResponseData ?: arrayListOf()
+                        spinnerAdapter = UrlAdapter(
+                            this@LoginActivity,
+                            R.layout.custom_spinner,
+                            urlResponseData
+                        )
+                        binding.domainSpinner.adapter = spinnerAdapter
+                        binding.domains.setOnClickListener { binding.domainSpinner.performClick() }
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            loginViewModel.loginResponse.collectLatest {
+                when (it) {
+                    Response.Empty -> {
+
+                    }
+
+                    is Response.Loading -> {
+                        showLoadingDialog(context, progressDialog).show()
+                    }
+
+                    is Response.Message -> {
+                        showLoadingDialog(context, progressDialog).hide()
+                        context.toast(message = "Credentials Mismatched,Please Check your Phone or password ")
+
+                    }
+
+                    is Response.Success -> {
+                        showLoadingDialog(context, progressDialog).hide()
+                        takeForegroundService(granted = {
+                            if (isNotificationPermissionGranted(context)) {
+                                navToHome()
+                            } else {
+                                requestNotificationPermission(context)
+                            }
+                        }) {
+                            context.toast(message = "Need Permission Foreground  Service")
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    fun getHostFromUrl(url: String): String? {
+        return try {
+            val uri = URI(url)
+            uri.host
+        } catch (e: URISyntaxException) {
+            null
+        }
     }
 
     private fun loadUrl(url:String) {

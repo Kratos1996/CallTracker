@@ -4,6 +4,7 @@ import com.ishant.calltracker.api.ApiInterface
 import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
+import com.ishant.calltracker.api.response.UrlResponse
 import java.time.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,5 +24,6 @@ class ContactRepositoryImpl  @Inject constructor(val api: ApiInterface) :Contact
         )
 
     override suspend fun uploadContacts(request: UploadContactRequest): UploadContactResponse = api.uploadContacts(request)
+    override suspend fun getDomains(): UrlResponse = api.getDomains()
 
 }

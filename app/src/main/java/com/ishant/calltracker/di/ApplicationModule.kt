@@ -40,7 +40,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApplicationModule {
-    val BASE_URL = "https://wappblaster.in/api/"
+
 
     @Provides
     @Singleton
@@ -103,10 +103,11 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        interceptor: ChuckerInterceptor
+        interceptor: ChuckerInterceptor,
+        interceptorBase: BaseUrlInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(interceptor)
+            .addInterceptor(interceptorBase)
             .addInterceptor(Interceptor { chain ->
                 val newRequest = chain.request().newBuilder().addHeader(
                     "Authorization", "Bearer " + AppPreference.firebaseToken
@@ -120,17 +121,38 @@ object ApplicationModule {
             .build()
     }
 
+    @Provides
+    @Singleton
+    fun provideBaseUrlInterceptor(): BaseUrlInterceptor {
+        return BaseUrlInterceptor("wappblaster.in") // Set a default base URL here
+    }
 
     @Provides
     @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://wappblaster.in/api/") // Base URL is set dynamically in Interceptor
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideApiService(retrofit: Retrofit): ApiInterface {
+        return retrofit.create(ApiInterface::class.java)
+    }
+
+    /*@Provides
+    @Singleton
     fun provideApi(okHttpClient: OkHttpClient): ApiInterface {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(AppPreference.baseUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiInterface::class.java)
-    }
+    }*/
 
     @Provides
     fun provideContactRepository(api : ApiInterface):ContactRepository = ContactRepositoryImpl(api)

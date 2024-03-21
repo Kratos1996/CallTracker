@@ -82,7 +82,7 @@ object ApplicationModule {
             // Toggles visibility of the notification
             showNotification = true,
             // Allows to customize the retention period of collected data
-            retentionPeriod = RetentionManager.Period.ONE_HOUR
+            retentionPeriod = RetentionManager.Period.FOREVER
         )
     }
 
@@ -108,16 +108,18 @@ object ApplicationModule {
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(interceptorBase)
+            .addInterceptor(interceptor)
             .addInterceptor(Interceptor { chain ->
                 val newRequest = chain.request().newBuilder().addHeader(
                     "Authorization", "Bearer " + AppPreference.firebaseToken
                 ).build()
                 chain.proceed(newRequest)
             })
-            .connectTimeout(20, TimeUnit.SECONDS)
-            .readTimeout(20, TimeUnit.SECONDS)
-            .writeTimeout(20, TimeUnit.SECONDS)
+            .connectTimeout(20, TimeUnit.MINUTES)
+            .readTimeout(20, TimeUnit.MINUTES)
+            .writeTimeout(20, TimeUnit.MINUTES)
             .retryOnConnectionFailure(true)
+            .pingInterval(20, TimeUnit.MINUTES)
             .build()
     }
 

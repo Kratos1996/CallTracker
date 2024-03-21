@@ -21,6 +21,7 @@ import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
 import com.ishant.calltracker.database.room.UploadContactType
+import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.LastCallDetailsCollector
@@ -51,6 +52,8 @@ class CallService : Service() {
 
     @Inject
     lateinit var databaseRepository: DatabaseRepository
+    @Inject
+    lateinit var baseUrlInterceptor: BaseUrlInterceptor
 
     private lateinit var telephonyManager: TelephonyManager
 
@@ -145,6 +148,7 @@ class CallService : Service() {
 
     private fun saveContact(uploadContacts: UploadContactRequest?) {
         if(uploadContacts?.data?.isNotEmpty() == true){
+            baseUrlInterceptor.setBaseUrl(AppPreference.baseUrl)
             contactUseCase.uploadContacts(request = uploadContacts).onEach { result ->
                 when (result) {
                     is Resource.Error -> {

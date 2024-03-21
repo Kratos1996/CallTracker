@@ -23,8 +23,7 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
 
             emit(Resource.Success<LoginResponse>(response))
 
-        } catch (e: Exception) {
-            catchExceptions<LoginResponse>(e,Gson())
+        } catch (e: Exception) { catchExceptions<LoginResponse>(e,Gson())
         }
     }
 

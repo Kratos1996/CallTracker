@@ -9,8 +9,10 @@ import com.ishant.calltracker.database.room.ContactList
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
 import com.ishant.calltracker.database.room.UploadContactType
+import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.DBResponse
 import com.ishant.calltracker.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel  @Inject constructor(
      private val  databaseRepository: DatabaseRepository,
-     private var contactUseCase: ContactUseCase
+     private var contactUseCase: ContactUseCase,
+     val baseUrlInterceptor: BaseUrlInterceptor
 ) : AndroidViewModel(Application()) {
 
 
@@ -79,6 +82,7 @@ class HomeViewModel  @Inject constructor(
     }
 
      fun saveContact(uploadContact: UploadContact, onMessage : (String) ->Unit) {
+         baseUrlInterceptor.setBaseUrl(AppPreference.baseUrl)
         contactUseCase.uploadContacts(request = Gson().fromJson(uploadContact.listOfCalls, UploadContactRequest::class.java)).onEach { result ->
             when (result) {
                 is Resource.Error -> {

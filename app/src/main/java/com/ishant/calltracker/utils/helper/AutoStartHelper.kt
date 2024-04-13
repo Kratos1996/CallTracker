@@ -10,6 +10,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import com.ishant.calltracker.R
+import com.ishant.calltracker.utils.AppPreference
 import java.lang.Exception
 import java.util.*
 
@@ -109,10 +110,13 @@ class AutoStartHelper private constructor() {
             BRAND_NOKIA -> autoStartNokia(context)
             BRAND_SAMSUNG -> autoStartSamsung(context)
             BRAND_ONE_PLUS -> autoStartOnePlus(context)
-            else -> Toast.makeText(
-                context, context.getString(R.string.setting_not_available_for_device),
-                Toast.LENGTH_SHORT
-            ).show()
+            else -> {
+                AppPreference.isAutoStartPermissionEnabled =  true
+               /* Toast.makeText(
+                    context, context.getString(R.string.setting_not_available_for_device),
+                    Toast.LENGTH_SHORT
+                ).show()*/
+            }
         }
     }
 
@@ -308,6 +312,7 @@ class AutoStartHelper private constructor() {
             val intent = Intent()
             intent.component = ComponentName(packageName, componentName)
             context.startActivity(intent)
+            AppPreference.isAutoStartPermissionEnabled =  true
         } catch (var5: Exception) {
             var5.printStackTrace()
             throw var5

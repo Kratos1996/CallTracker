@@ -30,20 +30,21 @@ class ServiceRestarterService : Service() {
     }
 
     private fun startServiceMonitoring() {
-        val intent = Intent(this, ContactUpdateOnServer::class.java) // Replace with your service class
-        intent.action = SERVICE_TO_RESTART
-        /*if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
+        if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
             Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > CallService is not running. Restarting...")
             navToCallService()
         }
         else{
+            callForegroundService(){ notificationId,notification ->
+                startForeground(notificationId, notification)
+            }
             Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > CallService service is running....")
-        }*/
+        }
         scheduleServiceCheck()
     }
 
     private fun scheduleServiceCheck() {
-        val intervalMillis = 60000L // 1 minute interval, adjust as needed
+        val intervalMillis = 29000L // 1 minute interval, adjust as needed
         val handler = android.os.Handler()
 
         handler.postDelayed(object : Runnable {

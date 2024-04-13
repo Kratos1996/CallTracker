@@ -29,6 +29,8 @@ import com.ishant.calltracker.ui.logs.CallLogsActivity
 import com.ishant.calltracker.ui.restricted.AddNewContact
 import com.ishant.calltracker.ui.restricted.ContactActivity
 import com.ishant.calltracker.ui.restricted.RestrictedContactActivity
+import com.ishant.calltracker.utils.helper.AutoStartHelper
+import com.ishant.calltracker.utils.helper.AutoStartHelper.Companion.instance
 
 val settingApplicationCode = 1996
 val notificationId = 1
@@ -47,13 +49,16 @@ fun Context.navToCallLogs(uploadContactRequest:String){
     intent.putExtra("logs", uploadContactRequest)
     startActivity(intent)
 }
-fun Context.navToCallService(){
+fun Context.navToCallService(done :()->Unit ={}){
     val intent = Intent(this, CallService::class.java)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         startForegroundService(intent)
+        done()
     } else {
        startService(intent)
+        done()
     }
+
 }
 fun Context.navToRestrictContactActivity(){
     val intent = Intent(this, RestrictedContactActivity::class.java)
@@ -95,37 +100,8 @@ fun Context.navToSetting(activity: AppCompatActivity){
 }
 
 fun Context.addAutoStartup() {
-    try {
-        val intent = Intent()
-        val manufacturer = Build.MANUFACTURER
-        if ("xiaomi".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")
-        } else if ("oppo".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity")
-        } else if ("vivo".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")
-        } else if ("Letv".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity")
-        } else if ("Honor".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")
-        }else if ("Huawei".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.appcontrol.activity.StartupAppControlActivity")
-        }else if ("iqoo".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager")
-        }else if ("samsung".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity")
-        }else if ("htc".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.htc.pitroad", "com.htc.pitroad.landingpage.activity.LandingPageActivity")
-        }else if ("asus".equals(manufacturer, ignoreCase = true)) {
-            intent.component = ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity")
-        }
-        val list: List<ResolveInfo> = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        if (list.size > 0 &&!(AppPreference.isRegister)) {
-            AppPreference.isRegister = (true)
-        }
-    } catch (e: Exception) {
-        AppPreference.isRegister = (false)
-        Log.e("exc", e.toString())
+    if(!AppPreference.isAutoStartPermissionEnabled){
+        instance.getAutoStartPermission(this)
     }
 }
 
@@ -172,6 +148,7 @@ fun Context.addAutoStartup() {
             .setSmallIcon(R.drawable.notification_ico)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setAutoCancel(false)
             .build()
@@ -196,7 +173,8 @@ private fun Context.createNotificationChannel(
         notificationManager.createNotificationChannel(channel)
         onRunNotification(notificationId,notification)
     } else {
-        notificationManager.notify(1996, notification)
+        onRunNotification(notificationId,notification)
+        notificationManager.notify(notificationId, notification)
     }
 }
 

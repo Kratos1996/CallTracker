@@ -92,7 +92,6 @@ class HomeActivity : AppCompatActivity() {
             readPhoneNumberPermission(granted = {
                 startAlarmManager()
                 navToCallService()
-                startWorkManager()
                 binding.uploadCallonApi.visibility = View.VISIBLE
                 binding.addToRestrictedBtn.visibility = View.VISIBLE
                 loadUi()
@@ -107,6 +106,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
     private fun loadUi(){
+        startWorkManager()
         val data = managerPlus.getSimCardPhoneNumbers(this)
         binding.phoneStatePermission.visibility = View.GONE
         if(!data.isNullOrEmpty()) {

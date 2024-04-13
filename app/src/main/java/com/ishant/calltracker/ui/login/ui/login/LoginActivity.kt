@@ -1,10 +1,14 @@
 package com.ishant.calltracker.ui.login.ui.login
 
+import android.Manifest
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
@@ -13,9 +17,12 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.databinding.ActivityLoginBinding
@@ -30,7 +37,6 @@ import isNotificationPermissionGranted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import requestNotificationPermission
-import takeForegroundCallService
 import takeForegroundService
 import writePhoneContactPermission
 import java.net.URI
@@ -47,6 +53,83 @@ class LoginActivity : AppCompatActivity() {
     var urlResponseData: List<UrlResponse.Data> = arrayListOf()
     @Inject
     lateinit var progressDialog:Dialog
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (!isGranted) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Build.VERSION.SDK_INT >= 33) {
+                        if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                            showNotificationPermissionRationale()
+                        } else {
+                            showSettingDialog()
+                        }
+                    } else {
+                        loadHome()
+                    }
+                }
+            } else {
+                loadHome()
+            }
+        }
+
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                // FCM SDK (and your app) can post notifications.
+                loadHome()
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                loadHome()
+            } else {
+                // Directly ask for the permission
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            loadHome()
+        }
+    }
+
+    private fun showNotificationPermissionRationale() {
+        MaterialAlertDialogBuilder(
+            this, com.google.android.material.R.style.MaterialAlertDialog_Material3
+        )
+            .setTitle("Alert")
+            .setMessage("Notification permission is required, to show notification")
+            .setPositiveButton("Ok") { _, _ ->
+                if (Build.VERSION.SDK_INT >= 33) {
+                    notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                } else
+                    loadHome()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showSettingDialog() {
+        MaterialAlertDialogBuilder(
+            this,
+            com.google.android.material.R.style.MaterialAlertDialog_Material3
+        )
+            .setTitle("Notification Permission")
+            .setMessage("Notification permission is required, Please allow notification permission from setting")
+            .setPositiveButton("Ok") { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                intent.data = Uri.parse("package:com.ishant.calltracker")
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun loadHome() {
+        loginViewModel.login(binding.username.text.toString(),binding.password.text.toString())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context = this
@@ -108,15 +191,15 @@ class LoginActivity : AppCompatActivity() {
             loginViewModel.domain.collectLatest { domains ->
                 when (domains) {
                     Response.Empty -> {}
-                    is Response.Loading -> showLoadingDialog(context, progressDialog).show()
+                    is Response.Loading -> binding.progressBar.visibility = View.VISIBLE
                     is Response.Message -> {
-                        showLoadingDialog(context, progressDialog).hide()
+                        binding.progressBar.visibility = View.GONE
                         context.toast(message = "Not Authorize")
 
                     }
 
                     is Response.Success -> {
-                        showLoadingDialog(context, progressDialog).hide()
+                        binding.progressBar.visibility = View.GONE
                         urlResponseData = domains.response?.urlResponseData ?: arrayListOf()
                         spinnerAdapter = UrlAdapter(
                             this@LoginActivity,
@@ -137,17 +220,17 @@ class LoginActivity : AppCompatActivity() {
                     }
 
                     is Response.Loading -> {
-                        showLoadingDialog(context, progressDialog).show()
+                        binding.progressBar.visibility = View.VISIBLE
                     }
 
                     is Response.Message -> {
-                        showLoadingDialog(context, progressDialog).hide()
+                        binding.progressBar.visibility = View.GONE
                         context.toast(message = "Credentials Mismatched,Please Check your Phone or password ")
 
                     }
 
                     is Response.Success -> {
-                        showLoadingDialog(context, progressDialog).hide()
+                        binding.progressBar.visibility = View.GONE
                         takeForegroundService(granted = {
                             if (isNotificationPermissionGranted(context)) {
                                 navToHome()
@@ -157,7 +240,6 @@ class LoginActivity : AppCompatActivity() {
                         }) {
                             context.toast(message = "Need Permission Foreground  Service")
                         }
-
                     }
                 }
             }
@@ -206,7 +288,7 @@ class LoginActivity : AppCompatActivity() {
             else -> {
                 binding.layEmail.isErrorEnabled = false
                 binding.layPassword.isErrorEnabled = false
-                loginViewModel.login(binding.username.text.toString(),binding.password.text.toString())
+                askNotificationPermission()
                 ContactSaver.saveContact(this,name = " Wappblaster Support","917375092569")
             }
         }

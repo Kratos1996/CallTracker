@@ -18,6 +18,7 @@ object AppPreference {
     private val PREF_SIM1_SELETED= "PREF_SIM_1_SELECTED"
     private val PREF_SIM2_SELECTED= "PREF_SIM_2_SELECTED"
     private val PREF_SPECIAL_PERMISION= "PREF_SPECIAL_PERMISSION"
+    private val PREF_AUTO_START_SPECIAL_PERMISSION= "PREF_AUTO_START_SPECIAL_PERMISSION"
     private val PREF_BASE_URL= "PREF_BASE_URL"
     private const val APP_NAME = "callTracker:Ishant"
 
@@ -46,6 +47,10 @@ object AppPreference {
     var isRegister: Boolean
         get() = getDataBoolean(PREF_SPECIAL_PERMISION) ?:false
         set(value) = setDataBoolean(PREF_SPECIAL_PERMISION,value)
+
+    var isAutoStartPermissionEnabled: Boolean
+        get() = getDataBoolean(PREF_AUTO_START_SPECIAL_PERMISSION) ?:false
+        set(value) = setDataBoolean(PREF_AUTO_START_SPECIAL_PERMISSION,value)
 
     var isSim1Selected: Boolean
         get() = getDataBoolean(PREF_SIM1_SELETED)

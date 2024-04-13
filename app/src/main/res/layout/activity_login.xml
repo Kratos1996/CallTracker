@@ -9,150 +9,168 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.login.ui.login.LoginActivity">
-    <androidx.core.widget.NestedScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <LinearLayout
-            android:elevation="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:background="@drawable/bg_curve_bottom"
-            android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="200dp"
-                android:layout_height="50dp"
-                android:src="@drawable/logo"
-                android:scaleType="centerCrop"
-                android:layout_marginTop="100dp"/>
-            <TextView
-                android:id="@+id/domains"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="40dp"
-                android:drawablePadding="20dp"
-                android:paddingRight="10dp"
-                android:text=""
-                android:gravity="center|left"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:paddingStart="10dp"
-                android:background="@drawable/edit_text_back"
-                app:drawableRightCompat="@drawable/arrow_down"
-                tools:ignore="RtlHardcoded" />
-            <Spinner
-                android:id="@+id/domainSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginHorizontal="16dp"
-                android:visibility="invisible" />
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical">
+                android:background="@drawable/bg_curve_bottom"
+                android:elevation="10dp"
+                android:gravity="center"
+                android:orientation="vertical">
 
-                <com.hbb20.CountryCodePicker
-                    android:id="@+id/codePicker"
-                    android:layout_width="wrap_content"
-                    android:gravity="center"
+                <ImageView
+                    android:layout_width="200dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="100dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/logo" />
+
+                <TextView
+                    android:id="@+id/domains"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="40dp"
                     android:background="@drawable/edit_text_back"
-                    android:layout_marginLeft="20dp"
-                    android:layout_height="57dp"
-                    android:layout_marginTop="3dp"
-                    app:ccpDialog_keyboardAutoPopup="false"
-                    app:ccpDialog_cornerRadius="@dimen/ccp_padding"
-                    app:ccp_defaultLanguage="ENGLISH"
-                    app:ccp_showNameCode="false"
-                    app:ccpDialog_showCloseIcon="true"
-                    app:ccp_defaultNameCode="IN"/>
+                    android:drawablePadding="20dp"
+                    android:gravity="center|left"
+                    android:paddingStart="10dp"
+                    android:paddingRight="10dp"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    app:drawableRightCompat="@drawable/arrow_down"
+                    tools:ignore="RtlHardcoded" />
 
+                <Spinner
+                    android:id="@+id/domainSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:visibility="invisible" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:id="@+id/layEmail"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    app:errorEnabled="true"
-                    android:layout_marginHorizontal="16dp"
-                    >
+                    android:gravity="center_vertical">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/username"
+                    <com.hbb20.CountryCodePicker
+                        android:id="@+id/codePicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="57dp"
+                        android:layout_marginLeft="20dp"
+                        android:background="@drawable/edit_text_back"
+                        android:gravity="center"
+                        app:ccpDialog_cornerRadius="@dimen/ccp_padding"
+                        app:ccpDialog_keyboardAutoPopup="false"
+                        app:ccpDialog_showCloseIcon="true"
+                        app:ccp_defaultLanguage="ENGLISH"
+                        app:ccp_defaultNameCode="IN"
+                        app:ccp_showNameCode="false" />
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layEmail"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:singleLine="true"
-                        android:maxLength="15"
-                        android:textColor="@color/black"
-                        android:inputType="number"
-                        android:textColorHint="@color/hintLine"
-                        android:hint="@string/prompt_mobile" />
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="10dp"
+                        android:paddingBottom="5dp"
+                        app:errorEnabled="true">
 
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/username"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/prompt_mobile"
+                            android:inputType="number"
+                            android:maxLength="15"
+                            android:singleLine="true"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/hintLine" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:id="@+id/layPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                app:errorEnabled="true"
-                android:layout_marginHorizontal="16dp"
-                >
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/password"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layPassword"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:hint="@string/prompt_password"
-                    android:imeActionLabel="@string/action_sign_in_short"
-                    android:imeOptions="actionDone"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/hintLine"
-                    android:inputType="textPassword"
-                    android:selectAllOnFocus="true" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="5dp"
+                    app:errorEnabled="true">
 
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/acceptTerms"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:textColor="@color/black"
-                android:text="@string/i_accept_this_terms_condition"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_password"
+                        android:imeActionLabel="@string/action_sign_in_short"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword"
+                        android:selectAllOnFocus="true"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/hintLine" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/loginBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:layout_marginHorizontal="16dp"
-                android:paddingVertical="10dp"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:background="@drawable/fill_main_btn"
-                android:text="@string/action_sign_in"
-                />
-            <TextView
-                android:id="@+id/createAccount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="64dp"
-                android:layout_marginHorizontal="16dp"
-                android:paddingVertical="10dp"
-                android:textAlignment="center"
-                android:visibility="visible"
-                android:textColor="@color/btnBlue"
-                android:text="@string/create_account"
-                />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/acceptTerms"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:text="@string/i_accept_this_terms_condition"
+                    android:textColor="@color/black" />
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                <TextView
+                    android:id="@+id/loginBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="18dp"
+                    android:background="@drawable/fill_main_btn"
+                    android:paddingVertical="10dp"
+                    android:text="@string/action_sign_in"
+                    android:textAlignment="center"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:id="@+id/createAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="64dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/create_account"
+                    android:textAlignment="center"
+                    android:textColor="@color/btnBlue"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/nestedScrollView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
 </LinearLayout>

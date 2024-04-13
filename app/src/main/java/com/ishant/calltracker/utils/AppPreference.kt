@@ -36,7 +36,7 @@ object AppPreference {
         set(value) = setDataString(PREF_IMPLICIT_TOKEN,value)
 
     var baseUrl: String
-        get() = getDataStringWithDefultValue(PREF_BASE_URL,"https://wappblaster.in/api/") ?:"https://wappblaster.in/api/"
+        get() = getDataStringWithDefultValue(PREF_BASE_URL,"wappblaster.in")?:"wappblaster.in"
         set(value) = setDataString(PREF_BASE_URL,value)
 
     var isUserLoggedIn: Boolean

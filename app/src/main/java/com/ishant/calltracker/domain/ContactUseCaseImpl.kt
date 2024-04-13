@@ -1,5 +1,6 @@
 package com.ishant.calltracker.domain
 
+import android.util.Log
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.api.response.ContactSavedResponse
@@ -9,6 +10,7 @@ import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.data.ContactRepository
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.network.catchExceptions
+import com.ishant.calltracker.utils.AppPreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -28,6 +30,7 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
     }
 
     override fun uploadContacts(request: UploadContactRequest): Flow<Resource<UploadContactResponse>> = flow {
+        Log.e("Login","BaseUrl : ${AppPreference.baseUrl}")
         try {
             emit(Resource.Loading<UploadContactResponse>())
             val response= repository.uploadContacts(request)

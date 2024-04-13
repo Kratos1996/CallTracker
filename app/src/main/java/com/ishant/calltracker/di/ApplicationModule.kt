@@ -126,7 +126,7 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideBaseUrlInterceptor(): BaseUrlInterceptor {
-        return BaseUrlInterceptor("wappblaster.in") // Set a default base URL here
+        return BaseUrlInterceptor(AppPreference.baseUrl) // Set a default base URL here
     }
 
     @Provides

@@ -1,8 +1,11 @@
+import java.text.SimpleDateFormat
+import java.util.Date
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
     kotlin("kapt")
+
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
@@ -20,19 +23,57 @@ android {
         applicationId = "com.ishant.calltracker"
         minSdk = 25
         targetSdk = 34
-        versionCode = 10
-        versionName = "1.1.0"
+        versionCode = 12
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    applicationVariants.all {
+        val variant = this
+        val formattedDate = SimpleDateFormat("MMM_yyyy").format(Date())
+        this.outputs.all {
+            if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
+                this.outputFileName =
+                    "WebBlasterAI${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
+            }
+        }
+    }
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        getByName("debug") {
+            /*  isDebuggable = true
+              isCrunchPngs = false
+              *//*isMinifyEnabled = true*//*
+            *//* isShrinkResources = true*//*
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules-debug.pro"
+            )*/
+        }
+        getByName("release") {
+
+            setProguardFiles(
+                listOf(
+                    getDefaultProguardFile("proguard-android.txt"),
+                    "proguard-rules.txt"
+                )
             )
+        }
+
+    }
+    packaging {
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/app_release.kotlin_module"
+        }
+
+        sourceSets.getByName("main") {
+            java.srcDir("src/main/java")
+            java.srcDir("src/main/kotlin")
+            java.srcDir("src/main/assets")
         }
     }
     compileOptions {
@@ -41,9 +82,22 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+        /* freeCompilerArgs = listOf("-Xjvm-default=compatibility")*/
     }
     buildFeatures {
+        dataBinding = true
         viewBinding = true
+        compose = true
+        buildConfig = true
+    }
+    lint {
+        disable += "NullSafeMutableLiveData"
+    }
+    androidResources {
+        additionalParameters.add("--warn-manifest-validation")
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 }
 
@@ -91,4 +145,9 @@ dependencies {
     implementation (libs.androidx.room.runtime)
     implementation (libs.room.ktx )
     kapt (libs.androidx.room.compiler)
+    implementation (libs.ccp)
+    // Compose Libs
+    debugImplementation(libs.androidx.compose.composeUiTooling)
+    implementation(libs.bundles.org.ishant.compose.libs )
+    implementation(libs.lifecycle.viewmodel.compose)
 }

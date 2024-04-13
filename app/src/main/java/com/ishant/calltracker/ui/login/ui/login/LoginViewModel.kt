@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel  @Inject constructor(
     private val contactUseCase: ContactUseCase,
-    private val  databaseRepository: DatabaseRepository,
+    val  databaseRepository: DatabaseRepository,
      val baseUrlInterceptor: BaseUrlInterceptor
 ) : ViewModel() {
 
@@ -43,8 +43,7 @@ class LoginViewModel  @Inject constructor(
                 is Resource.Error -> _loginResponse.value = Response.Message(result.message)
                 is Resource.Loading -> _loginResponse.value = Response.Loading(isLoading = true)
                 is Resource.Success -> {
-                    databaseRepository.deleteAll()
-                    AppPreference.logout()
+
                     AppPreference.isUserLoggedIn = true
                     AppPreference.user = result.data?.user?: LoginResponse.User()
                     AppPreference.firebaseToken = result.data?.token?: ""

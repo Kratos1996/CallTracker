@@ -75,7 +75,7 @@ class CallService : Service() {
                 readPhoneNumberPermission(granted = {
                     telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
-                    callForegroundService(){notificationId,notification ->
+                    callForegroundService(){ notificationId,notification ->
                         startForeground(notificationId, notification)
                     }
                     registerPhoneStateListener()
@@ -104,27 +104,6 @@ class CallService : Service() {
 
 
     private fun registerPhoneStateListener() {
-       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val extras = telephonyManager.currentCallExtras
-            telephonyManager.registerTelephonyCallback(
-                this.mainExecutor,
-                object : TelephonyCallback(), TelephonyCallback.CallStateListener {
-                    override fun onCallStateChanged(state: Int) {
-                        when (state) {
-                            TelephonyManager.CALL_STATE_IDLE -> {
-                                val incomingNumber = extras.getString(TelephonyManager.EXTRA_INCOMING_NUMBER)
-                                if (incomingNumber != null) {
-                                    // Log or handle the incoming call number
-                                    println("Incoming call number: $incomingNumber")
-                                }
-                                handleCallData( "", this@CallService)
-                            }
-                        }
-                    }
-                })
-        } else {
-
-        }*/
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
     }
 

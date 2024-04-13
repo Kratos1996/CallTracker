@@ -1,6 +1,7 @@
 [versions]
 agp = "8.2.0"
 androidx-hilt-compiler = "1.1.0"
+ccp = "2.5.0"
 converter-gson = "2.9.0"
 dexter = "6.2.3"
 gson = "2.10.1"
@@ -12,22 +13,39 @@ kotlinx-metadata-jvm = "0.7.0"
 libphonenumber = "8.7.0"
 library = "4.0.0"
 library-no-op = "3.5.2"
-lifecycle-runtime-ktx = "2.6.2"
-okhttp = "5.0.0-alpha.9"
-org-jetbrains-kotlin-android = "1.9.0"
+lifecycle-runtime-ktx = "2.7.0"
+okhttp = "5.0.0-alpha.11"
+org-jetbrains-kotlin-android = "1.9.22"
 core-ktx = "1.9.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 appcompat = "1.6.1"
-material = "1.10.0"
+material = "1.11.0"
 constraintlayout = "2.1.4"
 retrofit = "2.9.0"
 retrofit2-kotlin-coroutines-adapter = "0.9.2"
-annotation = "1.7.0"
-lifecycle-livedata-ktx = "2.6.2"
+annotation = "1.7.1"
+lifecycle-livedata-ktx = "2.7.0"
 room-ktx = "2.6.1"
 work-runtime-ktx = "2.9.0"
+
+composeVersion = "1.6.5"
+composeActivityVersion = "1.8.2"
+composeHiltVersion = "1.2.0"
+composeMaterial3Version = "1.2.1"
+composeConstraintLayoutVersion = "1.0.1"
+composeViewModelVersion = "2.7.0"
+composeNavigationVersion = "2.7.7"
+composeFoundation = "1.6.5"
+composeThemeAdapter = "1.2.1"
+composeRuntimeTracing = "1.0.0-beta01"
+compose-bom = "2023.08.00"
+pagingRuntimeKtx = "3.2.1"
+accompanistNavigationAnimation = "0.30.1"
+accompanistSwiperefresh = "0.32.0"
+
+lifecycleViewmodelKtx = "2.7.0"
 
 [libraries]
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidx-hilt-compiler" }
@@ -37,6 +55,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room-ktx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room-ktx" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work-runtime-ktx" }
+ccp = { module = "com.hbb20:ccp", version.ref = "ccp" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converter-gson" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 dexter = { module = "com.karumi:dexter", version.ref = "dexter" }
@@ -64,9 +83,32 @@ annotation = { group = "androidx.annotation", name = "annotation", version.ref =
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room-ktx" }
 
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingRuntimeKtx" }
+androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
+
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeFoundation" }
+androidx-compose-constraint = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "composeConstraintLayoutVersion" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "composeVersion" }
+androidx-compose-composeUiAnimation = { module = "androidx.compose.animation:animation", version.ref = "composeVersion" }
+androidx-compose-composeMaterial = { module = "androidx.compose.material:material", version.ref = "composeVersion" }
+androidx-compose-composeMaterial3 = { module = "androidx.compose.material3:material3", version.ref = "composeMaterial3Version" }
+androidx-compose-composeRuntimeLiveData = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "composeVersion" }
+androidx-compose-composeRuntime = { module = "androidx.compose.runtime:runtime", version.ref = "composeVersion" }
+androidx-compose-composeUiTooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "composeVersion" }
+androidx-compose-composeRuntimeTracing = { module = "androidx.compose.runtime:runtime-tracing", version.ref = "composeRuntimeTracing" }
+androidx-compose-composeNavigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigationVersion" }
+androidx-compose-composeViewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "composeViewModelVersion" }
+androidx-compose-composeNavigationHilt = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "composeHiltVersion" }
+androidx-compose-composeActivity = { module = "androidx.activity:activity-compose", version.ref = "composeActivityVersion" }
+androidx-compose-composeThemeAdapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "composeThemeAdapter" }
+accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
+accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
+
+lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelKtx" }
+
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
 
 [bundles]
-
+org-ishant-compose-libs =["androidx-paging-compose","androidx-paging-runtime-ktx","accompanist-swiperefresh","accompanist-navigation-animation","androidx-compose-foundation","androidx-compose-constraint","androidx-compose-composeMaterial3","androidx-compose-ui","androidx-compose-composeUiAnimation","androidx-compose-composeMaterial","androidx-compose-composeRuntimeLiveData","androidx-compose-composeRuntime","androidx-compose-composeRuntimeTracing","androidx-compose-composeNavigation","androidx-compose-composeViewmodel","androidx-compose-composeNavigationHilt","androidx-compose-composeActivity","androidx-compose-composeThemeAdapter","material"]

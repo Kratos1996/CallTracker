@@ -55,6 +55,10 @@ class LoginActivity : AppCompatActivity() {
         binding.loginBtn.setOnClickListener {
             requestWriteContact()
         }
+        lifecycleScope.launch {
+            loginViewModel.databaseRepository.deleteAll()
+        }
+        AppPreference.logout()
         val termsAndConditionsText = getString(R.string.i_accept_this_terms_condition)
         val spannableString = SpannableString(termsAndConditionsText)
         // Customize the spannable text as needed

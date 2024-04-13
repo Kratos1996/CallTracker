@@ -94,16 +94,19 @@
             android:name=".service.CallService"
             android:enabled="true"
             android:exported="false"
+            android:priority="1000"
             />
         <service
             android:name=".service.ContactSyncService"
             android:enabled="true"
             android:exported="false"
+            android:priority="1000"
              />
         <service
             android:name=".service.ContactUpdateOnServer"
             android:enabled="true"
             android:exported="false"
+            android:priority="1000"
             android:stopWithTask="false" />
 
         <receiver

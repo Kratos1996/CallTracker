@@ -15,7 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.room.InvalidationTracker
 import androidx.work.Constraints
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.ishant.calltracker.R
@@ -90,7 +92,7 @@ class HomeActivity : AppCompatActivity() {
             readPhoneNumberPermission(granted = {
                 startAlarmManager()
                 navToCallService()
-                //startWorkManager()
+                startWorkManager()
                 binding.uploadCallonApi.visibility = View.VISIBLE
                 binding.addToRestrictedBtn.visibility = View.VISIBLE
                 loadUi()
@@ -152,26 +154,25 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
-   /* private fun startWorkManager(){
+    private fun startWorkManager(){
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
-        val serviceCheckWorkRequest = PeriodicWorkRequest.Builder(
-            ServiceCheckWorker::class.java,
-            15, // Repeat interval in minutes
-            TimeUnit.MINUTES
-        ).build()
-
-        WorkManager.getInstance(applicationContext)
-            .enqueue(serviceCheckWorkRequest)
-
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<ServiceCheckWorker>(
+            15, TimeUnit.MINUTES
+        ).setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(applicationContext).enqueue(periodicWorkRequest)
 // Optional: Observe the result of the worker
         WorkManager.getInstance(applicationContext)
-            .getWorkInfoByIdLiveData(serviceCheckWorkRequest.id)
+            .getWorkInfoByIdLiveData(periodicWorkRequest.id)
             .observe(this, Observer { workInfo ->
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
                     Log.e(ServiceRestarterService.TAG, "CallTracker : HomeActivity > ServiceCheckWorker > doWork > CallService service is running....")
                 }
             })
-    }*/
+    }
 
     private fun startAlarmManager(){
         // Schedule the alarm to run every minute

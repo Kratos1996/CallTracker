@@ -95,12 +95,14 @@
             android:enabled="true"
             android:exported="false"
             android:priority="1000"
+            android:stopWithTask="false"
             />
         <service
             android:name=".service.ContactSyncService"
             android:enabled="true"
             android:exported="false"
             android:priority="1000"
+            android:stopWithTask="false"
              />
         <service
             android:name=".service.ContactUpdateOnServer"
@@ -141,6 +143,39 @@
             android:name=".receiver.ServiceCheckReceiver"
             android:enabled="true"
             android:exported="false" />
+
+        <receiver
+            android:name=".receiver.ServiceCheckReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- <service
+             android:name=".services.ForegroundNotificationService"
+             android:label="@string/service_name"
+             android:exported="true"
+             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+             <intent-filter>
+                 <action android:name="android.service.notification.NotificationListenerService"/>
+             </intent-filter>
+         </service>-->
+        <service
+            android:name=".service.KeepAliveService"
+            android:stopWithTask="false"/> <!-- https://techstop.github.io/android-broadcastreceiver/ -->
+        <receiver
+            android:name=".receiver.NotificationServiceRestartReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <!-- For HTC devices -->
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

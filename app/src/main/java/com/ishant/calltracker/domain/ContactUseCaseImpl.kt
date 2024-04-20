@@ -7,6 +7,7 @@ import com.ishant.calltracker.api.response.ContactSavedResponse
 import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
 import com.ishant.calltracker.api.response.UrlResponse
+import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.data.ContactRepository
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.network.catchExceptions
@@ -54,6 +55,17 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
         }
     }
 
+    override fun getCallDetails(): Flow<Resource<GetCallsRes>> = flow {
+        try {
+            emit(Resource.Loading<GetCallsRes>())
+            val response= repository.getCallDetails()
+
+            emit(Resource.Success<GetCallsRes>(response))
+
+        } catch (e: Exception) {
+            catchExceptions<GetCallsRes>(e,Gson())
+        }
+    }
 
     override fun uploadContact(sourceMobileNo: String, mobile: String, name: String,type:String,duration:String ):Flow<Resource<ContactSavedResponse>> = flow {
         try {

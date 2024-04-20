@@ -103,7 +103,7 @@ class HomeViewModel  @Inject constructor(
 
      fun saveContact(uploadContact: UploadContact, onMessage : (String) ->Unit) {
          baseUrlInterceptor.setBaseUrl(AppPreference.baseUrl)
-        contactUseCase.uploadContacts(request = Gson().fromJson(uploadContact.listOfCalls, UploadContactRequest::class.java)).onEach { result ->
+         contactUseCase.uploadContacts(request = Gson().fromJson(uploadContact.listOfCalls, UploadContactRequest::class.java)).onEach { result ->
             when (result) {
                 is Resource.Error -> {
                     isLoading.value = false

@@ -73,7 +73,7 @@ fun DashboardScreen() {
 }
 
 @Composable
-fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) {
+private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier

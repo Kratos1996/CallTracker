@@ -5,6 +5,7 @@
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
+
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -37,17 +38,20 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ui.restricted.AddNewContact"
-            android:screenOrientation="portrait"
+            android:name=".ui.dashboard.DashboardActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.restricted.AddNewContact"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.logs.CallLogsActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.callupdatecenter.CallUploadCenterActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.restricted.RestrictedContactActivity"
             android:exported="false"
@@ -95,24 +99,22 @@
             android:name=".service.CallService"
             android:enabled="true"
             android:exported="false"
-            android:priority="1000"
-            android:stopWithTask="false"
             android:foregroundServiceType="phoneCall"
-            />
+            android:priority="1000"
+            android:stopWithTask="false" />
         <service
             android:name=".service.ContactSyncService"
             android:enabled="true"
             android:exported="false"
-            android:priority="1000"
-            android:stopWithTask="false"
             android:foregroundServiceType="shortService"
-             />
+            android:priority="1000"
+            android:stopWithTask="false" />
         <service
             android:name=".service.ContactUpdateOnServer"
             android:enabled="true"
             android:exported="false"
-            android:priority="1000"
             android:foregroundServiceType="phoneCall"
+            android:priority="1000"
             android:stopWithTask="false" />
 
         <receiver
@@ -142,18 +144,16 @@
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receiver.ServiceCheckReceiver"
             android:enabled="true"
             android:exported="false" />
-
         <receiver
             android:name=".receiver.ServiceCheckReceiver"
             android:enabled="true"
             android:exported="false" />
-
-        <!-- <service
+        <!--
+ <service
              android:name=".services.ForegroundNotificationService"
              android:label="@string/service_name"
              android:exported="true"
@@ -161,23 +161,24 @@
              <intent-filter>
                  <action android:name="android.service.notification.NotificationListenerService"/>
              </intent-filter>
-         </service>-->
+         </service>
+        -->
         <service
             android:name=".service.KeepAliveService"
-            android:stopWithTask="false"/> <!-- https://techstop.github.io/android-broadcastreceiver/ -->
+            android:stopWithTask="false" /> <!-- https://techstop.github.io/android-broadcastreceiver/ -->
         <receiver
             android:name=".receiver.NotificationServiceRestartReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
 
-                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <!-- For HTC devices -->
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
     </application>

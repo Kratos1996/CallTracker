@@ -15,11 +15,9 @@
     <color name="colorstrock">#EBF0FF</color>
     <color name="colorstrock2">#AE1C29</color>
     <color name="colorAccent2">#653B5998</color>
-    <color name="white">#FFFFFF</color>
     <color name="gray_light">#F6F6F6</color>
     <color name="hintLine">#444f5e</color>
     <color name="pink">#FF1494</color>
-    <color name="black">#000000</color>
     <color name="lightGray">#3F485C</color>
     <color name="commentColor">#717D9C</color>
     <color name="text_shadow">#7F000000</color>
@@ -28,7 +26,6 @@
     <color name="color_white">#ffffff</color>
     <color name="color_gray_back">#EDEEF0</color>
     <color name="color_white_light">#E9FFFFFF</color>
-    <color name="transparent">#00000000</color>
     <color name="color_video_transparent">#88000000</color>
 
     <color name="colorTheme1">#3A57FB</color>
@@ -70,4 +67,102 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+    <color name="white">#ffffff</color>
+    <color name="white_10">#10ffffff</color>
+    <color name="black">#000000</color>
+    <color name="blackAll">#000000</color>
+    <color name="black_10">#10000000</color>
+    <color name="black_30">#30000000</color>
+    <color name="black_60">#60000000</color>
+    <color name="white_all">#ffffff</color>
+    <!-- background and fillers -->
+    <color name="bottom_sheet_background">#ffffff</color>
+    <color name="blue_bg_light">#E6EAF5</color>
+    <color name="blue_bg_light_60">#60E6EAF5</color>
+    <color name="blue_bg_light_30">#30E6EAF5</color>
+    <color name="gray_bg_light">#F9F9F9</color>
+    <color name="gray_bg_light_60">#60F9F9F9</color>
+    <color name="gray_bg">#F2F2F2</color>
+    <color name="gray_bg_90">#90F2F2F2</color>
+    <color name="gray_bg_60">#60F2F2F2</color>
+    <color name="gray_bg_dark">#D8D8D8</color>
+    <color name="gray_bg_dark_60">#60D8D8D8</color>
+    <color name="gray_devider">#F6F6F6</color>
+    <color name="gray_devider_2">#EFEFEF</color>
+    <color name="transparent">#0000</color>
+    <color name="purple_primary_bg">#FBF0FF</color>
+    <color name="purple_primary">#8B37F7</color>
+    <color name="purple_primary2">#8B80DE</color>
+    <color name="purple_primary_80">#808B37F7</color>
+    <color name="purple_primary_60">#608B37F7</color>
+    <color name="purple_primary_40">#408B37F7</color>
+    <color name="purple_primary_20">#208B37F7</color>
+    <color name="pink_secondary">#FD66B5</color>
+    <color name="water_blue">#09A8DA</color>
+    <color name="orange_20">#33FF9E00</color>
+    <color name="orange_60">#60FF9E00</color>
+    <color name="pink_secondary_20">#33FD66B5</color>
+    <color name="water_blue_30">#4D09A8DA</color>
+    <color name="green_primary_30_new">#4D01A308</color>
+    <color name="purple_dark">#420284</color>
+    <color name="purple_primary_dark">#6B12DD</color>
+    <color name="glass_back">#80FFFFFF</color>
+
+    <!-- Progress Bar Colors -->
+    <color name="progress_yellow">#FFC700</color>
+    <color name="progress_blue">#234FA6</color>
+    <color name="progress_green">#31BD9B</color>
+
+    <!-- Text Colors -->
+    <color name="text_secondary">#939393</color>
+    <color name="text_primary">#000619</color>
+    <color name="text_third_color">#B0B0B0</color>
+
+    <!--- Edit text -->
+    <color name="edit_text_border">#D8D8D8</color>
+
+    <!--Other Colors -->
+    <color name="green_color">#16B68E</color>
+    <color name="green_primary">#01a308</color>
+    <color name="green_primary_30">#3001a308</color>
+    <color name="green_primary_60">#6001A308</color>
+    <color name="green_primary_15">#1501a308</color>
+    <color name="orange_primary">#ff9e00</color>
+    <color name="red">#ffE25638</color>
+    <color name="red_color">#E25638</color>
+    <color name="red_primary">#E4080B</color>
+    <color name="red_primary_15">#15E4080B</color>
+    <color name="red_primary_30">#30E4080B</color>
+    <color name="red_primary_90">#90E4080B</color>
+
+    <color name="shadow">#3461FF</color>
+    <color name="blue_shadow_60">#603461FF</color>
+    <color name="blue_shadow_30">#303461FF</color>
+    <color name="shadow_20">#203461FF</color>
+    <color name="shadow_18">#183461FF</color>
+    <color name="shadow_16">#163461FF</color>
+    <color name="shadow_14">#143461FF</color>
+    <color name="shadow_12">#123461FF</color>
+    <color name="shadow_10">#103461FF</color>
+    <color name="shadow_8">#083461FF</color>
+    <color name="shadow_6">#063461FF</color>
+    <color name="shadow_4">#043461FF</color>
+    <color name="shadow_2">#023461FF</color>
+
+
+    <color name="pink_neon">#FF1178</color>
+    <color name="sky_neon">#01FFF4</color>
+    <color name="green_neon">#03FFA3</color>
+
+    <color name="black_transparent">#50000000</color>
+
+    //shimmer
+    <color name="backgroundShimmer">#dddddd</color>
+
+    //Intercom
+    <color name="intercomBack">#F6F6F6</color>
+    <color name="range_color">#f1e7fe</color>
+
+    <!--    snackbar toast-->
+    <color name="icon_gray">#686171</color>
 </resources>

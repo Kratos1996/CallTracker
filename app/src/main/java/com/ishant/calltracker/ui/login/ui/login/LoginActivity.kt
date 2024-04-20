@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.UrlResponse
+import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.databinding.ActivityLoginBinding
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.ContactSaver
@@ -44,7 +45,7 @@ import java.net.URISyntaxException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseComposeActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private val loginViewModel by viewModels<LoginViewModel>()

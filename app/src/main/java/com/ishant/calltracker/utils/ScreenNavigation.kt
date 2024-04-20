@@ -23,6 +23,7 @@ import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.service.ContactUpdateOnServer
 import com.ishant.calltracker.service.ServiceRestarterService
+import com.ishant.calltracker.ui.dashboard.DashboardActivity
 import com.ishant.calltracker.ui.home.HomeActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
 import com.ishant.calltracker.ui.logs.CallLogsActivity
@@ -36,7 +37,7 @@ val settingApplicationCode = 1996
 val notificationId = 1
 val channelId = "call_listener_channel"
 fun Context.navToHome(){
-    val intent = Intent(this, HomeActivity::class.java)
+    val intent = Intent(this, DashboardActivity::class.java)
     startActivity(intent)
 
 }

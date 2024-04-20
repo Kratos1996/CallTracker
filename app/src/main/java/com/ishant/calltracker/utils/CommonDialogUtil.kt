@@ -10,6 +10,9 @@ import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.Toast
 import com.ishant.calltracker.databinding.DialogProgressBinding
+import com.ishant.corelibcompose.toolkit.ui.snackbar.SnackBarSlideEffect
+import com.ishant.corelibcompose.toolkit.ui.snackbar.custom.SnackBarType
+import com.ishant.corelibcompose.toolkit.ui.snackbar.showSnackBar
 
 fun showCommonDialog(title:String,message:String,context: Context,positiveClick:()->Unit){
     val dialogBuilder = AlertDialog.Builder(context)
@@ -44,6 +47,13 @@ fun showLoadingDialog(context: Context,progressDialog: Dialog): Dialog {
     progressDialog.setCanceledOnTouchOutside(false)
     return progressDialog
 }
-fun Context.toast(message:String){
-    Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
+fun Context.toast(message: String?,slideEffect: SnackBarSlideEffect = SnackBarSlideEffect.FROM_TOP) {
+    if(!message.isNullOrEmpty()){
+        this.getActivityContext().showSnackBar(
+            message = message.trim(),
+            isBrushEnable = false,
+            snackBarType = SnackBarType.ERROR_SNACK_BAR,
+            slideEffect = slideEffect
+        )
+    }
 }

@@ -20,6 +20,9 @@ object AppPreference {
     private val PREF_SPECIAL_PERMISION= "PREF_SPECIAL_PERMISSION"
     private val PREF_AUTO_START_SPECIAL_PERMISSION= "PREF_AUTO_START_SPECIAL_PERMISSION"
     private val PREF_BASE_URL= "PREF_BASE_URL"
+    private val DARK_MODE= "DARK_MODE"
+    private val THEMES= "THEMES"
+    private val DARK_MODE_TYPE= "DARK_MODE_TYPE"
     private const val APP_NAME = "callTracker:Ishant"
 
     fun init(context: Context) {
@@ -31,6 +34,17 @@ object AppPreference {
         op(editor)
         editor.apply()
     }
+    var isDarkModeEnable: Boolean
+        get() = getDataBoolean(DARK_MODE)
+        set(darkmode) {
+            setDataBoolean(DARK_MODE, darkmode)
+        }
+    var isDarkMode: Boolean
+        get() = getDataBoolean(THEMES)
+        set(value) = setDataBoolean(THEMES, isDarkMode)
+    var darkModeType: Int
+        get() = getDataInt(DARK_MODE_TYPE,0)
+        set(value) = setDataInt(DARK_MODE_TYPE, darkModeType)
 
     var firebaseToken: String
         get() = getDataString(PREF_IMPLICIT_TOKEN)?:""

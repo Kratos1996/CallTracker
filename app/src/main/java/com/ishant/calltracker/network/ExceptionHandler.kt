@@ -20,14 +20,14 @@ suspend fun <T>  FlowCollector<Resource<T>>.catchExceptions(e: Exception, gson:G
                         else -> emit(Resource.Error<T>(e.message()))
                     }
                 }catch (e:Exception){
-                    emit(Resource.Error<T>("Something went wronge"))
+                    emit(Resource.Error<T>("Something went wrong"))
                 }
             }
             is IOException -> {
                 emit(Resource.Error<T>("No Internet Connection"))
             }
             else -> {
-                emit(Resource.Error<T>("Something went wronge"))
+                emit(Resource.Error<T>("Something went wrong"))
             }
         }
 
@@ -45,14 +45,14 @@ suspend fun <T>  Any.catchExceptions(e: Exception, gson:Gson) = flow  {
                     else -> emit(Resource.Error<T>(e.message()))
                 }
             }catch (e:Exception){
-                emit(Resource.Error<T>("Something went wronge"))
+                emit(Resource.Error<T>("Something went wrong"))
             }
         }
         is IOException -> {
             emit(Resource.Error<T>("No Internet Connection"))
         }
         else -> {
-            emit(Resource.Error<T>("Something went wronge"))
+            emit(Resource.Error<T>("Something went wrong"))
         }
     }
 

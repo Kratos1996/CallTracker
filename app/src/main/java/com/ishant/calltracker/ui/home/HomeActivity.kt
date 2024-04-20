@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.Checkbox
 import androidx.lifecycle.Observer
 import androidx.room.InvalidationTracker
 import androidx.work.Constraints
@@ -58,133 +59,20 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        autoUpdateContactObserver =  ContactObserver(this , Handler())
-        autoUpdateContactObserver.registerObserver()
-        addAutoStartup()
+
         binding.name.text = AppPreference.user.name?:""
         binding.emailName.text = AppPreference.user.email?:""
         binding.number.text = AppPreference.user.mobile?:""
-        binding.phoneStatePermission.setOnClickListener {
-            takeCallLogsPermission()
-        }
-        binding.phoneCallLogsPermission.setOnClickListener {
-            takeCallLogsPermission()
-        }
+
         binding.url.setOnClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url)))
-            startActivity(browserIntent)
+
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        autoUpdateContactObserver.unregisterObserver()
-    }
 
-    override fun onResume() {
-        super.onResume()
-        takeCallLogsPermission()
 
-    }
 
-    private fun takePhoneNetworkPermission() {
-        readPhoneStatePermission(granted = {
-            readPhoneNumberPermission(granted = {
-                startAlarmManager()
-                navToCallService()
-                binding.uploadCallonApi.visibility = View.VISIBLE
-                binding.addToRestrictedBtn.visibility = View.VISIBLE
-                loadUi()
 
-            }) {
-                binding.phoneCallLogsPermission.visibility = View.VISIBLE
 
-            }
-        }) {
-            binding.phoneStatePermission.visibility = View.VISIBLE
-            binding.phoneCallLogsPermission.visibility = View.VISIBLE
-        }
-    }
-    private fun loadUi(){
-        startWorkManager()
-        val data = managerPlus.getSimCardPhoneNumbers(this)
-        binding.phoneStatePermission.visibility = View.GONE
-        if(!data.isNullOrEmpty()) {
-            if (data.isEmpty()) {
-                binding.simEmptyView.visibility = View.VISIBLE
-                binding.dualSimUi.visibility = View.GONE
-                binding.singleSimUi.visibility = View.GONE
-            }
-        }
-        else{
-            binding.phoneStatePermission.visibility = View.VISIBLE
-            binding.phoneCallLogsPermission.visibility = View.VISIBLE
-        }
-        AppPreference.simManager = TelePhoneManager(data)
-        binding.addToRestrictedBtn.setOnClickListener {
-            navToRestrictContactActivity()
-        }
-        binding.uploadCallonApi.setOnClickListener {
-            navToUploadContactActivity()
-        }
-    }
 
-    private fun takeCallLogsPermission(){
-        readPhoneContactPermission(
-            granted = {
-                //serviceContact()
-                readPhoneLogPermission(granted = {
-                    binding.phoneCallLogsPermission.visibility = View.GONE
-                    takePhoneNetworkPermission()
-                }){
-                    if(!isNotificationPermissionGranted(this)) {
-                        requestNotificationPermission(this)
-                    }else{
-                        if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
-                             navToCallService()
-                        }
-                    }
-                    binding.phoneCallLogsPermission.visibility = View.VISIBLE
-                }
-            }
-        ){
-            binding.addToRestrictedBtn.visibility = View.GONE
-            Toast.makeText(this,"Need Contact Permission",Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
-    private fun startWorkManager(){
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val periodicWorkRequest = PeriodicWorkRequestBuilder<ServiceCheckWorker>(
-            15, TimeUnit.MINUTES
-        ).setConstraints(constraints)
-            .build()
-        WorkManager.getInstance(applicationContext).enqueue(periodicWorkRequest)
-// Optional: Observe the result of the worker
-        WorkManager.getInstance(applicationContext)
-            .getWorkInfoByIdLiveData(periodicWorkRequest.id)
-            .observe(this, Observer { workInfo ->
-                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.e(ServiceRestarterService.TAG, "CallTracker : HomeActivity > ServiceCheckWorker > doWork > CallService service is running....")
-                }
-            })
-    }
-
-    private fun startAlarmManager(){
-        // Schedule the alarm to run every minute
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, ServiceCheckReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val intervalMillis = 60 * 1000L  // 1 minute
-        alarmManager.setRepeating(
-            AlarmManager.ELAPSED_REALTIME,
-            SystemClock.elapsedRealtime() + intervalMillis,
-            intervalMillis,
-            pendingIntent
-        )
-    }
 }

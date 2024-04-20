@@ -4,7 +4,7 @@
     <string name="prompt_mobile">Mobile</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
-    <string name="contact_permission">Are You Given Contact Permission?</string>
+    <string name="contact_permission"> Contact Permission</string>
     <string name="create_account">Create Account</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
@@ -13,10 +13,10 @@
     <string name="login_failed">"Login failed"</string>
     <string name="required_permission">Required Permission</string>
     <string name="over_lay_permission">Need Overlay Permission</string>
-    <string name="phone_state_permission">Need Phone State Permission</string>
-    <string name="phone_foreground_permission">Need Foreground Service Permission</string>
-    <string name="phone_number_permission">Need Phone Number Permission</string>
-    <string name="read_call_log_permission">Need Read Call Logs Permission</string>
+    <string name="phone_state_permission">Phone State</string>
+    <string name="phone_foreground_permission">Foreground Service</string>
+    <string name="phone_number_permission">Phone Number</string>
+    <string name="read_call_log_permission">Read Call Logs</string>
     <string name="read_device_permission">Need Read Device Permission</string>
     <string name="write_device_permission">Need Write Device Permission</string>
     <string name="read_call_record_permission">Need Audio Record Permission</string>
@@ -85,4 +85,14 @@
     <string name="notification_listener_service_explanation">"For the app. to work you need to enable the
         Notification Listener Service. Enable it now?"
     </string>
+    <string name="service">Services</string>
+    <string name="permission_pending">Permissions</string>
+    <string name="ristricted_contact">Ristricted Contact</string>
+    <string name="start_call_service">Start Call Service</string>
+    <string name="granted">Granted</string>
+    <string name="denied">Denied</string>
+    <string name="already_running">Already Running</string>
+    <string name="not_running">Not Running</string>
+    <string name="phone_log">Phone Logs</string>
+    <string name="please_check_all_pending_permission_for_call_service_all_permission_is_required">Please check All Pending Permission, For Call Service all Permission is Required</string>
 </resources>

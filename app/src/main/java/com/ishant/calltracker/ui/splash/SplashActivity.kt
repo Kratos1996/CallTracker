@@ -3,8 +3,10 @@ package com.ishant.calltracker.ui.splash
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.compose.material3.DateRangePicker
 import androidx.lifecycle.lifecycleScope
 import com.ishant.calltracker.R
+import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.navToHome
 import com.ishant.calltracker.utils.navToLogin
@@ -12,7 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("CustomSplashScreen")
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : BaseComposeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)

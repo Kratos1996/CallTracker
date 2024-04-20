@@ -81,7 +81,7 @@
 
         </LinearLayout>
         <androidx.cardview.widget.CardView
-            android:visibility="gone"
+            android:visibility="visible"
             android:id="@+id/addToRestrictedBtn"
             android:layout_width="match_parent"
             app:cardCornerRadius="16dp"
@@ -271,7 +271,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:visibility="gone"
+            android:visibility="visible"
             android:id="@+id/phoneStatePermission"
             android:layout_width="match_parent"
             app:cardCornerRadius="16dp"
@@ -294,7 +294,7 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
-            android:visibility="gone"
+            android:visibility="visible"
             android:id="@+id/phoneCallLogsPermission"
             android:layout_width="match_parent"
             app:cardCornerRadius="16dp"
@@ -317,7 +317,7 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
-            android:visibility="gone"
+            android:visibility="visible"
             android:id="@+id/simEmptyView"
             android:layout_width="match_parent"
             app:cardCornerRadius="16dp"

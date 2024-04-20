@@ -102,13 +102,14 @@ android {
 }
 
 dependencies {
-
+    //implementation (libs.core.library.compose)
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
     implementation(libs.annotation)
     implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.androidx.activity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -150,4 +151,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.composeUiTooling)
     implementation(libs.bundles.org.ishant.compose.libs )
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation ("com.github.Kratos1996:corelib:1.0.7@aar")
+    implementation(libs.bundles.image.libs)
 }

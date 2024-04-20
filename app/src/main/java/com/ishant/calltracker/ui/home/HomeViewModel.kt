@@ -1,10 +1,15 @@
 package com.ishant.calltracker.ui.home
 
 import android.app.Application
+import android.content.Context
+import android.os.Handler
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.app.BaseObservableViewModel
+import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.ContactList
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
@@ -12,8 +17,10 @@ import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
+import com.ishant.calltracker.receiver.ContactObserver
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.DBResponse
+import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -30,11 +37,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel  @Inject constructor(
+    private val app:CallTrackerApplication,
      private val  databaseRepository: DatabaseRepository,
      private var contactUseCase: ContactUseCase,
      val baseUrlInterceptor: BaseUrlInterceptor
-) : AndroidViewModel(Application()) {
+) : BaseObservableViewModel(app) {
 
+    @Inject
+    lateinit var managerPlus: TelephonyManagerPlus
+    private lateinit var autoUpdateContactObserver : ContactObserver
+
+    val readPhoneStatePermissionGranted = mutableStateOf(false)
+    val phoneNumberPermissionGranted = mutableStateOf(false)
+    val phoneLogsPermissionGranted = mutableStateOf(false)
+    val contactPermissionGranted = mutableStateOf(false)
 
     val uploadContactListMutable = MutableStateFlow<List<UploadContact>>(arrayListOf())
     val contactListMutable = MutableStateFlow<DBResponse<List<ContactList>>>(DBResponse.Empty)
@@ -43,6 +59,10 @@ class HomeViewModel  @Inject constructor(
     val scopeMain = CoroutineScope(Dispatchers.Main + SupervisorJob())
     var lastApiCall :String = UploadContactType.PENDING
 
+    fun loadContactObserver(context: Context){
+        autoUpdateContactObserver =  ContactObserver(context , Handler())
+        autoUpdateContactObserver.registerObserver()
+    }
     fun getRestrictedContacts(search:String): LiveData<List<ContactList>> {
        return databaseRepository.getRestrictedDataList(search)
     }
@@ -116,5 +136,9 @@ class HomeViewModel  @Inject constructor(
             delay(2000)
             isLoading.value = false
         }
+    }
+
+    fun toggleAppTheme() {
+        app.toggleAppTheme()
     }
 }

@@ -59,7 +59,7 @@ class ContactActivity : AppCompatActivity() {
         binding.refresh.setOnClickListener {
             serviceContact()
         }
-        observer()
+     /*   observer()*/
 
     }
 
@@ -71,7 +71,7 @@ class ContactActivity : AppCompatActivity() {
     private fun searchContact(searchString: String = "") {
         viewModel.getContacts(searchString)
     }
-    private fun observer(){
+  /*  private fun observer(){
         lifecycleScope.launch {
             viewModel.contactListMutable.collectLatest {result ->
                 when(result){
@@ -114,5 +114,5 @@ class ContactActivity : AppCompatActivity() {
             }
         }
 
-    }
+    }*/
 }

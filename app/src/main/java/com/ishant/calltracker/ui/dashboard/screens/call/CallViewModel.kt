@@ -25,7 +25,6 @@ class CallViewModel  @Inject constructor(
 
     val callsDataMainList = mutableStateListOf<GetCallsRes.GetCallsData>()
     val callsDataFilterList = mutableStateListOf<GetCallsRes.GetCallsData>()
-    var searchString = ""
     var isRefreshing = mutableStateOf(false)
 
 

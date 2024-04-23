@@ -3,11 +3,13 @@ package com.ishant.calltracker.ui.home
 import android.app.Application
 import android.content.Context
 import android.os.Handler
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.app.BaseObservableViewModel
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.ContactList
@@ -20,6 +22,7 @@ import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.ContactObserver
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.DBResponse
+import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +46,7 @@ class HomeViewModel  @Inject constructor(
      val baseUrlInterceptor: BaseUrlInterceptor
 ) : BaseObservableViewModel(app) {
 
+    var isRefreshing = mutableStateOf(false)
     @Inject
     lateinit var managerPlus: TelephonyManagerPlus
     private lateinit var autoUpdateContactObserver : ContactObserver
@@ -53,12 +57,13 @@ class HomeViewModel  @Inject constructor(
     val contactPermissionGranted = mutableStateOf(false)
 
     val uploadContactListMutable = MutableStateFlow<List<UploadContact>>(arrayListOf())
-    val contactListMutable = MutableStateFlow<DBResponse<List<ContactList>>>(DBResponse.Empty)
+
     val isLoading = MutableStateFlow<Boolean>(false)
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val scopeMain = CoroutineScope(Dispatchers.Main + SupervisorJob())
     var lastApiCall :String = UploadContactType.PENDING
-
+    val contactMainList = mutableStateListOf<ContactList>()
+    val contactDataFilterList = mutableStateListOf<ContactList>()
     fun loadContactObserver(context: Context){
         autoUpdateContactObserver =  ContactObserver(context , Handler())
         autoUpdateContactObserver.registerObserver()
@@ -68,16 +73,41 @@ class HomeViewModel  @Inject constructor(
     }
 
     fun getContacts(search:String) {
-        contactListMutable.value =  DBResponse.Loading(true)
+       isLoading.value = true
          databaseRepository.getContactList(search).onEach { result ->
+             isRefreshing.value = false
              if(result.isEmpty()){
-                 contactListMutable.value =  DBResponse.Loading(false)
-                 contactListMutable.value = DBResponse.Message("No Contacts Found")
+                 isLoading.value = false
+                 contactMainList.addAll(arrayListOf())
+                 _errorListener.emit(Response.Message("No Records Found"))
+
              }else{
-                 contactListMutable.value =  DBResponse.Loading(false)
-                 contactListMutable.value = DBResponse.Success(result)
+                 isLoading.value = false
+                 contactMainList.addAll(result)
+                 filterSearch()
              }
          }.launchIn(scope)
+    }
+
+    fun filterSearch() {
+        try {
+            val filteredList: ArrayList<ContactList> = ArrayList()
+            if (contactDataFilterList != null) {
+                contactDataFilterList.clear()
+            }
+            contactMainList.filter {
+                (it.name?.lowercase()?.contains(searchString.lowercase()) == true) || (it.phoneNumber?.lowercase()?.contains(searchString.lowercase()) == true)
+            }.let { contacts ->
+                contacts?.let { it1 -> filteredList.addAll(it1) }
+                filteredList.removeIf { callData ->
+                    callData.phoneNumber.isNullOrEmpty()
+                }
+                contactDataFilterList.addAll(filteredList)
+            }
+        }catch (e:Exception){
+            searchString = ""
+            contactDataFilterList.clear()
+        }
     }
 
     fun getUploadContactsList(type:String = UploadContactType.PENDING){

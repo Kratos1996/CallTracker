@@ -29,7 +29,7 @@ open class BaseObservableViewModel @Inject constructor(
     var showShimmer = mutableStateOf(false)
     private val _navigationListener = MutableSharedFlow<NavigationData>()
     val navigationListener = _navigationListener.asSharedFlow()
-
+    var searchString = ""
     fun navigateTo(navCode: Int, navData: String = "") {
         viewModelScope.launch {
             _navigationListener.emit(

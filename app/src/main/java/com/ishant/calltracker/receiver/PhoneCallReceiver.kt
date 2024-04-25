@@ -18,17 +18,12 @@ import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.utils.AppPreference
-import com.ishant.calltracker.utils.Utils
-import com.ishant.calltracker.utils.callForegroundService
 import com.ishant.calltracker.utils.isServiceRunning
-import com.ishant.calltracker.utils.navToCallService
-import com.ishant.calltracker.utils.navToRestrictContactActivity
 import com.ishant.calltracker.utils.serviceContactUploadRestarter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch

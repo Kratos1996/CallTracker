@@ -3,7 +3,6 @@ package com.ishant.calltracker.ui.dashboard.screens.dashboard
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,18 +29,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.service.CallService
-import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
-import com.ishant.calltracker.ui.home.HomeViewModel
+import com.ishant.calltracker.ui.dashboard.HomeViewModel
+import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavConstants
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.navToCallService
-import com.ishant.calltracker.utils.navToRestrictContactActivity
 import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
@@ -118,7 +115,10 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
             firstBlockText = context.getString(R.string.ristricted_contact),
             secondBlockText = context.getString(R.string.start_call_service),
             firstBlock = {
-                context.navToRestrictContactActivity()
+                homeViewModel.ristrictedContact.value = true
+                homeViewModel.allContactSelected.value = false
+                homeViewModel.filterSearch()
+                homeViewModel.navigateTo(navCode = HomeNavConstants.NAV_ALL_CONTACTS_SCREEN)
             },
             secondBlock = {
                 if (!homeViewModel.contactPermissionGranted.value && !homeViewModel.phoneLogsPermissionGranted.value && !homeViewModel.readPhoneStatePermissionGranted.value && !homeViewModel.phoneNumberPermissionGranted.value) {

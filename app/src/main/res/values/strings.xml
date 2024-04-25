@@ -35,13 +35,14 @@
     <string name="restricted_contact">Restricted Contacts</string>
     <string name="no_contacts_found">Data Not Available!</string>
     <string name="contact">Contacts</string>
+    <string name="all_contact">All Contacts</string>
     <string name="uploadCallsOnServer">Call uploaded on server</string>
     <string name="all">All </string>
     <string name="pending">Pending</string>
     <string name="completed">Completed</string>
     <string name="source_name">Source Name :</string>
     <string name="source_mobile">Source Mobile :</string>
-    <string name="saveContact">Save Contact</string>
+    <string name="saveContact">Add New Contact</string>
     <string name="name">Name</string>
     <string name="isRistrictedContact">Please Check if this is Your Restricted Contact</string>
     <string name="lastMissedCalls">Last Missed Uploaded Calls</string>

@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.UploadContact
 import com.ishant.calltracker.databinding.ActivityCallUploadCenterBinding
-import com.ishant.calltracker.ui.home.HomeViewModel
+import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.utils.navToCallLogs
 import com.ishant.calltracker.utils.showLoadingDialog
 import com.ishant.calltracker.utils.toast

@@ -5,23 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
-import com.ishant.calltracker.R
 import com.ishant.calltracker.api.request.UploadContactRequest
-import com.ishant.calltracker.app.CallTrackerApplication
-import com.ishant.calltracker.database.room.UploadContact
-import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.databinding.ActivityCallLogsBinding
-import com.ishant.calltracker.databinding.ActivityCallUploadCenterBinding
-import com.ishant.calltracker.ui.home.HomeViewModel
-import com.ishant.calltracker.utils.showLoadingDialog
-import com.ishant.calltracker.utils.toast
+import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -7,27 +7,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
-import android.view.View
-import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.ishant.calltracker.R
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
-import com.ishant.calltracker.ui.home.HomeViewModel
 import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavHost
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.isServiceRunning
@@ -42,7 +34,6 @@ import readPhoneNumberPermission
 import readPhoneStatePermission
 import requestNotificationPermission
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class DashboardActivity : BaseComposeActivity() {

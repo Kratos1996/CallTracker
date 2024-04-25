@@ -34,7 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
-import com.ishant.calltracker.ui.home.HomeViewModel
+import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary

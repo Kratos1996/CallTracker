@@ -23,7 +23,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ishant.calltracker.R
-import com.ishant.calltracker.ui.home.HomeViewModel
+import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.ui.navhost.screens.dashboard.AppScreenHome
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.corelibcompose.toolkit.colors.gray_bg_dark

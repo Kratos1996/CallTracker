@@ -5,32 +5,22 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.ishant.calltracker.R
-import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.ui.callupdatecenter.CallUploadCenterActivity
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.service.ContactUpdateOnServer
-import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.dashboard.DashboardActivity
-import com.ishant.calltracker.ui.home.HomeActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
 import com.ishant.calltracker.ui.logs.CallLogsActivity
 import com.ishant.calltracker.ui.restricted.AddNewContact
-import com.ishant.calltracker.ui.restricted.ContactActivity
-import com.ishant.calltracker.ui.restricted.RestrictedContactActivity
-import com.ishant.calltracker.utils.helper.AutoStartHelper
 import com.ishant.calltracker.utils.helper.AutoStartHelper.Companion.instance
 
 val settingApplicationCode = 1996
@@ -60,14 +50,6 @@ fun Context.navToCallService(done :()->Unit ={}){
         done()
     }
 
-}
-fun Context.navToRestrictContactActivity(){
-    val intent = Intent(this, RestrictedContactActivity::class.java)
-    startActivity(intent)
-}
-fun Context.navToContactActivity(){
-    val intent = Intent(this, ContactActivity::class.java)
-    startActivity(intent)
 }
 fun Context.navToUploadContactActivity(){
     val intent = Intent(this, CallUploadCenterActivity::class.java)
@@ -124,7 +106,7 @@ fun Context.addAutoStartup() {
  fun Context.callForegroundService( onRunNotification: (id:Int,notification:Notification) -> Unit) {
 
     val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    val notificationIntent = Intent(this, HomeActivity::class.java)
+    val notificationIntent = Intent(this, DashboardActivity::class.java)
     val pendingIntent = PendingIntent.getActivity(
         this,
         0,

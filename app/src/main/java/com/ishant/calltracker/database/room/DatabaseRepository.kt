@@ -44,7 +44,7 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
             db.getDao().getContactList()
         }
     }
-     fun getRestrictedDataList(data:String): LiveData<List<ContactList>> {
+     fun getRestrictedDataList(data:String): Flow<List<ContactList>> {
         return if(data.isNotEmpty()){
             db.getDao().getAllRestrictedContacts(data,isFav = true)
         }else{

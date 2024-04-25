@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,31 +27,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.airbnb.lottie.model.content.CircleShape
 import com.ishant.calltracker.R
-import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.database.room.ContactList
-import com.ishant.calltracker.ui.dashboard.screens.call.CallViewModel
 import com.ishant.calltracker.ui.dashboard.screens.call.callNow
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
-import com.ishant.calltracker.ui.home.HomeViewModel
+import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.utils.getActivityContext
+import com.ishant.calltracker.utils.navToSaveContactActivity
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
-import com.ishant.corelibcompose.toolkit.constant.AppConst.MEDIA_TYPE_LOTTIE
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CircularBox
+import com.ishant.corelibcompose.toolkit.ui.checkbox.CustomCheckBox
+import com.ishant.corelibcompose.toolkit.ui.checkbox.SwitchIosStyle
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.custom_pullrefresh.CustomPullToRefresh
-import com.ishant.corelibcompose.toolkit.ui.imageLib.MultiMediaView
 import com.ishant.corelibcompose.toolkit.ui.other.OtherModifiers
+import com.ishant.corelibcompose.toolkit.ui.progressindicator.ProgressDialog
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SearchViewNew
@@ -64,8 +64,10 @@ fun ContactScreen() {
         if (!initialApiCalled.value) {
             initialApiCalled.value = true
             homeViewModel.getContacts("")
+            homeViewModel.loadTabs()
         }
     }
+    ProgressDialog(showDialog = homeViewModel.showLoading)
     LoadContactScreen(homeViewModel)
 }
 
@@ -95,9 +97,41 @@ private fun LoadContactScreen(
                 state = lazyColumnListState,
                 contentPadding = PaddingValues(bottom = 60.sdp)
             ) {
+                item { TabView(homeViewModel = homeViewModel) }
                 item { SearchViewWithCheckBox(homeViewModel = homeViewModel) }
                 contactList(homeViewModel)
             }
+        }
+    }
+}
+
+@Composable
+private fun TabView(homeViewModel: HomeViewModel) {
+    val context = LocalContext.current
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.sdp)) {
+        DashboardCommon.Tab(
+            title = stringResource(id = R.string.all_contact),
+            isSelected = homeViewModel.allContactSelected.value
+        ) {
+            homeViewModel.allContactSelected.value = true
+            homeViewModel.ristrictedContact.value = false
+            homeViewModel.filterSearch()
+        }
+        DashboardCommon.Tab(
+            title = stringResource(id = R.string.ristricted_contact),
+            isSelected = homeViewModel.ristrictedContact.value
+        ) {
+            homeViewModel.allContactSelected.value = false
+            homeViewModel.ristrictedContact.value = true
+            homeViewModel.filterSearch()
+        }
+        DashboardCommon.Tab(
+            title = stringResource(id = R.string.saveContact),
+            isSelected = false
+        ) {
+            context.navToSaveContactActivity()
         }
     }
 }
@@ -141,7 +175,6 @@ private fun LazyListScope.contactList(
         }
     }
 }
-
 
 
 @Composable
@@ -192,19 +225,23 @@ private fun ContactDataItem(item: ContactList, viewModel: HomeViewModel) {
                     top.linkTo(coinCode.bottom)
                 }
         )
-        MultiMediaView.FromLocal(
-            mediaDrawable = R.raw.call_ico,
-            playAnimation = true,
-            mediaType = MEDIA_TYPE_LOTTIE,
-            roundCorner = 30.sdp,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .height(40.sdp)
-                .width(42.sdp)
-                .constrainAs(coinBalance) {
-                    end.linkTo(parent.end)
-                    top.linkTo(icon.top)
-                })
+        CustomCheckBox.invoke(modifier = Modifier
+            .constrainAs(coinBalance) {
+                end.linkTo(parent.end)
+                top.linkTo(icon.top)
+            },
+            isChecked = item?.isFav ?: false,
+            isCircular = true,
+            checkBoxSize = 20.sdp,
+            text = ""
+        ) {checked ->
+            var isChecked = checked
+            if(item.isFav == isChecked){
+                isChecked = !isChecked
+            }
+            viewModel.setRistricted(item, isChecked)
+        }
+
 
         OtherModifiers.LineDivider(modifier = Modifier
             .padding(top = 10.sdp)
@@ -216,3 +253,4 @@ private fun ContactDataItem(item: ContactList, viewModel: HomeViewModel) {
         )
     }
 }
+

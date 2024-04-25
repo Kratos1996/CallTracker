@@ -151,6 +151,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.composeUiTooling)
     implementation(libs.bundles.org.ishant.compose.libs )
     implementation(libs.lifecycle.viewmodel.compose)
-    implementation ("com.github.Kratos1996:corelib:1.0.7@aar")
+    implementation ("com.github.Kratos1996:corelib:1.0.9@aar")
     implementation(libs.bundles.image.libs)
 }

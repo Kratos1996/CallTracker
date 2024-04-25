@@ -28,7 +28,7 @@ interface CallTrackerDao {
 
 
     @Query("Select * From ContactList where name Like '%' || :data || '%' and isFav=:isFav  ")
-    fun getAllRestrictedContacts(data:String,isFav:Boolean ):LiveData<List<ContactList>>
+    fun getAllRestrictedContacts(data:String,isFav:Boolean ):Flow<List<ContactList>>
 
     @Query("Delete From ContactList")
     suspend fun deleteAllContacts()
@@ -44,7 +44,7 @@ interface CallTrackerDao {
     suspend fun setContactRestricted(phone:String,isFav:Boolean):Int
 
     @Query("Select * From ContactList Where isFav=:isFav")
-    fun getAllRestrictedContacts(isFav:Boolean):LiveData<List<ContactList>>
+    fun getAllRestrictedContacts(isFav:Boolean):Flow<List<ContactList>>
 
     @Query("Select * From UploadContact  ORDER BY date DESC ")
     fun getUploadContactList():Flow<List<UploadContact>>

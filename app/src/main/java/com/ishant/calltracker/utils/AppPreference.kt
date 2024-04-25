@@ -74,14 +74,14 @@ object AppPreference {
         get() = getDataBoolean(PREF_SIM2_SELECTED)
         set(value) = setDataBoolean(PREF_SIM2_SELECTED,value)
 
-    var user: LoginResponse.User
+    var loginUser: LoginResponse
         get() {
             val gson = Gson()
             val value = getDataString(PREF_IMPLICIT_USER)
             if (value?.isEmpty() == true) {
-                return LoginResponse.User()
+                return LoginResponse()
             }
-            return gson.fromJson(value, LoginResponse.User::class.java)
+            return gson.fromJson(value, LoginResponse::class.java)
         }
         set(value) {
             val gson = Gson()

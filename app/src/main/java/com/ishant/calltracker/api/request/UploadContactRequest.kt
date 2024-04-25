@@ -1,8 +1,14 @@
 package com.ishant.calltracker.api.request
 
-import retrofit2.http.Field
+import com.google.gson.annotations.SerializedName
+import com.ishant.calltracker.api.response.LoginResponse
 
-data class UploadContactRequest(val data: ArrayList<UploadContactData> = arrayListOf()) {
+data class UploadContactRequest(
+    @SerializedName("countryCode")
+    var countryCode: LoginResponse.CountryCode? =null,
+    @SerializedName("data")
+    val data: ArrayList<UploadContactData> = arrayListOf()
+) {
     data class UploadContactData(
         val sourceMobileNo: String,
         val mobile: String,

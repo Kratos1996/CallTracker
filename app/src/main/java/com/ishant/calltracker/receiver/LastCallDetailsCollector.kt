@@ -13,9 +13,7 @@ import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Utils
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.util.Date
 import java.util.Locale
 
@@ -145,6 +143,7 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     callsCount++
                 }
                 dataCaller.data?.addAll(dataUploadList)
+                dataCaller.countryCode = AppPreference.loginUser.countryCode
                 return dataCaller
             }
             cursor?.close()
@@ -180,7 +179,7 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
         when (AppPreference.simManager.data.size) {
             1 -> {
                 return if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.user.mobile ?: ""
+                    AppPreference.loginUser.user?.mobile ?: ""
                 } else {
                     AppPreference.simManager.data[0].phoneNumber
                 }
@@ -188,16 +187,16 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
 
             2 -> {
                 return if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty() && AppPreference.simManager.data[1].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.user.mobile ?: ""
+                    AppPreference.loginUser.user?.mobile ?: ""
                 } else if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.user.mobile ?: ""
+                    AppPreference.loginUser.user?.mobile ?: ""
                 } else {
                     AppPreference.simManager.data[0].phoneNumber
                 }
             }
 
             else -> {
-                return AppPreference.user.mobile ?: ""
+                return AppPreference.loginUser.user?.mobile ?: ""
             }
         }
     }

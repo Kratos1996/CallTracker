@@ -4,16 +4,21 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
+import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.databinding.ActivityAddNewContactBinding
 import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.utils.ContactSaver
 import com.ishant.calltracker.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AddNewContact : AppCompatActivity() {
+class AddNewContact : BaseComposeActivity() {
     private lateinit var binding:ActivityAddNewContactBinding
     @Inject
     lateinit var databaseRepository: DatabaseRepository
@@ -28,6 +33,11 @@ class AddNewContact : AppCompatActivity() {
             validateNow(binding = binding)
         }
         binding.backBtn.setOnClickListener {
+            setResult(RESULT_CANCELED, Intent().putExtra("VALUE", 0))
+            finish()
+        }
+        onBackPressedWaAppBlaster(this){
+            setResult(RESULT_CANCELED, Intent().putExtra("VALUE", 0))
             finish()
         }
     }
@@ -50,6 +60,8 @@ class AddNewContact : AppCompatActivity() {
                 context.toast("Contact Saved Successfully")
                 binding.mobileNumber.setText("")
                 binding.name.setText("")
+                setResult(RESULT_OK, Intent().putExtra("VALUE", 0))
+                finish()
             }
         }
     }

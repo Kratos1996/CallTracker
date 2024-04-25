@@ -97,4 +97,7 @@
     <string name="phone_log">Phone Logs</string>
     <string name="please_check_all_pending_permission_for_call_service_all_permission_is_required">Please check All Pending Permission, For Call Service all Permission is Required</string>
     <string name="no_records_found">No records Found</string>
+    <string name="application_manager">Application Manager</string>
+    <string name="alarm_manager">Call Service Supporter</string>
+    <string name="work_manager">Call Service Manager</string>
 </resources>

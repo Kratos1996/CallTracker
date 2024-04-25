@@ -74,7 +74,6 @@ class CallService : Service() {
             readPhoneStatePermission(granted = {
                 readPhoneNumberPermission(granted = {
                     telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-
                     callForegroundService(){ notificationId,notification ->
                         startForeground(notificationId, notification)
                     }
@@ -82,7 +81,7 @@ class CallService : Service() {
                 })
             })
         } catch (e: Exception) {
-            registerPhoneStateListener()
+
         }
 
         return START_STICKY
@@ -104,6 +103,7 @@ class CallService : Service() {
 
 
     private fun registerPhoneStateListener() {
+        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
     }
 

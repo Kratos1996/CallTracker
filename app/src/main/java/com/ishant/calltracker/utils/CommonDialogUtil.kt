@@ -9,27 +9,23 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.Toast
+import com.ishant.calltracker.app.showAsBottomSheet
 import com.ishant.calltracker.databinding.DialogProgressBinding
+import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.snackbar.SnackBarSlideEffect
 import com.ishant.corelibcompose.toolkit.ui.snackbar.custom.SnackBarType
 import com.ishant.corelibcompose.toolkit.ui.snackbar.showSnackBar
 
 fun showCommonDialog(title:String,message:String,context: Context,positiveClick:()->Unit){
-    val dialogBuilder = AlertDialog.Builder(context)
-    dialogBuilder.apply {
-        setTitle(title)
-        setMessage(message)
-        setCancelable(false)
-        setNegativeButton("No") { dialog, _ ->
-            dialog.dismiss()
-        }
-        setPositiveButton("Yes") { dialog, _ ->
-            dialog.dismiss()
-            positiveClick.invoke()
-        }
+
+    context.getActivityContext().showAsBottomSheet{dismiss ->
+        CommonAlertBottomSheet(msg = message,
+            onPositiveClick = {positiveClick.invoke() },
+            onNegativeClick = {
+                dismiss.invoke()
+            })
+
     }
-    // show dialog
-    dialogBuilder.create().show()
 }
 fun showLoadingDialog(context: Context,progressDialog: Dialog): Dialog {
     if (progressDialog.window != null) {

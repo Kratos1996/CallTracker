@@ -27,6 +27,7 @@ import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.databinding.ActivityLoginBinding
+import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.ContactSaver
 import com.ishant.calltracker.utils.Response
@@ -37,7 +38,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import isNotificationPermissionGranted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import readPhoneContactPermission
 import requestNotificationPermission
+import takeForegroundContactService
 import takeForegroundService
 import writePhoneContactPermission
 import java.net.URI
@@ -263,8 +266,15 @@ class LoginActivity : BaseComposeActivity() {
 
     private fun requestWriteContact(){
         writePhoneContactPermission(granted = {
-            loginViewModel.permissionGrantedMain.value = true
-            validateNow(binding)
+            takeForegroundContactService(granted = {
+                readPhoneContactPermission(granted = {
+                    startService(Intent(this, ContactSyncService::class.java))
+                    loginViewModel.permissionGrantedMain.value = true
+                    validateNow(binding)
+                }){
+                    toast("Need Read Contact Service")
+                }
+            })
         }){
             Toast.makeText(this,getString(R.string.read_write_contact_permission),Toast.LENGTH_SHORT).show()
             loginViewModel.permissionGrantedMain.value = false

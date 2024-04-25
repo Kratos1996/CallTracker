@@ -71,6 +71,8 @@ fun HomeNavHost(
                     AppConst.NAV_BACK_CLICK -> {
                         if (!navController.popBackStack()) {
                             context.getActivityContext().finish()
+                        }else{
+                            navController.popBackStack()
                         }
                     }
 

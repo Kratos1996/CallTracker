@@ -14,6 +14,7 @@ import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.navToCallService
 import readPhoneContactPermission
+import takeForegroundContactService
 
 
 class ContactObserver(val context: Context, handler: Handler) : ContentObserver(handler) {
@@ -22,16 +23,23 @@ class ContactObserver(val context: Context, handler: Handler) : ContentObserver(
 
     override fun onChange(selfChange: Boolean) {
         super.onChange(selfChange)
-        if (!context.isServiceRunning(CallService::class.java)) { // Replace with your service class
-            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > Target service is not running. Restarting...")
-            context.navToCallService()
-        }else{
-            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ServiceRestarterService > startServiceMonitoring > Target service is running....")
+        try {
+            if (!context.isServiceRunning(CallService::class.java)) { // Replace with your service class
+                Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ContactService > Receiver > Target service is not running. Restarting...")
+                context.navToCallService()
+            }else{
+                Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ContactService > Receiver > Target service is running....")
+            }
+            context.readPhoneContactPermission(
+                granted = {
+                    context.takeForegroundContactService(granted = {
+                        context.startService(Intent(context, ContactSyncService::class.java))
+                    })
+                })
+        }catch (e:Exception){
+            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > ContactService > Receiver > Something went wrong...")
         }
-        context.readPhoneContactPermission(
-            granted = {
-                context.startService(Intent(context, ContactSyncService::class.java))
-            })
+
     }
 
     fun registerObserver() {

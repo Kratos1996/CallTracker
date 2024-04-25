@@ -3,6 +3,7 @@ package com.ishant.calltracker.ui.dashboard.screens.dashboard
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,13 +33,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.service.CallService
+import com.ishant.calltracker.service.KeepAliveService
+import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavConstants
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isServiceRunning
+import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.navToCallService
+import com.ishant.calltracker.utils.startAlarmManager
+import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
@@ -47,7 +53,9 @@ import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
 import com.ishant.corelibcompose.toolkit.ui.textstyles.ExtraLargeText
+import com.ishant.corelibcompose.toolkit.ui.textstyles.PS
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
+import com.ishant.corelibcompose.toolkit.ui.textstyles.SFPRO
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SubHeadingText
 import readPhoneContactPermission
 import readPhoneLogPermission
@@ -62,7 +70,6 @@ fun DashboardScreen() {
     LaunchedEffect(key1 = Unit, block = {
         if (!initialApiCalled.value) {
             initialApiCalled.value = true
-
         }
     })
     LoadDashboardScreen(context, homeViewModel)
@@ -99,9 +106,9 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     space = 10.sdp, alignment = Alignment.CenterVertically
                 )
             ) {
-                RegularText.Medium(title = AppPreference.user.name ?: "")
-                RegularText.Medium(title = AppPreference.user.email ?: "")
-                RegularText.Medium(title = AppPreference.user.mobile ?: "")
+                RegularText.Medium(title = AppPreference.loginUser.user?.name ?: "")
+                RegularText.Medium(title = AppPreference.loginUser.user?.email ?: "")
+                RegularText.Medium(title = AppPreference.loginUser.user?.mobile ?: "")
                 RegularText.Underlined(title = context.getString(R.string.url) ?: "", modifier = Modifier.noRippleClickable {
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.url)))
                     context.startActivity(browserIntent)
@@ -112,19 +119,14 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
         DashboardCardComponents(
             title = context.getString(R.string.service),
             modifier = Modifier,
-            firstBlockText = context.getString(R.string.ristricted_contact),
-            secondBlockText = context.getString(R.string.start_call_service),
+            firstBlockText = context.getString(R.string.start_call_service),
+            secondBlockText =   context.getString(R.string.work_manager),
             firstBlock = {
-                homeViewModel.ristrictedContact.value = true
-                homeViewModel.allContactSelected.value = false
-                homeViewModel.filterSearch()
-                homeViewModel.navigateTo(navCode = HomeNavConstants.NAV_ALL_CONTACTS_SCREEN)
-            },
-            secondBlock = {
                 if (!homeViewModel.contactPermissionGranted.value && !homeViewModel.phoneLogsPermissionGranted.value && !homeViewModel.readPhoneStatePermissionGranted.value && !homeViewModel.phoneNumberPermissionGranted.value) {
                     context.toast(context.getString(R.string.please_check_all_pending_permission_for_call_service_all_permission_is_required))
                 } else {
                     if (context.isServiceRunning(CallService::class.java)) {
+                        homeViewModel.callService.value = true
                         context.toast("Call Service is already Running")
                     } else {
                         context.toast("Call Service started....")
@@ -132,7 +134,22 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }
                 }
             },
-            subSecondBlockText = if (!context.isServiceRunning(CallService::class.java)) {
+            secondBlock = {
+                context.readPhoneStatePermission(granted = {
+                    context.readPhoneNumberPermission(granted = {
+                        if (!context.isServiceRunning(KeepAliveService::class.java)) { // Replace with your service class
+                            context.startWorkManager(context.getActivityContext())
+                            context.startAlarmManager()
+                            context.keepAliveService()
+                            homeViewModel.managers.value = true
+                        }
+                    })
+                })
+            },
+            subFirstBlockText = if (!homeViewModel.callService.value ) {
+                context.getString(R.string.not_running)
+            } else context.getString(R.string.already_running),
+            subSecondBlockText = if (! homeViewModel.managers.value) {
                 context.getString(R.string.not_running)
             } else context.getString(R.string.already_running)
         )
@@ -203,6 +220,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
             ) else context.getString(R.string.denied)
         )
 
+
         CoreImageView.FromLocalDrawable(
             painterResource = R.drawable.home, modifier = Modifier
                 .fillMaxWidth()
@@ -271,13 +289,15 @@ private fun DashboardTileView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            ExtraLargeText.Medium(
+            SubHeadingText.Medium(
                 title = firstBlockText,
-                textColor = MaterialTheme.colors.white_only
+                textColor = MaterialTheme.colors.white_only,
+                fontStyle = SFPRO
             )
-            SubHeadingText(
+            RegularText(
                 title = subFirstBlockText,
-                textColor = MaterialTheme.colors.white_only
+                textColor = MaterialTheme.colors.white_only,
+                fontStyle = PS
             )
         }
 
@@ -298,13 +318,15 @@ private fun DashboardTileView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            ExtraLargeText.Medium(
+            SubHeadingText.Medium(
                 title = secondBlockText,
-                textColor = MaterialTheme.colors.white_only
+                textColor = MaterialTheme.colors.white_only,
+                fontStyle = SFPRO
             )
-            SubHeadingText(
+            RegularText(
                 title = subSecondBlockText,
-                textColor = MaterialTheme.colors.white_only
+                textColor = MaterialTheme.colors.white_only,
+                fontStyle = PS
             )
         }
 

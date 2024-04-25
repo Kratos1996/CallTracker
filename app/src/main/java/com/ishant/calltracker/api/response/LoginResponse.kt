@@ -4,11 +4,21 @@ package com.ishant.calltracker.api.response
 import com.google.gson.annotations.SerializedName
 
 data class LoginResponse(
+    @SerializedName("countryCode")
+    var countryCode: CountryCode?= null,
     @SerializedName("token")
-    var token: String? = null ,
+    var token: String? = null,
     @SerializedName("user")
     var user: User? = null
 ) {
+    data class CountryCode(
+        @SerializedName("country_code")
+        var countryCode: String?,
+        @SerializedName("id")
+        var id: Int?,
+        @SerializedName("replace_from")
+        var replaceFrom: String?
+    )
     data class User(
         @SerializedName("city")
         var city: Any? = null ,

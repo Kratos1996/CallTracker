@@ -9,51 +9,51 @@ import com.ishant.calltracker.receiver.NotificationServiceRestartReceiver
 
 class KeepAliveService : Service() {
     override fun onCreate() {
-        Log.d("DEBUG", "KeepAliveService onCreate")
+        Log.e("DEBUG", "KeepAliveService onCreate")
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d("DEBUG", "KeepAliveService onStartCommand")
+        Log.e("DEBUG", "CallTracker : KeepAliveService onStartCommand")
 
         startNotificationService()
         return START_STICKY
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        Log.d("DEBUG", "KeepAliveService onBind")
+        Log.e("DEBUG", "CallTracker : KeepAliveService onBind")
         return null
     }
 
     override fun onUnbind(intent: Intent): Boolean {
-        Log.d("DEBUG", "KeepAliveService onUnbind")
+        Log.e("DEBUG", "CallTracker : KeepAliveService onUnbind")
         tryReconnectService()
         return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("DEBUG", "KeepAliveService onDestroy")
+        Log.e("DEBUG", "CallTracker : KeepAliveService onDestroy")
         tryReconnectService()
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {
         super.onTaskRemoved(rootIntent)
-        Log.d("DEBUG", "KeepAliveService onTaskRemoved")
+        Log.e("DEBUG", "CallTracker : KeepAliveService onTaskRemoved")
         tryReconnectService()
     }
 
     private fun tryReconnectService() {
-        Log.d("DEBUG", "KeepAliveService tryReconnectService")
+        Log.e("DEBUG", "CallTracker : KeepAliveService tryReconnectService")
         //Send broadcast to restart service
         val broadcastIntent = Intent(applicationContext, NotificationServiceRestartReceiver::class.java)
-        broadcastIntent.action = "AutoReply-RestartService-Broadcast"
+        broadcastIntent.action = "Ishant-RestartService-Broadcast"
         sendBroadcast(broadcastIntent)
     }
 
     private fun startNotificationService() {
         if (!isMyServiceRunning) {
-            Log.d("DEBUG", "KeepAliveService startNotificationService")
+            Log.e("DEBUG", "CallTracker : KeepAliveService startNotificationService")
             val mServiceIntent = Intent(this, CallService::class.java)
             startService(mServiceIntent)
         }
@@ -64,11 +64,11 @@ class KeepAliveService : Service() {
             val manager: ActivityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
                 if (CallService::class.java.equals(service.service.className)) {
-                    Log.i("isMyServiceRunning?", true.toString() + "")
+                    Log.e("isMyServiceRunning?", true.toString() + "")
                     return true
                 }
             }
-            Log.i("isMyServiceRunning?", false.toString() + "")
+            Log.e("isMyServiceRunning?", false.toString() + "")
             return false
         }
 }

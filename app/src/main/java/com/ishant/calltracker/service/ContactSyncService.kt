@@ -1,9 +1,11 @@
 package com.ishant.calltracker.service
 
 import android.app.IntentService
+import android.app.Service
 import android.content.ContentResolver
 import android.content.Intent
 import android.database.Cursor
+import android.os.IBinder
 import android.provider.ContactsContract
 import android.util.Log
 import com.google.gson.Gson
@@ -21,17 +23,22 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ContactSyncService : IntentService("ContactSyncService") {
+class ContactSyncService : Service() {
 
     @Inject
     lateinit var databaseRepository: DatabaseRepository
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    @Deprecated("Deprecated in Java")
-    override fun onHandleIntent(intent: Intent?) {
-       fetchContacts()
+    override fun onCreate() {
+        super.onCreate()
 
+    }
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        Log.e("DEBUG", "CallTracker :  ContactService onStartCommand")
+
+        fetchContacts()
+        return START_STICKY
     }
 
     private fun fetchContacts() {
@@ -103,11 +110,6 @@ class ContactSyncService : IntentService("ContactSyncService") {
         return phoneNumbers
     }
 
-    private fun saveContactsToDatabase(contacts: List<ContactList>) {
-        scope.launch {
-           databaseRepository.insertContact(contacts)
-        }
-    }
     private  fun saveContactsToDatabase(contacts: ContactList) {
         scope.launch {
             databaseRepository.insertContact(contacts)
@@ -123,5 +125,9 @@ class ContactSyncService : IntentService("ContactSyncService") {
     override fun onDestroy() {
         super.onDestroy()
         scope.coroutineContext.cancelChildren()
+    }
+
+    override fun onBind(p0: Intent?): IBinder? {
+       return null
     }
 }

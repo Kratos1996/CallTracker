@@ -72,4 +72,8 @@ class CallViewModel  @Inject constructor(
         }
     }
 
+    fun callDetailUpdateOnServer(onSuccess: (isSuccess:Boolean, response:Any)->Unit) {
+
+    }
+
 }

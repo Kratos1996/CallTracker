@@ -23,13 +23,23 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ishant.calltracker.R
+import com.ishant.calltracker.app.showAsBottomSheet
+import com.ishant.calltracker.receiver.BootReceiver
+import com.ishant.calltracker.receiver.NotificationServiceRestartReceiver
+import com.ishant.calltracker.receiver.PhoneCallReceiver
+import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.ui.navhost.screens.dashboard.AppScreenHome
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
+import com.ishant.calltracker.utils.keepAliveService
+import com.ishant.calltracker.utils.stopServiceCall
+import com.ishant.calltracker.utils.stopServiceContact
 import com.ishant.corelibcompose.toolkit.colors.gray_bg_dark
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
 import com.ishant.corelibcompose.toolkit.colors.white
+import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SmallText
@@ -62,7 +72,9 @@ fun BottomBar(
         BottomNavigation(
             elevation = 0.dp,
             backgroundColor = MaterialTheme.colors.white,
-            modifier = modifier.padding(top = 6.sdp).height(56.dp)
+            modifier = modifier
+                .padding(top = 6.sdp)
+                .height(56.dp)
         ) {
             screens.forEach { screen ->
                 AddItemIxfiCard(
@@ -70,13 +82,33 @@ fun BottomBar(
                     currentDestination = currentDestination,
                     onClick = {
                         if (screen.route == BottomBarScreen.Back.route) {
-                            context.getActivityContext().finish()
+                           //
+                            context.getActivityContext().showAsBottomSheet{dismiss ->
+                                CommonAlertBottomSheet(
+                                    msg = "Do you want to Logout?",
+                                    positiveText = "Yes",
+                                    onPositiveClick = {
+                                        AppPreference.logout()
+                                        context.stopServiceContact()
+                                        context.stopServiceCall()
+                                        context.keepAliveService()
+                                        context.unregisterReceiver(PhoneCallReceiver())
+                                        context.unregisterReceiver(ServiceCheckReceiver())
+                                        context.unregisterReceiver(NotificationServiceRestartReceiver())
+                                        context.unregisterReceiver(BootReceiver())
+                                        context.getActivityContext().finish()
+                                    },
+                                    negativeText = "No",
+                                    onNegativeClick = {
+                                        dismiss.invoke()
+                                    })
+                            }
                         } else if (currentDestination?.route != screen.route) {
                             navController.navigate(screen.route) {
                                 navController.graph.startDestinationRoute?.let { route ->
                                     popUpTo(route) { saveState = true }
                                 }
-                                launchSingleTop = true
+                                launchSingleTop = false
                                 restoreState = true
                             }
                         }

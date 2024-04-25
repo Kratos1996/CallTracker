@@ -17,6 +17,7 @@ import com.ishant.calltracker.ui.callupdatecenter.CallUploadCenterActivity
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.service.ContactUpdateOnServer
+import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.ui.dashboard.DashboardActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
 import com.ishant.calltracker.ui.logs.CallLogsActivity
@@ -64,6 +65,11 @@ fun Context.serviceContactUploadRestarter(){
     startService(intent)*/
 
 }
+fun Context.keepAliveService(){
+    val intent = Intent(this, KeepAliveService::class.java)
+    startService(intent)
+
+}
 fun Context.serviceContact(){
     startService(Intent(this, ContactSyncService::class.java))
 }
@@ -72,6 +78,12 @@ fun Context.stopServiceContactUpload(){
 }
 fun Context.stopServiceContact(){
     stopService(Intent(this, ContactSyncService::class.java))
+}
+fun Context.stopServiceCall(){
+    stopService(Intent(this, CallService::class.java))
+}
+fun Context.stopServiceKeepAlive(){
+    stopService(Intent(this, KeepAliveService::class.java))
 }
 
 fun Context.navToSetting(activity: AppCompatActivity){

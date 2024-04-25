@@ -1,5 +1,10 @@
 package com.ishant.calltracker.ui.dashboard.screens.contact
 
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,11 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
+import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.ContactList
-import com.ishant.calltracker.ui.dashboard.screens.call.callNow
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
+import com.ishant.calltracker.ui.restricted.AddNewContact
 import com.ishant.calltracker.utils.getActivityContext
+import com.ishant.calltracker.utils.initiatePhoneCall
 import com.ishant.calltracker.utils.navToSaveContactActivity
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
@@ -45,7 +52,6 @@ import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CircularBox
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CustomCheckBox
-import com.ishant.corelibcompose.toolkit.ui.checkbox.SwitchIosStyle
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.custom_pullrefresh.CustomPullToRefresh
 import com.ishant.corelibcompose.toolkit.ui.other.OtherModifiers
@@ -60,11 +66,11 @@ fun ContactScreen() {
     val context = LocalContext.current
     val homeViewModel: HomeViewModel = hiltViewModel(context.getActivityContext())
     val initialApiCalled = rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(key1 = Unit) {
         if (!initialApiCalled.value) {
             initialApiCalled.value = true
             homeViewModel.getContacts("")
-            homeViewModel.loadTabs()
         }
     }
     ProgressDialog(showDialog = homeViewModel.showLoading)
@@ -108,6 +114,12 @@ private fun LoadContactScreen(
 @Composable
 private fun TabView(homeViewModel: HomeViewModel) {
     val context = LocalContext.current
+    val intent = Intent(context,AddNewContact::class.java)
+    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            homeViewModel.getContacts("")
+        }
+    }
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(top = 16.sdp)) {
@@ -131,7 +143,7 @@ private fun TabView(homeViewModel: HomeViewModel) {
             title = stringResource(id = R.string.saveContact),
             isSelected = false
         ) {
-            context.navToSaveContactActivity()
+            startForResult.launch(intent)
         }
     }
 }
@@ -151,7 +163,7 @@ private fun SearchViewWithCheckBox(homeViewModel: HomeViewModel) {
 private fun LazyListScope.contactList(
     viewModel: HomeViewModel
 ) {
-    if (viewModel.showLoading.value) {
+    if (viewModel.showLoading.value ) {
         item {
             DashboardCommon.CustomShimmer()
         }
@@ -180,13 +192,14 @@ private fun LazyListScope.contactList(
 @Composable
 private fun ContactDataItem(item: ContactList, viewModel: HomeViewModel) {
     val randomColor = DashboardCommon.getRandomColor()
+    val context = LocalContext.current
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(top = 12.sdp, start = 12.sdp, end = 12.sdp)
             .noRippleClickable(true) {
-                callNow(item.phoneNumber ?: "")
+                context.initiatePhoneCall(item.phoneNumber ?: "")
             }
     ) {
         val (icon, coinCode, coinName, coinBalance, coinValue, divider) = createRefs()

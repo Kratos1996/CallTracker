@@ -14,6 +14,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.ishant.calltracker.R
+import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.navToSetting
 import com.ishant.calltracker.utils.showCommonDialog
 
@@ -44,6 +45,17 @@ fun Context.takeForegroundCallService(granted:()->Unit, rejected:(() -> Unit)? =
         takePermissions(
             permissions = Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL,
             title = getString(R.string.phone_foreground_permission),
+            granted = granted,
+            rejected = rejected
+        )
+    }else{
+        granted()
+    }
+}fun Context.takeForegroundContactService(granted:()->Unit, rejected:(() -> Unit)? = null){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        takePermissions(
+            permissions = Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC,
+            title = getString(R.string.contact_permission),
             granted = granted,
             rejected = rejected
         )
@@ -159,7 +171,7 @@ private fun Context.takePermissions(permissions :String, title:String, granted:(
                 rejected?.let { it() }
                 if(permissionDeniedResponse.isPermanentlyDenied){
                     showCommonDialog(title = getString(R.string.required_permission),message = title ,context){
-                        navToSetting(context as AppCompatActivity)
+                        navToSetting(context.getActivityContext())
                     }
                 }
             }
@@ -171,14 +183,14 @@ private fun Context.takePermissions(permissions :String, title:String, granted:(
                 permissionToken.continuePermissionRequest()
                 rejected?.let { it() }
                 showCommonDialog(title = getString(R.string.required_permission),message = title,context){
-                    navToSetting(context as AppCompatActivity)
+                    navToSetting(context.getActivityContext())
                 }
             }
         })
         .withErrorListener {
             rejected?.let { it() }
             showCommonDialog(title = getString(R.string.required_permission),message = title,context){
-                navToSetting(context as AppCompatActivity)
+                navToSetting(context.getActivityContext())
             }
         }
         .check()

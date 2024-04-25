@@ -43,9 +43,8 @@ class LoginViewModel  @Inject constructor(
                 is Resource.Error -> _loginResponse.value = Response.Message(result.message)
                 is Resource.Loading -> _loginResponse.value = Response.Loading(isLoading = true)
                 is Resource.Success -> {
-
                     AppPreference.isUserLoggedIn = true
-                    AppPreference.user = result.data?.user?: LoginResponse.User()
+                    AppPreference.loginUser = result.data?: LoginResponse()
                     AppPreference.firebaseToken = result.data?.token?: ""
                     _loginResponse.value = Response.Success(result.data)
                 }

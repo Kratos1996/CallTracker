@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -17,14 +18,24 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.app.CallTrackerApplication
+import com.ishant.calltracker.app.showAsBottomSheet
 import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.service.CallService
+import com.ishant.calltracker.service.ContactSyncService
+import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavHost
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.addAutoStartup
+import com.ishant.calltracker.utils.callForegroundService
+import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isServiceRunning
+import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.navToCallService
+import com.ishant.calltracker.utils.startAlarmManager
+import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.workmanager.ServiceCheckWorker
+import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.theme.CoreTheme
 import dagger.hilt.android.AndroidEntryPoint
 import isNotificationPermissionGranted
@@ -33,6 +44,7 @@ import readPhoneLogPermission
 import readPhoneNumberPermission
 import readPhoneStatePermission
 import requestNotificationPermission
+import takeForegroundContactService
 import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
@@ -53,11 +65,36 @@ class DashboardActivity : BaseComposeActivity() {
 
                     }
                 )
+
             }
         }
         addAutoStartup()
-        startWorkManager()
-        startAlarmManager()
+        readPhoneStatePermission(granted = {
+            readPhoneNumberPermission(granted = {
+                if (!isServiceRunning(KeepAliveService::class.java)) { // Replace with your service class
+                    keepAliveService()
+                    startWorkManager(this)
+                    startAlarmManager()
+                    viewModel.managers.value = true
+                }else{
+                    viewModel.managers.value = true
+                }
+            })
+        })
+        onBackPressedWaAppBlaster(this) {
+            showAsBottomSheet { dismiss ->
+                CommonAlertBottomSheet(msg = "Do you want to Close Application?",
+                    positiveText = "Yes",
+                    onPositiveClick = {
+                        viewModel.navigateBack()
+                    },
+                    negativeText = "No",
+                    onNegativeClick = {
+                        dismiss.invoke()
+                    }
+                )
+            }
+        }
     }
 
     private fun takePhoneNetworkPermission() {
@@ -91,37 +128,6 @@ class DashboardActivity : BaseComposeActivity() {
         )
     }
 
-    private fun startWorkManager(){
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
 
-        val periodicWorkRequest = PeriodicWorkRequestBuilder<ServiceCheckWorker>(
-            15, TimeUnit.MINUTES
-        ).setConstraints(constraints)
-            .build()
-        WorkManager.getInstance(applicationContext).enqueue(periodicWorkRequest)
-// Optional: Observe the result of the worker
-        WorkManager.getInstance(applicationContext)
-            .getWorkInfoByIdLiveData(periodicWorkRequest.id)
-            .observe(this, Observer { workInfo ->
-                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.e(ServiceRestarterService.TAG, "CallTracker : HomeActivity > ServiceCheckWorker > doWork > CallService service is running....")
-                }
-            })
-    }
 
-    private fun startAlarmManager(){
-        // Schedule the alarm to run every minute
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, ServiceCheckReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val intervalMillis = 60 * 1000L  // 1 minute
-        alarmManager.setRepeating(
-            AlarmManager.ELAPSED_REALTIME,
-            SystemClock.elapsedRealtime() + intervalMillis,
-            intervalMillis,
-            pendingIntent
-        )
-    }
 }

@@ -1,5 +1,6 @@
 package com.ishant.calltracker.ui.dashboard.screens.call
 
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,8 +36,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
-import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.utils.getActivityContext
+import com.ishant.calltracker.utils.initiatePhoneCall
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
 import com.ishant.corelibcompose.toolkit.colors.white
@@ -54,7 +56,6 @@ import com.ishant.corelibcompose.toolkit.ui.textstyles.SubHeadingText
 @Composable
 fun CallScreen() {
     val context = LocalContext.current
-    val homeViewModel: HomeViewModel = hiltViewModel(context.getActivityContext())
     val callViewModel: CallViewModel = hiltViewModel(context.getActivityContext())
     val initialApiCalled = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = Unit) {
@@ -120,7 +121,7 @@ private fun LazyListScope.callList(
             DashboardCommon.CustomShimmer()
         }
     } else {
-        if (viewModel.callsDataFilterList.isNullOrEmpty()) {
+        if (viewModel.callsDataFilterList.isEmpty()) {
             item {
                 Column(
                     modifier = Modifier
@@ -145,16 +146,25 @@ private fun LazyListScope.callList(
 @Composable
 private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel) {
     val randomColor = DashboardCommon.getRandomColor()
+    val context = LocalContext.current
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(top = 12.sdp, start = 12.sdp, end = 12.sdp)
             .noRippleClickable(true) {
-                callNow(item.mobile ?: "")
+                viewModel.callDetailUpdateOnServer(){ isSuccess,response ->
+                    if(isSuccess){
+                        context.initiatePhoneCall(item.mobile ?: "")
+                    }else{
+
+                    }
+
+                }
+
             }
     ) {
-        val (icon, coinCode, coinName, coinBalance, coinValue, divider) = createRefs()
+        val (icon, coinCode, coinName, coinBalance, divider) = createRefs()
         CircularBox(
             modifier = Modifier
                 .height(28.sdp)
@@ -166,12 +176,12 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
                 }
         ) {
             SubHeadingText.Medium(
-                title = (item?.name?.uppercase() ?: item?.mobile.toString()).take(2),
+                title = (item.name?.uppercase() ?: item.mobile.toString()).take(2),
                 textColor = MaterialTheme.colors.white_only
             )
         }
         SubHeadingText.Medium(
-            title = item?.name?.uppercase() ?: "",
+            title = item.name?.uppercase() ?: "",
             textColor = MaterialTheme.colors.text_primary,
             modifier = Modifier
                 .padding(start = 10.sdp, end = 4.sdp)
@@ -181,7 +191,7 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
                 }
         )
         RegularText(
-            title = item?.mobile.toString() ?: "",
+            title = item.mobile.toString(),
             textColor = MaterialTheme.colors.text_secondary,
             modifier = Modifier
                 .padding(top = 3.sdp, start = 10.sdp, end = 4.sdp)
@@ -215,7 +225,5 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
     }
 }
 
-fun callNow(mobileNumber: String) {
 
-}
 

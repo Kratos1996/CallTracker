@@ -52,6 +52,8 @@ class HomeViewModel @Inject constructor(
     val phoneNumberPermissionGranted = mutableStateOf(false)
     val phoneLogsPermissionGranted = mutableStateOf(false)
     val contactPermissionGranted = mutableStateOf(false)
+    val callService = mutableStateOf(false)
+    val managers = mutableStateOf(false)
 
     val allContactSelected = mutableStateOf(true)
     val ristrictedContact = mutableStateOf(false)
@@ -68,6 +70,7 @@ class HomeViewModel @Inject constructor(
         autoUpdateContactObserver = ContactObserver(context, Handler())
         autoUpdateContactObserver.registerObserver()
     }
+
 
     fun getContacts(search: String) {
         viewModelScope.launch {
@@ -190,9 +193,6 @@ class HomeViewModel @Inject constructor(
         app.toggleAppTheme()
     }
 
-    fun loadTabs() {
-
-    }
 
     fun setRistricted(item: ContactList, it: Boolean) {
         viewModelScope.launch {

@@ -1,6 +1,7 @@
 package com.ishant.calltracker.domain
 
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.api.response.UploadCallDataRes
 import com.ishant.calltracker.api.response.ContactSavedResponse
 import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
@@ -14,6 +15,7 @@ interface ContactUseCase {
 
     fun uploadContacts(request : UploadContactRequest): Flow<Resource<UploadContactResponse>>
     fun getDomains():  Flow<Resource<UrlResponse>>
-    fun getCallDetails():  Flow<Resource<GetCallsRes>>
+    fun getCallDetails(callType:Int):  Flow<Resource<GetCallsRes>>
+    fun uploadCallDetails(data: GetCallsRes.GetCallsData): Flow<Resource<UploadCallDataRes>>
     fun uploadContact(sourceMobileNo:String, mobile:String, name:String ,type:String,duration:String ):Flow<Resource<ContactSavedResponse>>
 }

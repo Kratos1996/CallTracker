@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class GetCallsRes(
     @SerializedName("data")
-    var getCallsData: List<GetCallsData> = arrayListOf()
+    var getCallsData: ArrayList<GetCallsData> = arrayListOf()
 ) {
     data class GetCallsData(
         @SerializedName("created_at")

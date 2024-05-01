@@ -100,4 +100,8 @@
     <string name="application_manager">Application Manager</string>
     <string name="alarm_manager">Call Service Supporter</string>
     <string name="work_manager">Call Service Manager</string>
+    <string name="cannot_initiate_this_call">Currently we cannot initiate this call,Please try after some time</string>
+    <string name="do_you_want_to_close_application">Do you want to Close Application?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

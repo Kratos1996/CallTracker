@@ -1,6 +1,7 @@
 package com.ishant.calltracker.api
 
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.api.response.UploadCallDataRes
 import com.ishant.calltracker.api.response.ContactSavedResponse
 import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
@@ -11,6 +12,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ApiInterface {
 
@@ -21,8 +23,11 @@ interface ApiInterface {
         @Field("password") password:String
     ): LoginResponse
 
-    @GET(ApiConstant.GET_CALLS)
-    suspend fun getCallDetails(): GetCallsRes
+    @GET(ApiConstant.GET_CALLS+"/{callType}")
+    suspend fun getCallDetails(@Path("callType") callType:Int): GetCallsRes
+
+    @POST(ApiConstant.GET_CALLS)
+    suspend fun uploadCallDetails(@Body data: GetCallsRes.GetCallsData): UploadCallDataRes
 
     @FormUrlEncoded
     @POST(ApiConstant.UPLOAD_CONTACT)

@@ -1,6 +1,7 @@
 package com.ishant.calltracker.data
 
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.api.response.UploadCallDataRes
 import com.ishant.calltracker.api.response.ContactSavedResponse
 import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
@@ -17,5 +18,7 @@ interface ContactRepository {
     suspend fun uploadContacts(request : UploadContactRequest): UploadContactResponse
 
     suspend fun getDomains(): UrlResponse
-    suspend fun getCallDetails(): GetCallsRes
+    suspend fun getCallDetails(callType:Int): GetCallsRes
+
+    suspend fun uploadCallDetails(data: GetCallsRes.GetCallsData): UploadCallDataRes
 }

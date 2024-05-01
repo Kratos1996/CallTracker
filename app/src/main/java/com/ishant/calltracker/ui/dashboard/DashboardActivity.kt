@@ -10,12 +10,14 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Observer
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.ishant.calltracker.R
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.app.showAsBottomSheet
@@ -76,19 +78,21 @@ class DashboardActivity : BaseComposeActivity() {
                     startWorkManager(this)
                     startAlarmManager()
                     viewModel.managers.value = true
+                    viewModel.callService.value = true
                 }else{
                     viewModel.managers.value = true
+                    viewModel.callService.value = true
                 }
             })
         })
         onBackPressedWaAppBlaster(this) {
             showAsBottomSheet { dismiss ->
-                CommonAlertBottomSheet(msg = "Do you want to Close Application?",
-                    positiveText = "Yes",
+                CommonAlertBottomSheet(msg = stringResource(R.string.do_you_want_to_close_application),
+                    positiveText = stringResource(R.string.yes),
                     onPositiveClick = {
                         viewModel.navigateBack()
                     },
-                    negativeText = "No",
+                    negativeText = stringResource(R.string.no),
                     onNegativeClick = {
                         dismiss.invoke()
                     }

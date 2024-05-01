@@ -3,6 +3,7 @@ package com.ishant.calltracker.ui.dashboard.screens.call
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
+import com.ishant.calltracker.api.response.UploadCallDataRes
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.app.BaseObservableViewModel
 import com.ishant.calltracker.app.CallTrackerApplication
@@ -26,10 +27,12 @@ class CallViewModel  @Inject constructor(
     val callsDataMainList = mutableStateListOf<GetCallsRes.GetCallsData>()
     val callsDataFilterList = mutableStateListOf<GetCallsRes.GetCallsData>()
     var isRefreshing = mutableStateOf(false)
+    val pendingCall = mutableStateOf(true)
+    val completedCall = mutableStateOf(false)
 
-
-    fun getCallDetails() {
-        contactUseCase.getCallDetails().onEach { response ->
+    fun getCallDetails( ) {
+        val callType = if(pendingCall.value) 0 else 1
+        contactUseCase.getCallDetails(callType).onEach { response ->
             when(response){
                 is Resource.Error -> {
                     _errorListener.emit(Response.Message(response.message?:""))
@@ -45,6 +48,18 @@ class CallViewModel  @Inject constructor(
                     callsDataMainList.clear()
                     callsDataFilterList.clear()
                     val dataList = response.data?.getCallsData?: arrayListOf()
+                   /* if(dataList.isNullOrEmpty()){
+                       val data=  GetCallsRes.GetCallsData(createdAt = "",
+                            id = 1,
+                            mobile = "7732993378",
+                            name = "Ishant",
+                            remark = "",
+                            type = 1,
+                            updatedAt = "",
+                            userId = AppPreference.loginUser.user?.id
+                            )
+                        dataList.add(data)
+                    }*/
                     callsDataMainList.addAll(dataList)
                     filterSearch()
                 }
@@ -72,8 +87,23 @@ class CallViewModel  @Inject constructor(
         }
     }
 
-    fun callDetailUpdateOnServer(onSuccess: (isSuccess:Boolean, response:Any)->Unit) {
+    fun callDetailUpdateOnServer(data:GetCallsRes.GetCallsData, onSuccess: (isSuccess:Boolean, response:UploadCallDataRes)->Unit) {
 
+        contactUseCase.uploadCallDetails(data).onEach { response ->
+            when(response){
+                is Resource.Error -> {
+                    _errorListener.emit(Response.Message(response.message?:""))
+                    showLoading.value = false
+                }
+                is Resource.Loading -> {
+                    showLoading.value = true
+                }
+                is Resource.Success -> {
+                    response.data?.let { onSuccess(true, it) }
+                    showLoading.value = false
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
 }

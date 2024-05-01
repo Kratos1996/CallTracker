@@ -3,6 +3,7 @@ package com.ishant.calltracker.domain
 import android.util.Log
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.api.response.UploadCallDataRes
 import com.ishant.calltracker.api.response.ContactSavedResponse
 import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
@@ -55,15 +56,27 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
         }
     }
 
-    override fun getCallDetails(): Flow<Resource<GetCallsRes>> = flow {
+    override fun getCallDetails(callType:Int): Flow<Resource<GetCallsRes>> = flow {
         try {
             emit(Resource.Loading<GetCallsRes>())
-            val response= repository.getCallDetails()
+            val response= repository.getCallDetails(callType)
 
             emit(Resource.Success<GetCallsRes>(response))
 
         } catch (e: Exception) {
             catchExceptions<GetCallsRes>(e,Gson())
+        }
+    }
+
+    override fun uploadCallDetails(data: GetCallsRes.GetCallsData): Flow<Resource<UploadCallDataRes>> = flow {
+        try {
+            emit(Resource.Loading<UploadCallDataRes>())
+            val response= repository.uploadCallDetails(data)
+
+            emit(Resource.Success<UploadCallDataRes>(response))
+
+        } catch (e: Exception) {
+            catchExceptions<UploadCallDataRes>(e,Gson())
         }
     }
 

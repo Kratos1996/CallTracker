@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +39,7 @@ import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.initiatePhoneCall
+import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
 import com.ishant.corelibcompose.toolkit.colors.white
@@ -94,9 +96,33 @@ private fun LoadCallScreen(
                 state = lazyColumnListState,
                 contentPadding = PaddingValues(bottom = 60.sdp)
             ) {
+                item { CallTab(callViewModel = callViewModel) }
                 item { SearchViewWithCheckBox(viewModel = callViewModel) }
                 callList(callViewModel)
             }
+        }
+    }
+}
+@Composable
+private fun CallTab(callViewModel: CallViewModel){
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.sdp)) {
+        DashboardCommon.Tab(
+            title = stringResource(id = R.string.pending),
+            isSelected = callViewModel.pendingCall.value
+        ) {
+            callViewModel.pendingCall.value = true
+            callViewModel.completedCall.value = false
+            callViewModel.getCallDetails()
+        }
+        DashboardCommon.Tab(
+            title = stringResource(id = R.string.completed),
+            isSelected = callViewModel.completedCall.value
+        ) {
+            callViewModel.pendingCall.value = false
+            callViewModel.completedCall.value = true
+            callViewModel.getCallDetails()
         }
     }
 }
@@ -152,17 +178,7 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(top = 12.sdp, start = 12.sdp, end = 12.sdp)
-            .noRippleClickable(true) {
-                viewModel.callDetailUpdateOnServer(){ isSuccess,response ->
-                    if(isSuccess){
-                        context.initiatePhoneCall(item.mobile ?: "")
-                    }else{
 
-                    }
-
-                }
-
-            }
     ) {
         val (icon, coinCode, coinName, coinBalance, divider) = createRefs()
         CircularBox(
@@ -212,6 +228,18 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
                 .constrainAs(coinBalance) {
                     end.linkTo(parent.end)
                     top.linkTo(icon.top)
+                }.noRippleClickable(true) {
+                    item.type = 1
+                    viewModel.callDetailUpdateOnServer(item) { isSuccess, response ->
+                        if (isSuccess) {
+                            context.toast(response.message)
+                            context.initiatePhoneCall(item.mobile ?: "")
+                            viewModel.getCallDetails()
+                        } else {
+                            context.toast(context.getString(R.string.cannot_initiate_this_call))
+                        }
+                    }
+
                 })
 
         LineDivider(modifier = Modifier

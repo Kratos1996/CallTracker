@@ -50,7 +50,7 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     val callDuration: Long = cursorData.getLong(cursorData.getColumnIndexOrThrow(CallLog.Calls.DURATION))
                     val callDateTime: Long = cursorData.getLong(cursorData.getColumnIndexOrThrow(CallLog.Calls.DATE))
                     val dataContactDatabase = databaseRepository.getRestrictedContact(
-                        phone = Utils.extractLast10Digits(callerName),
+                        phone = callerNumber,
                         isFav = true
                     )
                     Log.d("LastCallDetails", "CallTracker:  Caller Name: $callerName")

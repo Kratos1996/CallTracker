@@ -103,7 +103,7 @@ class ContactSyncService : Service() {
         cursor?.use {
             while (it.moveToNext()) {
                 val phoneNumber = it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                phoneNumbers.add(Utils.extractLast10Digits(phoneNumber))
+                phoneNumbers.add(phoneNumber)
             }
         }
 

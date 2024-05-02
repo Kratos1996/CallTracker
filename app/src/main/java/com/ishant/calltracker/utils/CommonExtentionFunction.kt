@@ -25,7 +25,7 @@ import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.dashboard.DashboardActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
-import com.ishant.calltracker.ui.restricted.AddNewContact
+import com.ishant.calltracker.ui.dashboard.screens.contact.newcontact.AddNewContact
 import com.ishant.calltracker.ui.splash.SplashActivity
 import com.ishant.calltracker.workmanager.ServiceCheckWorker
 import java.util.concurrent.TimeUnit

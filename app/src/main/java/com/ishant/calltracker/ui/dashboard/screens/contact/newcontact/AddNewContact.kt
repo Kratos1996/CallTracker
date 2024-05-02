@@ -1,10 +1,8 @@
-package com.ishant.calltracker.ui.restricted
+package com.ishant.calltracker.ui.dashboard.screens.contact.newcontact
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.databinding.ActivityAddNewContactBinding
@@ -12,9 +10,6 @@ import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.utils.ContactSaver
 import com.ishant.calltracker.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint

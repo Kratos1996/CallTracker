@@ -46,7 +46,7 @@
             android:singleUser="true"
             android:exported="false" />
         <activity
-            android:name=".ui.restricted.AddNewContact"
+            android:name=".ui.dashboard.screens.contact.newcontact.AddNewContact"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|adjustResize"
 

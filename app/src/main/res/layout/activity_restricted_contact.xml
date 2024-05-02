@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.restricted.RestrictedContactActivity">
+    tools:context=".ui.newcontact.RestrictedContactActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"

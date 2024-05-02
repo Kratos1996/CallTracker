@@ -21,7 +21,7 @@ import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.ui.dashboard.DashboardActivity
 import com.ishant.calltracker.ui.login.ui.login.LoginActivity
 import com.ishant.calltracker.ui.logs.CallLogsActivity
-import com.ishant.calltracker.ui.restricted.AddNewContact
+import com.ishant.calltracker.ui.dashboard.screens.contact.newcontact.AddNewContact
 import com.ishant.calltracker.utils.helper.AutoStartHelper.Companion.instance
 
 val settingApplicationCode = 1996

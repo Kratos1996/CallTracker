@@ -38,14 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
-import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.ContactList
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
-import com.ishant.calltracker.ui.restricted.AddNewContact
+import com.ishant.calltracker.ui.dashboard.screens.contact.newcontact.AddNewContact
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.initiatePhoneCall
-import com.ishant.calltracker.utils.navToSaveContactActivity
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
 import com.ishant.corelibcompose.toolkit.colors.white
@@ -114,7 +112,7 @@ private fun LoadContactScreen(
 @Composable
 private fun TabView(homeViewModel: HomeViewModel) {
     val context = LocalContext.current
-    val intent = Intent(context,AddNewContact::class.java)
+    val intent = Intent(context, AddNewContact::class.java)
     val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             homeViewModel.getContacts("")

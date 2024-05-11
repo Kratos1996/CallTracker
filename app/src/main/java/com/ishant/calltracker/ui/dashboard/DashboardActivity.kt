@@ -9,6 +9,8 @@ import android.os.SystemClock
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Observer
@@ -25,9 +27,11 @@ import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.service.KeepAliveService
+import com.ishant.calltracker.service.NotificationReaderService
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavHost
 import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.callForegroundService
 import com.ishant.calltracker.utils.getActivityContext
@@ -52,6 +56,8 @@ import java.util.concurrent.TimeUnit
 @AndroidEntryPoint
 class DashboardActivity : BaseComposeActivity() {
     private val viewModel by viewModels<HomeViewModel>()
+    lateinit var notificationListenerUtil: NotificationListenerUtil
+    private lateinit var notificationListenerPermissionLauncher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.loadContactObserver(this)
@@ -70,6 +76,14 @@ class DashboardActivity : BaseComposeActivity() {
 
             }
         }
+        notificationListenerPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                val granted = notificationListenerUtil.isNotificationServiceEnabled()
+                if(granted){
+                    val mServiceIntent = Intent(this, NotificationReaderService::class.java)
+                    startService(mServiceIntent)
+                }
+            }
         addAutoStartup()
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
@@ -98,6 +112,12 @@ class DashboardActivity : BaseComposeActivity() {
                     }
                 )
             }
+        }
+    }
+
+    private fun readNotificationService() {
+        if(!notificationListenerUtil.isNotificationServiceEnabled()){
+            notificationListenerUtil.requestNotificationListenerPermission(notificationListenerPermissionLauncher)
         }
     }
 

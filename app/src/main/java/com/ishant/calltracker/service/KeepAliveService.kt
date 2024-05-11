@@ -1,11 +1,15 @@
 package com.ishant.calltracker.service
 
+import android.Manifest
 import android.app.ActivityManager
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.IBinder
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.ishant.calltracker.receiver.NotificationServiceRestartReceiver
+import com.ishant.calltracker.utils.isServiceRunning
 
 class KeepAliveService : Service() {
     override fun onCreate() {
@@ -56,6 +60,10 @@ class KeepAliveService : Service() {
             Log.e("DEBUG", "CallTracker : KeepAliveService startNotificationService")
             val mServiceIntent = Intent(this, CallService::class.java)
             startService(mServiceIntent)
+        }
+        if (!isServiceRunning(NotificationReaderService::class.java)) {
+                val mServiceIntent = Intent(this, NotificationReaderService::class.java)
+                startService(mServiceIntent)
         }
     }
 

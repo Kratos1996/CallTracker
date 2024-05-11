@@ -17,9 +17,11 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -28,8 +30,10 @@ import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.databinding.ActivityLoginBinding
 import com.ishant.calltracker.service.ContactSyncService
+import com.ishant.calltracker.service.NotificationReaderService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.ContactSaver
+import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.navToHome
 import com.ishant.calltracker.utils.showLoadingDialog
@@ -54,9 +58,12 @@ class LoginActivity : BaseComposeActivity() {
     private val loginViewModel by viewModels<LoginViewModel>()
     lateinit var context: Context
     lateinit var spinnerAdapter:UrlAdapter
+    val REQUEST_CODE_ACCESS_NOTIFICATIONS = 777
     var urlResponseData: List<UrlResponse.Data> = arrayListOf()
     @Inject
     lateinit var progressDialog:Dialog
+    lateinit var notificationListenerUtil: NotificationListenerUtil
+    private lateinit var notificationListenerPermissionLauncher: ActivityResultLauncher<Intent>
 
     private val notificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -131,7 +138,12 @@ class LoginActivity : BaseComposeActivity() {
     }
 
     private fun loadHome() {
-        loginViewModel.login(binding.username.text.toString(),binding.password.text.toString())
+        if(notificationListenerUtil.isNotificationServiceEnabled()) {
+            loginViewModel.login(binding.username.text.toString(), binding.password.text.toString())
+        }else{
+            toast("Need Notification Read Permission")
+            readNotificationService()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,9 +151,19 @@ class LoginActivity : BaseComposeActivity() {
         context = this
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        notificationListenerPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                val granted = notificationListenerUtil.isNotificationServiceEnabled()
+                if(granted){
+                    val mServiceIntent = Intent(this, NotificationReaderService::class.java)
+                    startService(mServiceIntent)
+                }
+            }
+        notificationListenerUtil = NotificationListenerUtil(this)
         binding.loginBtn.setOnClickListener {
             requestWriteContact()
         }
+        readNotificationService()
         lifecycleScope.launch {
             loginViewModel.databaseRepository.deleteAll()
         }
@@ -188,6 +210,12 @@ class LoginActivity : BaseComposeActivity() {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+    }
+
+    private fun readNotificationService() {
+       if(!notificationListenerUtil.isNotificationServiceEnabled()){
+           notificationListenerUtil.requestNotificationListenerPermission(notificationListenerPermissionLauncher)
+       }
     }
 
     private fun lifecycleLoginResponse() {

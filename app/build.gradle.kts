@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
     kotlin("kapt")
-
+    id ("org.jetbrains.kotlin.plugin.serialization")
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
@@ -102,6 +102,7 @@ android {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     //implementation (libs.core.library.compose)
     implementation(libs.core.ktx)
     implementation(libs.appcompat)

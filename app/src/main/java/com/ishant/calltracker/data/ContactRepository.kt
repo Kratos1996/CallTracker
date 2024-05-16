@@ -13,7 +13,7 @@ interface ContactRepository {
 
     suspend fun loginNow(mobile:String, password:String ): LoginResponse
 
-    suspend fun uploadContact(sourceMobileNo:String, mobile:String, name:String,type:String,duration:String  ): ContactSavedResponse
+    suspend fun uploadContact(uploadContactData: UploadContactRequest.UploadContactData  ): ContactSavedResponse
 
     suspend fun uploadContacts(request : UploadContactRequest): UploadContactResponse
 

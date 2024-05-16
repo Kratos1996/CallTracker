@@ -17,5 +17,5 @@ interface ContactUseCase {
     fun getDomains():  Flow<Resource<UrlResponse>>
     fun getCallDetails(callType:Int):  Flow<Resource<GetCallsRes>>
     fun uploadCallDetails(data: GetCallsRes.GetCallsData): Flow<Resource<UploadCallDataRes>>
-    fun uploadContact(sourceMobileNo:String, mobile:String, name:String ,type:String,duration:String ):Flow<Resource<ContactSavedResponse>>
+    fun uploadContact(uploadContactData: UploadContactRequest.UploadContactData ):Flow<Resource<ContactSavedResponse>>
 }

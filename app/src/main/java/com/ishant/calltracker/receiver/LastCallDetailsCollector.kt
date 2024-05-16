@@ -13,6 +13,8 @@ import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Utils
+import com.ishant.calltracker.utils.convertDate
+import com.ishant.calltracker.utils.getPhoneNumber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -59,8 +61,6 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     Log.d("LastCallDetails", "CallTracker:  Call Duration: $callDuration")
                     // Add more details as needed
                     // Implement your logic to save or use the call details
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                    val callDate = dateFormat.format(Date(callDateTime))
                     val durationFormat = String.format(
                         "%02d:%02d:%02d",
                         callDuration / 3600,
@@ -71,12 +71,12 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     if (dataContactDatabase == null ||  dataContactDatabase.isFav == false) {
                         dataUploadList.add(
                             UploadContactRequest.UploadContactData(
-                                sourceMobileNo = Utils.extractLast10Digits(getPhoneNumber()),
-                                mobile = Utils.extractLast10Digits(callerNumber),
+                                sourceMobileNo = getPhoneNumber(),
+                                mobile = callerNumber,
                                 type = callType,
                                 duration = durationFormat,
                                 name = callerName,
-                                dateTime = callDate ?: ""
+                                dateTime = convertDate(callDateTime) ?: ""
                             )
                         )
                     }
@@ -117,10 +117,6 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     Log.d("LastCallDetails", "CallTracker:  Call Type: $callType")
                     Log.d("LastCallDetails", "CallTracker:  Call Duration: $callDuration")
 
-                    // Add more details as needed
-                    // Implement your logic to save or use the call details
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                    val callDate = dateFormat.format(Date(callDateTime))
                     val durationFormat = String.format(
                         "%02d:%02d:%02d",
                         callDuration / 3600,
@@ -131,12 +127,12 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     if (dataContactDatabase == null ||  dataContactDatabase.isFav == false) {
                             dataUploadList.add(
                                 UploadContactRequest.UploadContactData(
-                                    sourceMobileNo = Utils.extractLast10Digits(getPhoneNumber()),
-                                    mobile = Utils.extractLast10Digits(callerNumber),
+                                    sourceMobileNo = getPhoneNumber(),
+                                    mobile = callerNumber,
                                     type = callType,
                                     duration = durationFormat,
                                     name = callerName,
-                                    dateTime = callDate ?: ""
+                                    dateTime =convertDate(callDateTime) ?: ""
                                 )
                             )
                         }
@@ -175,29 +171,6 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
         }
     }
 
-    private fun getPhoneNumber(): String {
-        when (AppPreference.simManager.data.size) {
-            1 -> {
-                return if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.loginUser.user?.mobile ?: ""
-                } else {
-                    AppPreference.simManager.data[0].phoneNumber
-                }
-            }
 
-            2 -> {
-                return if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty() && AppPreference.simManager.data[1].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.loginUser.user?.mobile ?: ""
-                } else if (AppPreference.simManager.data[0].phoneNumber.isNullOrEmpty()) {
-                    AppPreference.loginUser.user?.mobile ?: ""
-                } else {
-                    AppPreference.simManager.data[0].phoneNumber
-                }
-            }
 
-            else -> {
-                return AppPreference.loginUser.user?.mobile ?: ""
-            }
-        }
-    }
 }

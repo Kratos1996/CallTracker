@@ -31,12 +31,7 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiConstant.UPLOAD_CONTACT)
-    suspend fun uploadContact(
-        @Field("source_mobile") sourceMobileNo:String,
-        @Field("mobile") mobile:String,
-        @Field("type") type:String,
-        @Field("duration") duration:String,
-        @Field("name") name:String
+    suspend fun uploadContact(@Body uploadContactData: UploadContactRequest.UploadContactData
     ): ContactSavedResponse
 
 

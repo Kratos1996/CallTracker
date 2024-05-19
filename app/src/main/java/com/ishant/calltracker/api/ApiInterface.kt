@@ -30,9 +30,8 @@ interface ApiInterface {
     suspend fun uploadCallDetails(@Body data: GetCallsRes.GetCallsData): UploadCallDataRes
 
     @FormUrlEncoded
-    @POST(ApiConstant.UPLOAD_CONTACT)
-    suspend fun uploadContact(@Body uploadContactData: UploadContactRequest.UploadContactData
-    ): ContactSavedResponse
+    @POST(ApiConstant.UPLOAD_WHATSAPP_CONTACT)
+    suspend fun uploadContact(@Body data: UploadContactRequest): ContactSavedResponse
 
 
     @POST(ApiConstant.UPLOAD_CONTACTS)

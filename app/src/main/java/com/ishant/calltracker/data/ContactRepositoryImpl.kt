@@ -13,7 +13,7 @@ import javax.inject.Singleton
 class ContactRepositoryImpl  @Inject constructor(val api: ApiInterface) :ContactRepository {
 
     override suspend fun loginNow(mobile: String, password: String): LoginResponse = api.loginNow(mobile, password)
-    override suspend fun uploadContact(uploadContactData: UploadContactRequest.UploadContactData ) = api.uploadContact(uploadContactData)
+    override suspend fun uploadContact(uploadContactData: UploadContactRequest ) = api.uploadContact(uploadContactData)
 
     override suspend fun uploadContacts(request: UploadContactRequest): UploadContactResponse = api.uploadContacts(request)
     override suspend fun getDomains(): UrlResponse = api.getDomains()

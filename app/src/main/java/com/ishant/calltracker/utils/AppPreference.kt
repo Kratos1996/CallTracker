@@ -23,6 +23,7 @@ object AppPreference {
     private val DARK_MODE= "DARK_MODE"
     private val THEMES= "THEMES"
     private val DARK_MODE_TYPE= "DARK_MODE_TYPE"
+    private val LAST_API_CALL= "last_api_call_timestamp"
     private const val APP_NAME = "callTracker:Ishant"
 
     fun init(context: Context) {
@@ -45,6 +46,10 @@ object AppPreference {
     var darkModeType: Int
         get() = getDataInt(DARK_MODE_TYPE,0)
         set(value) = setDataInt(DARK_MODE_TYPE, darkModeType)
+
+    var lastWahtsappApicalled: Long
+        get() = getDataLong(LAST_API_CALL)
+        set(value) = setDataLong(LAST_API_CALL, lastWahtsappApicalled)
 
     var firebaseToken: String
         get() = getDataString(PREF_IMPLICIT_TOKEN)?:""

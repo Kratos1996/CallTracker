@@ -4,17 +4,15 @@ import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Binder
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
-import android.os.PowerManager
+import android.telecom.TelecomManager
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.app.CallTrackerApplication
@@ -25,8 +23,8 @@ import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.LastCallDetailsCollector
+import com.ishant.calltracker.receiver.PhoneCallReceiver
 import com.ishant.calltracker.utils.AppPreference
-import com.ishant.calltracker.utils.Utils
 import com.ishant.calltracker.utils.callForegroundService
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.navToCallService
@@ -34,7 +32,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -58,26 +55,39 @@ class CallService : Service() {
     private lateinit var telephonyManager: TelephonyManager
 
 
+
     private val phoneStateListener = object : PhoneStateListener() {
-        override fun onCallStateChanged(state: Int, phoneNumber: String?) {
-            when (state) {
-                TelephonyManager.CALL_STATE_IDLE -> {
-                    handleCallData(phoneNumber ?: "", this@CallService)
+            override fun onCallStateChanged(state: Int, phoneNumber: String?) {
+                when (state) {
+                    TelephonyManager.CALL_STATE_IDLE -> {
+                        handleCallData(phoneNumber ?: "", this@CallService)
+                    }
                 }
             }
         }
-    }
 
     @SuppressLint("ForegroundServiceType")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
             readPhoneStatePermission(granted = {
                 readPhoneNumberPermission(granted = {
+                   // telecomManager = getSystemService(TELECOM_SERVICE) as TelecomManager
                     telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                     callForegroundService(){ notificationId,notification ->
                         startForeground(notificationId, notification)
                     }
-                    registerPhoneStateListener()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                        myTelephonyCallback = MyTelephonyCallback(this)
+                        telephonyManager.registerTelephonyCallback(mainExecutor, myTelephonyCallback!!)
+                    } else {
+                        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
+                        callStateReceiver = PhoneCallReceiver()
+                        val filter = IntentFilter().apply {
+                            addAction("android.intent.action.PHONE_STATE")
+                        }
+                        registerReceiver(callStateReceiver, filter)
+                    }
                 })
             })
         } catch (e: Exception) {
@@ -91,25 +101,10 @@ class CallService : Service() {
         fun getService(): CallService = this@CallService
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     private val binder = LocalBinder()
 
     override fun onBind(intent: Intent): IBinder {
         return binder
-    }
-
-
-    private fun registerPhoneStateListener() {
-        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
-    }
-
-    private fun unregisterPhoneStateListener() {
-        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
     }
 
     private fun handleCallData(phoneNumber: String, context: Context){
@@ -166,6 +161,41 @@ class CallService : Service() {
             Log.e(ServiceRestarterService.TAG, "CallTracker : Service > CallService > TaskRemoved > CallService service is running....")
         }
         super.onTaskRemoved(rootIntent)
+    }
+
+    private var myTelephonyCallback: MyTelephonyCallback? = null
+    private var callStateReceiver: PhoneCallReceiver? = null
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            telephonyManager.unregisterTelephonyCallback(myTelephonyCallback!!)
+        } else {
+            unregisterReceiver(callStateReceiver)
+        }
+    }
+
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.S)
+    inner class MyTelephonyCallback(private val context: Context) : TelephonyCallback(), TelephonyCallback.CallStateListener {
+
+        override fun onCallStateChanged(state: Int) {
+            if (state == TelephonyManager.CALL_STATE_RINGING) {
+                if (state == TelephonyManager.CALL_STATE_RINGING) {
+                    /*      val call: Call = telecomManager.getCurrentCall()
+                                if (call != null) {
+                                    val phoneNumber: String = call.details.handle.schemeSpecificPart
+                                    Log.d("Incoming Call", "Phone Number: $phoneNumber")
+                                }*/
+
+                    val phoneNumber = telephonyManager.line1Number
+                    handleCallData(phoneNumber ?: "", this@CallService)
+                }
+
+            }
+        }
     }
 
 }

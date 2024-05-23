@@ -24,7 +24,7 @@ class NotificationListenerUtil(private val activity: Activity) {
 
     fun requestNotificationListenerPermission(launcher: ActivityResultLauncher<Intent>) {
         toggleNotificationListenerService(true)
-        launcher.launch(getNotificationListenerSettingsIntent())
+        getNotificationListenerSettingsIntent()?.let { launcher.launch(it) }
     }
 
     private fun toggleNotificationListenerService(enable: Boolean) {

@@ -4,6 +4,7 @@ import java.util.Date
 plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     kotlin("kapt")
     id ("org.jetbrains.kotlin.plugin.serialization")
     id("dagger.hilt.android.plugin")
@@ -96,9 +97,7 @@ android {
     androidResources {
         additionalParameters.add("--warn-manifest-validation")
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
-    }
+
 }
 
 dependencies {

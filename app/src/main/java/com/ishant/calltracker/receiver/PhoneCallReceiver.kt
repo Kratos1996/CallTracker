@@ -59,6 +59,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                             ServiceRestarterService.TAG,
                             "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService service is running...."
                         )
+                      //  handleCallData(intent, context)
                     }
                 }
 

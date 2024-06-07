@@ -201,5 +201,6 @@ object AppPreference {
 
     fun logout() {
         getSharedPreferences().edit().clear().apply()
+        getSharedPreferences().edit().clear().commit()
     }
 }

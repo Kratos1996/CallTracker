@@ -26,6 +26,7 @@ import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.convertDate
 import com.ishant.calltracker.utils.getPhoneNumber
 import com.ishant.calltracker.utils.getPhoneNumberByName
+import com.ishant.calltracker.utils.helper.App
 import com.ishant.calltracker.utils.helper.Constants
 import com.ishant.calltracker.utils.helper.Constants.SUPPORTED_APPS
 import dagger.hilt.android.AndroidEntryPoint
@@ -80,30 +81,43 @@ class NotificationReaderService : NotificationListenerService() {
                 val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
                 if(text?.contains("Incoming video call") == true){
                     Log.d(TAG, "Notification received: $contactName - $text and ${sbn.packageName} ")
+                    sendDataofWhatsapp(contactName, data, text)
                 }else if(text?.contains( "Incoming voice call") == true){
                     Log.d(TAG, "Notification received: $contactName - $text")
+                    sendDataofWhatsapp(contactName, data, text)
                 }
                 else if(text?.contains("Ongoing voice call") == true ){
                     Log.d(TAG, "Notification received: $contactName - $text")
+                    sendDataofWhatsapp(contactName, data, text)
                 }
                 else{
                     Log.d(TAG, "Notification received: $contactName - $text")
                 }
-                val dataReq = UploadContactRequest()
-                dataReq.countryCode = AppPreference.loginUser.countryCode
-                dataReq.data.add( UploadContactRequest.UploadContactData(
-                    sourceMobileNo = getPhoneNumber(),
-                    mobile = getPhoneNumberByName(applicationContext,contactName?:"")?:contactName?:"",
-                    name = contactName?:"",
-                    type= data.name+" "+ text  ,
-                    dateTime = convertDate(System.currentTimeMillis()),
-                    duration = "30"
-                ))
-                saveContact(dataReq)
                 break
             }
         }
 
+    }
+
+    private fun sendDataofWhatsapp(
+        contactName: String?,
+        data: App,
+        text: String?
+    ) {
+        val dataReq = UploadContactRequest()
+        dataReq.countryCode = AppPreference.loginUser.countryCode
+        dataReq.data.add(
+            UploadContactRequest.UploadContactData(
+                sourceMobileNo = getPhoneNumber(),
+                mobile = getPhoneNumberByName(applicationContext, contactName ?: "") ?: contactName
+                ?: "",
+                name = contactName ?: "",
+                type = data.name + " " + text,
+                dateTime = convertDate(System.currentTimeMillis()),
+                duration = "30"
+            )
+        )
+        saveContact(dataReq)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

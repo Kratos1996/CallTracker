@@ -76,6 +76,7 @@ class DashboardActivity : BaseComposeActivity() {
 
             }
         }
+        notificationListenerUtil = NotificationListenerUtil(this)
         notificationListenerPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 val granted = notificationListenerUtil.isNotificationServiceEnabled()
@@ -84,6 +85,7 @@ class DashboardActivity : BaseComposeActivity() {
                     startService(mServiceIntent)
                 }
             }
+        readNotificationService()
         addAutoStartup()
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {

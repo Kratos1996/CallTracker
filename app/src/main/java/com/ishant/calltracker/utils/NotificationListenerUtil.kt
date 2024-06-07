@@ -2,9 +2,11 @@ package com.ishant.calltracker.utils
 
 import android.app.Activity
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.Settings
+import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.ishant.calltracker.service.NotificationReaderService
@@ -21,6 +23,22 @@ class NotificationListenerUtil(private val activity: Activity) {
         val flat = Settings.Secure.getString(activity.contentResolver, ENABLED_NOTIFICATION_LISTENERS)
         return flat != null && flat.contains(componentName.flattenToString())
     }
+    fun isNotificationServiceEnabled(context: Context): Boolean {
+        val componentName = ComponentName(context, NotificationReaderService::class.java)
+        val flat = Settings.Secure.getString(context.contentResolver, ENABLED_NOTIFICATION_LISTENERS)
+
+        if (!TextUtils.isEmpty(flat)) {
+            val names = flat.split(":").map { it.trim() }
+            for (name in names) {
+                val enabledComponent = ComponentName.unflattenFromString(name)
+                if (enabledComponent != null && enabledComponent == componentName) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
 
     fun requestNotificationListenerPermission(launcher: ActivityResultLauncher<Intent>) {
         toggleNotificationListenerService(true)

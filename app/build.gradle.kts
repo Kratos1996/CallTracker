@@ -13,7 +13,6 @@ plugins {
 }
 hilt {
     enableAggregatingTask = true
-    enableTransformForLocalTests = true
     enableExperimentalClasspathAggregation = true
 }
 android {
@@ -24,8 +23,8 @@ android {
         applicationId = "com.ishant.calltracker"
         minSdk = 25
         targetSdk = 34
-        versionCode = 15
-        versionName = "2.0.0"
+        versionCode = 16
+        versionName = "2.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -101,7 +100,7 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation(libs.kotlinx.serialization.json)
     //implementation (libs.core.library.compose)
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
@@ -145,7 +144,7 @@ dependencies {
     // Room
     implementation (libs.androidx.room.runtime)
     implementation (libs.room.ktx )
-    kapt (libs.androidx.room.compiler)
+    ksp (libs.androidx.room.compiler)
     implementation (libs.ccp)
     // Compose Libs
     debugImplementation(libs.androidx.compose.composeUiTooling)

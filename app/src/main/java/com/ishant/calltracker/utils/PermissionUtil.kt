@@ -170,9 +170,9 @@ private fun Context.takePermissions(permissions :String, title:String, granted:(
             override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
                 rejected?.let { it() }
                 if(permissionDeniedResponse.isPermanentlyDenied){
-                    showCommonDialog(title = getString(R.string.required_permission),message = title ,context){
+                   /* showCommonDialog(title = getString(R.string.required_permission),message = title ,context){
                         navToSetting(context.getActivityContext())
-                    }
+                    }*/
                 }
             }
 
@@ -182,16 +182,16 @@ private fun Context.takePermissions(permissions :String, title:String, granted:(
             ) {
                 permissionToken.continuePermissionRequest()
                 rejected?.let { it() }
-                showCommonDialog(title = getString(R.string.required_permission),message = title,context){
+                /*showCommonDialog(title = getString(R.string.required_permission),message = title,context){
                     navToSetting(context.getActivityContext())
-                }
+                }*/
             }
         })
         .withErrorListener {
             rejected?.let { it() }
-            showCommonDialog(title = getString(R.string.required_permission),message = title,context){
+           /* showCommonDialog(title = getString(R.string.required_permission),message = title,context){
                 navToSetting(context.getActivityContext())
-            }
+            }*/
         }
         .check()
 }

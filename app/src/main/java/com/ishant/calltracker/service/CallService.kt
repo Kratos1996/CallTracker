@@ -182,8 +182,8 @@ class CallService : Service() {
     inner class MyTelephonyCallback(private val context: Context) : TelephonyCallback(), TelephonyCallback.CallStateListener {
 
         override fun onCallStateChanged(state: Int) {
-            if (state == TelephonyManager.CALL_STATE_RINGING) {
-                if (state == TelephonyManager.CALL_STATE_RINGING) {
+            if (state == TelephonyManager.CALL_STATE_IDLE) {
+                if (state == TelephonyManager.CALL_STATE_IDLE) {
                     /*      val call: Call = telecomManager.getCurrentCall()
                                 if (call != null) {
                                     val phoneNumber: String = call.details.handle.schemeSpecificPart

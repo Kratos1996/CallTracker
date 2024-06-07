@@ -138,12 +138,21 @@ class LoginActivity : BaseComposeActivity() {
     }
 
     private fun loadHome() {
-        if(notificationListenerUtil.isNotificationServiceEnabled()) {
-            loginViewModel.login(binding.username.text.toString(), binding.password.text.toString())
-        }else{
-            toast("Need Notification Read Permission")
-            readNotificationService()
+        writePhoneContactPermission(granted = {
+            takeForegroundContactService(granted = {
+                readPhoneContactPermission(granted = {
+                    startService(Intent(this, ContactSyncService::class.java))
+                    loginViewModel.permissionGrantedMain.value = true
+                    loginViewModel.login(binding.username.text.toString(), binding.password.text.toString())
+                }){
+                    toast("Need Read Contact Service")
+                }
+            })
+        }){
+            Toast.makeText(this,getString(R.string.read_write_contact_permission),Toast.LENGTH_SHORT).show()
+            loginViewModel.permissionGrantedMain.value = false
         }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -293,20 +302,7 @@ class LoginActivity : BaseComposeActivity() {
     }
 
     private fun requestWriteContact(){
-        writePhoneContactPermission(granted = {
-            takeForegroundContactService(granted = {
-                readPhoneContactPermission(granted = {
-                    startService(Intent(this, ContactSyncService::class.java))
-                    loginViewModel.permissionGrantedMain.value = true
-                    validateNow(binding)
-                }){
-                    toast("Need Read Contact Service")
-                }
-            })
-        }){
-            Toast.makeText(this,getString(R.string.read_write_contact_permission),Toast.LENGTH_SHORT).show()
-            loginViewModel.permissionGrantedMain.value = false
-        }
+        validateNow(binding)
     }
 
     private fun validateNow(binding: ActivityLoginBinding) {
@@ -328,6 +324,7 @@ class LoginActivity : BaseComposeActivity() {
                 binding.layEmail.isErrorEnabled = false
                 binding.layPassword.isErrorEnabled = false
                 askNotificationPermission()
+
                 ContactSaver.saveContact(this,name = " Wappblaster Support","917375092569")
             }
         }

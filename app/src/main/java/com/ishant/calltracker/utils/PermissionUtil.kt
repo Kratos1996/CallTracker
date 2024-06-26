@@ -26,6 +26,14 @@ fun Context.readPhoneStatePermission(granted:()->Unit, rejected:(() -> Unit)? = 
         rejected =rejected
     )
 }
+fun Context.sendSmsPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
+    takePermissions(
+        permissions = Manifest.permission.SEND_SMS,
+        title = getString(R.string.phone_message_permission),
+        granted = granted,
+        rejected =rejected
+    )
+}
 
 fun Context.takeForegroundService(granted:()->Unit, rejected:(() -> Unit)? = null){
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

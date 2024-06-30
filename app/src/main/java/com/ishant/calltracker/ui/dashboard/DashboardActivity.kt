@@ -76,6 +76,7 @@ class DashboardActivity : BaseComposeActivity() {
 
             }
         }
+        viewModel.loadSimInfo(this)
         notificationListenerUtil = NotificationListenerUtil(this)
         notificationListenerPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

@@ -27,6 +27,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.gson.Gson
+import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.service.ServiceRestarterService
@@ -122,8 +123,7 @@ fun Context.startAlarmManager() {
 @SuppressLint("MissingPermission")
 private fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String, message: String) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-        val subscriptionManager =
-            getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+        val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
         readPhoneStatePermission(granted = {
             val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
             if (subscriptionInfoList != null && subscriptionInfoList.size > simSlot) {
@@ -155,24 +155,34 @@ private fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String, messa
     }
 }
 
- fun Context.showSimInfo() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-        val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-        val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
-        if (subscriptionInfoList != null && subscriptionInfoList.isNotEmpty()) {
-            val simInfo = StringBuilder()
-            for (subscriptionInfo in subscriptionInfoList) {
-                simInfo.append("Carrier Name: ${subscriptionInfo.carrierName}\n")
-                simInfo.append("Country Iso: ${subscriptionInfo.countryIso}\n")
-                simInfo.append("Subscription ID: ${subscriptionInfo.subscriptionId}\n")
-                simInfo.append("Sim Slot Index: ${subscriptionInfo.simSlotIndex}\n")
-                simInfo.append("------------------------------------------------\n")
-            }
-            Log.e("SimData",Gson().toJson(simInfo))
-        } else {
-            Toast.makeText(this, "No active SIM cards found", Toast.LENGTH_SHORT).show()
-        }
-    } else {
-        Toast.makeText(this, "Dual SIM support requires API 22+", Toast.LENGTH_SHORT).show()
-    }
+ fun Context.showSimInfo() : List<SimInfo> {
+     val simList = ArrayList<SimInfo>()
+     readPhoneStatePermission(granted = {
+         val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+         val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
+
+         if (subscriptionInfoList != null && subscriptionInfoList.isNotEmpty()) {
+             val simInfo = StringBuilder()
+             for (subscriptionInfo in subscriptionInfoList) {
+                 simList.add(
+                    SimInfo(
+                        carrierName = subscriptionInfo.carrierName.toString(),
+                        simSlot = subscriptionInfo.simSlotIndex,
+                        carrierId = subscriptionInfo.subscriptionId,
+                        countryCode = subscriptionInfo.countryIso
+                    )
+                 )
+                 simInfo.append("Carrier Name: ${subscriptionInfo.carrierName}\n")
+                 simInfo.append("Country Iso: ${subscriptionInfo.countryIso}\n")
+                 simInfo.append("Subscription ID: ${subscriptionInfo.subscriptionId}\n")
+                 simInfo.append("Sim Slot Index: ${subscriptionInfo.simSlotIndex}\n")
+                 simInfo.append("------------------------------------------------\n")
+             }
+             Log.e("SimData", Gson().toJson(simInfo))
+         } else {
+             Toast.makeText(this, "Dual SIM support requires API 22+", Toast.LENGTH_SHORT).show()
+         }
+     })
+     return simList
 }
+data class SimInfo(val carrierName :String, val simSlot: Int,val carrierId:Int, val countryCode: String)

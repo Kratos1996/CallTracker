@@ -37,6 +37,7 @@ import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.navToHome
 import com.ishant.calltracker.utils.showLoadingDialog
+import com.ishant.calltracker.utils.showSimInfo
 import com.ishant.calltracker.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 import isNotificationPermissionGranted

@@ -5,16 +5,22 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -39,6 +45,7 @@ import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleS
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavConstants
 import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.keepAliveService
@@ -46,6 +53,8 @@ import com.ishant.calltracker.utils.navToCallService
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.utils.toast
+import com.ishant.corelibcompose.toolkit.colors.gray_bg_light
+import com.ishant.corelibcompose.toolkit.colors.gray_divider
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
 import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
@@ -77,13 +86,51 @@ fun DashboardScreen() {
 }
 
 @Composable
+private fun SimInfoList(homeViewModel: HomeViewModel){
+    val state = rememberLazyListState()
+    LazyRow (modifier = Modifier.wrapContentWidth(),
+        state = state,
+        verticalAlignment = Alignment.CenterVertically) {
+        items(items = homeViewModel.simList){item->
+            SimInfo(item)
+        }
+    }
+}
+
+@Composable
+fun SimInfo(simInfo: SimInfo){
+    Column (
+        modifier = Modifier
+        .width(150.sdp)
+        .padding(10.sdp)
+        .background(MaterialTheme.colors.gray_bg_light, shape = RoundedCornerShape(10.sdp))
+        .border(width = 1.sdp, color = MaterialTheme.colors.gray_divider, shape = RoundedCornerShape(10.sdp))
+        .padding(horizontal = 20.sdp, vertical = 30.sdp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CoreImageView.FromLocalDrawable(painterResource= R.drawable.sim_card_selected,
+            modifier = Modifier
+            .width(30.sdp)
+            .height(45.sdp))
+        RegularText.Medium(
+            title = simInfo.carrierName,
+            modifier = Modifier
+                .padding(top = 10.sdp)
+        )
+    }
+}
+
+
+@Composable
 private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.white)
-            .verticalScroll(scrollState)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Row(
@@ -115,6 +162,8 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 })
             }
         }
+
+        SimInfoList(homeViewModel = homeViewModel)
 
         DashboardCardComponents(
             title = context.getString(R.string.service),

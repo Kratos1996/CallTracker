@@ -20,7 +20,9 @@ import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.ContactObserver
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Response
+import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.TelephonyManagerPlus
+import com.ishant.calltracker.utils.showSimInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +49,7 @@ class HomeViewModel @Inject constructor(
     @Inject
     lateinit var managerPlus: TelephonyManagerPlus
     private lateinit var autoUpdateContactObserver: ContactObserver
+    val simList = mutableStateListOf<SimInfo>()
 
     val readPhoneStatePermissionGranted = mutableStateOf(false)
     val phoneNumberPermissionGranted = mutableStateOf(false)
@@ -69,6 +72,9 @@ class HomeViewModel @Inject constructor(
     fun loadContactObserver(context: Context) {
         autoUpdateContactObserver = ContactObserver(context, Handler())
         autoUpdateContactObserver.registerObserver()
+    }
+    fun loadSimInfo(context: Context){
+        simList.addAll(context.showSimInfo())
     }
 
 

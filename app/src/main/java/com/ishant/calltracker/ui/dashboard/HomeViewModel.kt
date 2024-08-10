@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
@@ -18,7 +17,7 @@ import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.ContactObserver
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.TelephonyManagerPlus

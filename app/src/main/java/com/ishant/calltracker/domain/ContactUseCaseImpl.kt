@@ -12,7 +12,7 @@ import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.data.ContactRepository
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.network.catchExceptions
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

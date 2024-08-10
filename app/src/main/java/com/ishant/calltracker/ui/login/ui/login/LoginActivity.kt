@@ -19,9 +19,7 @@ import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,13 +29,11 @@ import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.databinding.ActivityLoginBinding
 import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.service.NotificationReaderService
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import com.ishant.calltracker.utils.ContactSaver
 import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.navToHome
-import com.ishant.calltracker.utils.showLoadingDialog
-import com.ishant.calltracker.utils.showSimInfo
 import com.ishant.calltracker.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 import isNotificationPermissionGranted

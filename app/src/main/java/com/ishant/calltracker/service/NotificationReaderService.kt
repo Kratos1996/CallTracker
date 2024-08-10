@@ -22,13 +22,12 @@ import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.ui.dashboard.DashboardActivity
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import com.ishant.calltracker.utils.convertDate
 import com.ishant.calltracker.utils.getPhoneNumber
 import com.ishant.calltracker.utils.getPhoneNumberByName
 import com.ishant.calltracker.utils.helper.App
 import com.ishant.calltracker.utils.helper.Constants
-import com.ishant.calltracker.utils.helper.Constants.SUPPORTED_APPS
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

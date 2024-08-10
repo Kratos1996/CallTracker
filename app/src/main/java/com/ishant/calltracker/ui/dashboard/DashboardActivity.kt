@@ -1,46 +1,27 @@
 package com.ishant.calltracker.ui.dashboard
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.SystemClock
-import android.telephony.TelephonyManager
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.Observer
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.ishant.calltracker.R
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.app.showAsBottomSheet
-import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.service.CallService
-import com.ishant.calltracker.service.ContactSyncService
 import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.service.NotificationReaderService
-import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavHost
-import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.addAutoStartup
-import com.ishant.calltracker.utils.callForegroundService
-import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.navToCallService
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
-import com.ishant.calltracker.workmanager.ServiceCheckWorker
 import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.theme.CoreTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,8 +31,6 @@ import readPhoneLogPermission
 import readPhoneNumberPermission
 import readPhoneStatePermission
 import requestNotificationPermission
-import takeForegroundContactService
-import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class DashboardActivity : BaseComposeActivity() {

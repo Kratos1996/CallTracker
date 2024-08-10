@@ -8,7 +8,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.dataclassesUtils.TelePhoneManager
 import com.ishant.calltracker.utils.isServiceRunning

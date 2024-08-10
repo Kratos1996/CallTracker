@@ -3,12 +3,10 @@ package com.ishant.calltracker.ui.dashboard.screens.dashboard
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,11 +38,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
-import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
-import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavConstants
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isServiceRunning
@@ -61,7 +57,6 @@ import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
-import com.ishant.corelibcompose.toolkit.ui.textstyles.ExtraLargeText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.PS
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SFPRO

@@ -17,7 +17,7 @@ import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.serviceContactUploadRestarter
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +27,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.time.Duration
 import javax.inject.Inject
 
 @AndroidEntryPoint

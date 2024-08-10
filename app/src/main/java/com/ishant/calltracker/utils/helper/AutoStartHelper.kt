@@ -1,7 +1,6 @@
 package com.ishant.calltracker.utils.helper
 
 import android.os.Build
-import android.widget.Toast
 import android.content.DialogInterface
 import android.os.Bundle
 import kotlin.Throws
@@ -10,7 +9,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import com.ishant.calltracker.R
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import java.lang.Exception
 import java.util.*
 

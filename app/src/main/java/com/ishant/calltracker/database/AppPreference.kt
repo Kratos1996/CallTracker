@@ -1,4 +1,4 @@
-package com.ishant.calltracker.utils
+package com.ishant.calltracker.database
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -52,11 +52,11 @@ object AppPreference {
         set(value) = setDataLong(LAST_API_CALL, lastWahtsappApicalled)
 
     var firebaseToken: String
-        get() = getDataString(PREF_IMPLICIT_TOKEN)?:""
+        get() = getDataString(PREF_IMPLICIT_TOKEN) ?:""
         set(value) = setDataString(PREF_IMPLICIT_TOKEN,value)
 
     var baseUrl: String
-        get() = getDataStringWithDefultValue(PREF_BASE_URL,"wappblaster.in")?:"wappblaster.in"
+        get() = getDataStringWithDefultValue(PREF_BASE_URL,"wappblaster.in") ?:"wappblaster.in"
         set(value) = setDataString(PREF_BASE_URL,value)
 
     var isUserLoggedIn: Boolean

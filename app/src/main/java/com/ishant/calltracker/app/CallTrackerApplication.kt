@@ -6,7 +6,7 @@ package com.ishant.calltracker.app
 * */
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
-import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.database.AppPreference
 import com.ishant.corelibcompose.toolkit.constant.AppConstants
 import com.ishant.corelibcompose.toolkit.pref.ToolKitPref
 import dagger.hilt.android.HiltAndroidApp

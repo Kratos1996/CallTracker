@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.ishant.calltracker.R
 import com.ishant.calltracker.app.BaseComposeActivity
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.navToHome
 import com.ishant.calltracker.utils.navToLogin
 import kotlinx.coroutines.delay

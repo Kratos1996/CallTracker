@@ -11,7 +11,7 @@ import android.provider.ContactsContract
 import android.util.Log
 import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.database.room.DatabaseRepository
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.convertDate
 import com.ishant.calltracker.utils.getPhoneNumber
 

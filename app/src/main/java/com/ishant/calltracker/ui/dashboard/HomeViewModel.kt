@@ -18,11 +18,13 @@ import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.ContactObserver
-import com.ishant.calltracker.database.AppPreference
+
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import com.ishant.calltracker.utils.showSimInfo
+import com.ishant.corelibcompose.toolkit.ui.text.InputWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +64,22 @@ class HomeViewModel @Inject constructor(
     val ristrictedContact = mutableStateOf(false)
 
     val uploadContactListMutable = MutableStateFlow<List<UploadContact>>(arrayListOf())
-
+    val replyMessage by lazy { mutableStateOf(AppPreference.replyMsg) }
+    val replyMessageErrorMessage by lazy { mutableStateOf("") }
+    val replyMessageTextWrapper by lazy {
+        InputWrapper(
+            dataValue = replyMessage,
+            errorStringMessage = replyMessageErrorMessage
+        )
+    }
+    val replyTimesMessage by lazy { mutableStateOf(AppPreference.autoReplyDelayDays.toString()) }
+    val replyTimesMessageErrorMessage by lazy { mutableStateOf("") }
+    val replyTimesMessageTextWrapper by lazy {
+        InputWrapper(
+            dataValue = replyTimesMessage,
+            errorStringMessage = replyTimesMessageErrorMessage
+        )
+    }
     val isLoading = MutableStateFlow<Boolean>(false)
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val scopeMain = CoroutineScope(Dispatchers.Main + SupervisorJob())

@@ -23,7 +23,7 @@ import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.LastCallDetailsCollector
 import com.ishant.calltracker.receiver.PhoneCallReceiver
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.callForegroundService
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.navToCallService

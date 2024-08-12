@@ -37,6 +37,7 @@ import com.ishant.calltracker.ui.splash.SplashActivity
 import com.ishant.calltracker.workmanager.ServiceCheckWorker
 import readPhoneStatePermission
 import sendSmsPermission
+import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 
 fun Context.getActivityContext(): AppCompatActivity {
@@ -82,7 +83,7 @@ fun Context.initiatePhoneCall(phoneNumber: String) {
         toast("initiatePhoneCall failed")
     }
 }
-fun Context.sendWhatsAppMessage(phoneNumber: String, message: String) {
+fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?) {
     try {
         if(message.isNullOrEmpty()){
             toast("Please set your desired message to send from the dashboard")
@@ -104,7 +105,7 @@ fun Context.sendWhatsAppMessage(phoneNumber: String, message: String) {
         i.data = Uri.parse(url)
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if(i.resolveActivity(packageManager) != null){
-            startActivity(this,i,null)
+            startActivity(i,null)
         }
 
     } catch (e: Exception) {
@@ -189,37 +190,33 @@ fun Context.startAlarmManager() {
 }
 
 @SuppressLint("MissingPermission")
-private fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String, message: String) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-        val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-        readPhoneStatePermission(granted = {
-            val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
-            if (subscriptionInfoList != null && subscriptionInfoList.size > simSlot) {
-                val subscriptionInfo: SubscriptionInfo = subscriptionInfoList[simSlot]
-                val subscriptionId = subscriptionInfo.subscriptionId
-                sendSmsPermission(granted ={
-                    try {
-                        val smsManager = SmsManager.getSmsManagerForSubscriptionId(subscriptionId)
-                        smsManager.sendTextMessage(phoneNumber, null, message, null, null)
-                        Toast.makeText(this, "SMS sent from SIM $simSlot", Toast.LENGTH_SHORT).show()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        Toast.makeText(this, "Failed to send SMS from SIM $simSlot", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }){
-                    Toast.makeText(this, "Phone Send SMS Permission Required", Toast.LENGTH_SHORT).show()
+ fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String, message: String) {
+    val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+    readPhoneStatePermission(granted = {
+        val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
+        if (subscriptionInfoList != null && subscriptionInfoList.size > simSlot) {
+            val subscriptionInfo: SubscriptionInfo = subscriptionInfoList[simSlot]
+            val subscriptionId = subscriptionInfo.subscriptionId
+            sendSmsPermission(granted ={
+                try {
+                    val smsManager = SmsManager.getSmsManagerForSubscriptionId(subscriptionId)
+                    smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+                    Toast.makeText(this, "SMS sent from SIM $simSlot", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(this, "Failed to send SMS from SIM $simSlot", Toast.LENGTH_SHORT)
+                        .show()
                 }
-            }
-            else {
-                Toast.makeText(this, "Invalid SIM slot", Toast.LENGTH_SHORT).show()
+            }){
+                Toast.makeText(this, "Phone Send SMS Permission Required", Toast.LENGTH_SHORT).show()
             }
         }
-        ){
-            Toast.makeText(this, "Phone State Permission Required", Toast.LENGTH_SHORT).show()
+        else {
+            Toast.makeText(this, "Invalid SIM slot", Toast.LENGTH_SHORT).show()
         }
-    } else {
-        Toast.makeText(this, "Dual SIM support requires API 22+", Toast.LENGTH_SHORT).show()
+    }
+    ){
+        Toast.makeText(this, "Phone State Permission Required", Toast.LENGTH_SHORT).show()
     }
 }
 

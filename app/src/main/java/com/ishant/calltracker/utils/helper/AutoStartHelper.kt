@@ -9,7 +9,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import com.ishant.calltracker.R
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
 import java.lang.Exception
 import java.util.*
 

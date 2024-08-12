@@ -23,7 +23,8 @@ import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.MessageLogDB
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.domain.ContactUseCaseImpl
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
+
 import com.ishant.calltracker.utils.TelephonyManagerPlus
 import dagger.Module
 import dagger.Provides

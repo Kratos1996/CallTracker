@@ -3,7 +3,6 @@ package com.ishant.calltracker.utils
 import android.content.Context
 import android.database.Cursor
 import android.provider.ContactsContract
-import com.ishant.calltracker.database.AppPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext

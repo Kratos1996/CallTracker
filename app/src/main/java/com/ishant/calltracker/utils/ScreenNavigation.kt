@@ -13,7 +13,6 @@ import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.ishant.calltracker.R
-import com.ishant.calltracker.database.AppPreference
 import com.ishant.calltracker.ui.callupdatecenter.CallUploadCenterActivity
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ContactSyncService

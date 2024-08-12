@@ -59,7 +59,7 @@ object AppPreference {
         get() = getDataString(PREF_IMPLICIT_TOKEN) ?: ""
         set(value) = setDataString(PREF_IMPLICIT_TOKEN, value)
     var replyMsg: String
-        get() = getDataString(REPLY_MSG,"Hi,User is not available.") ?: ""
+        get() = getDataStringWithDefultValue(REPLY_MSG,"Hi,User is not available.") ?: ""
         set(value) = setDataString(REPLY_MSG, value)
     var lastPurgedTime: Long
         get() = getDataLong(KEY_PURGE_MESSAGE_LOGS_LAST_TIME)

@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -34,13 +35,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
+
 import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isServiceRunning
@@ -57,6 +60,7 @@ import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
+import com.ishant.corelibcompose.toolkit.ui.text.CustomOutlinedTextFieldWithTrailingIcon
 import com.ishant.corelibcompose.toolkit.ui.textstyles.PS
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SFPRO
@@ -263,6 +267,40 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 R.string.granted
             ) else context.getString(R.string.denied)
         )
+        TitleSeparator(title = context.getString(R.string.reply_message), showArrow = false)
+
+
+            CustomOutlinedTextFieldWithTrailingIcon(
+                inputWrapper = homeViewModel.replyMessageTextWrapper,
+                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
+                hintText = context.getString(R.string.add_reply_message),
+                trailingIcon = {},
+                enabled = true,
+                isDefaultMultiline = true,
+
+                onChanged = {
+                    homeViewModel.replyMessageTextWrapper.dataValue.value = it
+                    AppPreference.replyMsg = homeViewModel.replyMessageTextWrapper.dataValue.value
+                },
+
+                )
+            CustomOutlinedTextFieldWithTrailingIcon(
+                inputWrapper = homeViewModel.replyTimesMessageTextWrapper,
+                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
+                hintText = context.getString(R.string.add_Repeat_reply_message),
+                trailingIcon = {},
+                enabled = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isDefaultMultiline = true,
+                onChanged = {
+                    homeViewModel.replyTimesMessageTextWrapper.dataValue.value = it
+                    AppPreference.autoReplyDelayDays = if(it.isNullOrEmpty())0 else it.toInt()
+                    AppPreference.autoReplyDelay = if(it.isNullOrEmpty())0 else ((homeViewModel.replyTimesMessageTextWrapper.dataValue.value).toInt() * 24 * 60 * 60 * 1000).toLong()
+                },
+
+                )
+
+
 
 
         CoreImageView.FromLocalDrawable(

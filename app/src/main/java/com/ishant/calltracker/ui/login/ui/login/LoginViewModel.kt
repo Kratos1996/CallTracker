@@ -8,7 +8,7 @@ import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

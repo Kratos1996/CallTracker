@@ -30,7 +30,7 @@ import com.ishant.calltracker.receiver.PhoneCallReceiver
 import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.ui.navhost.screens.dashboard.AppScreenHome
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.stopServiceCall

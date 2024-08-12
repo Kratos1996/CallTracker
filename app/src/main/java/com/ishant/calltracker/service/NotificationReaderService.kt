@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.text.SpannableString
@@ -27,7 +28,9 @@ import com.ishant.calltracker.di.BaseUrlInterceptor
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.ui.dashboard.DashboardActivity
-import com.ishant.calltracker.database.AppPreference
+
+import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.utils.DbUtils
 import com.ishant.calltracker.utils.convertDate
 import com.ishant.calltracker.utils.getPhoneNumber
 import com.ishant.calltracker.utils.getPhoneNumberByName
@@ -37,9 +40,12 @@ import com.ishant.calltracker.utils.helper.Constants.SUPPORTED_APPS
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 @AndroidEntryPoint
 class NotificationReaderService : NotificationListenerService() {
@@ -191,6 +197,101 @@ class NotificationReaderService : NotificationListenerService() {
         )
         saveContact(dataReq)
     }
+
+    private fun saveLogs(sbn: StatusBarNotification) {
+        if (dbUtils == null) {
+            dbUtils = DbUtils(applicationContext, messageLogDB)
+        }
+        dbUtils!!.saveLogs(
+            sbn,
+            sbn.notification.extras.getString(Notification.EXTRA_TITLE),
+            sbn.notification.extras.getString(Notification.EXTRA_TEXT)
+        )
+    }
+
+    private suspend fun sendReply(sbn: StatusBarNotification) {
+        val (_, pendingIntent, remoteInputs1) = extractWearNotification(sbn)
+        if (remoteInputs1.isEmpty()) {
+            return
+        }
+
+
+        val remoteInputs = arrayOfNulls<RemoteInput>(remoteInputs1.size)
+        val localIntent = Intent()
+        localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val localBundle = Bundle()
+
+
+        for ((i, remoteIn) in remoteInputs1.withIndex()) {
+            remoteInputs[i] = remoteIn
+
+            try {
+
+
+                localBundle.putCharSequence(
+                    remoteInputs[i]!!.resultKey, AppPreference.replyMsg
+
+                )
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+            }
+        }
+
+
+        RemoteInput.addResultsToIntent(remoteInputs, localIntent, localBundle)
+        try {
+            if (pendingIntent != null) {
+                if (dbUtils == null) {
+                    dbUtils = DbUtils(applicationContext, messageLogDB)
+                }
+                dbUtils!!.logReply(sbn, sbn.notification.extras.getString(Notification.EXTRA_TITLE))
+                pendingIntent.send(this, 0, localIntent)
+
+                cancelNotification(sbn.key)
+//                if (canPurgeMessages()) {
+                dbUtils!!.purgeMessageLogs()
+                AppPreference.lastPurgedTime = System.currentTimeMillis()
+//                }
+            }
+        } catch (e: PendingIntent.CanceledException) {
+            Log.e(TAG, "replyToLastNotification error: " + e.localizedMessage)
+        }
+    }
+
+    private fun canPurgeMessages(): Boolean {
+        val daysBeforePurgeInMS = 30 * 24 * 60 * 60 * 1000L
+        return System.currentTimeMillis() -
+                (AppPreference.lastPurgedTime) > daysBeforePurgeInMS
+    }
+
+    fun extractWearNotification(statusBarNotification: StatusBarNotification): NotificationWear {
+        val wearableExtender =
+            NotificationCompat.WearableExtender(statusBarNotification.notification)
+        val actions = wearableExtender.actions
+        val remoteInputs: MutableList<RemoteInput> = ArrayList(actions.size)
+        var pendingIntent: PendingIntent? = null
+
+        for (act in actions) {
+            if (act != null && act.remoteInputs != null) {
+                for (x in act.remoteInputs!!.indices) {
+                    val remoteInput = act.remoteInputs!![x]
+                    remoteInputs.add(remoteInput)
+                    pendingIntent = act.actionIntent
+                }
+            }
+        }
+        return NotificationWear(
+            statusBarNotification.packageName,
+            pendingIntent,
+            remoteInputs,
+            statusBarNotification.notification.extras,
+            statusBarNotification.tag,
+            UUID.randomUUID().toString()
+        )
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotification(): Notification {

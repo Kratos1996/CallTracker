@@ -17,7 +17,7 @@ import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
-import com.ishant.calltracker.database.AppPreference
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.serviceContactUploadRestarter
 import dagger.hilt.android.AndroidEntryPoint

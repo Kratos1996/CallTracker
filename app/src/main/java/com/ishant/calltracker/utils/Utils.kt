@@ -8,6 +8,9 @@ import com.ishant.calltracker.utils.Constant.DEFAULT_GSM_CELL_ID_VALUE
 import com.ishant.calltracker.utils.Constant.DEFAULT_TELEPHONY_MANAGER_INT_VALUE
 import com.ishant.calltracker.utils.Constant.DEFAULT_TELEPHONY_MANAGER_STRING_VALUE
 import java.lang.reflect.Method
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 internal object Utils {
@@ -42,6 +45,11 @@ internal object Utils {
             }
         }
         return output
+    }
+    fun getCurrentDate(format: String="dd/MM/yyyy"): String {
+        val formatter = SimpleDateFormat(format, Locale("en"))
+        val date = Date()
+        return formatter.format(date)
     }
 
     private fun getOutputByReflection(

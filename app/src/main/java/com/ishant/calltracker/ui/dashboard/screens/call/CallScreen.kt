@@ -37,8 +37,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.initiatePhoneCall
+import com.ishant.calltracker.utils.sendSms
+import com.ishant.calltracker.utils.sendWhatsAppMessage
 import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
@@ -48,6 +51,7 @@ import com.ishant.corelibcompose.toolkit.constant.AppConst
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CircularBox
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.custom_pullrefresh.CustomPullToRefresh
+import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.imageLib.MultiMediaView
 import com.ishant.corelibcompose.toolkit.ui.other.OtherModifiers.LineDivider
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
@@ -180,7 +184,7 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
             .padding(top = 12.sdp, start = 12.sdp, end = 12.sdp)
 
     ) {
-        val (icon, coinCode, coinName, coinBalance, divider) = createRefs()
+        val (icon, coinCode, coinName, coinBalance,msgImg,wpImg, divider) = createRefs()
         CircularBox(
             modifier = Modifier
                 .height(28.sdp)
@@ -215,6 +219,29 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
                     start.linkTo(icon.end)
                     top.linkTo(coinCode.bottom)
                 }
+        )
+        CoreImageView.FromLocalDrawable(
+            painterResource = R.drawable.ic_whatsapp,
+            modifier = Modifier.constrainAs(wpImg){
+                end.linkTo(msgImg.start, margin = 10.dp)
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+            },
+            onClick = {
+              context.sendWhatsAppMessage("+91"+item.mobile?:"",AppPreference.replyMsg)
+            }
+        )
+        CoreImageView.FromLocalDrawable(
+            painterResource = R.drawable.ic_message,
+            modifier = Modifier.constrainAs(msgImg){
+                end.linkTo(coinBalance.start, margin = 10.dp)
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+            },
+            onClick = {
+
+                context.sendSms(item.mobile?:"",AppPreference.replyMsg)
+            }
         )
         MultiMediaView.FromLocal(
             mediaDrawable = R.raw.call_ico,

@@ -1,4 +1,4 @@
-package com.ishant.calltracker.database
+package com.ishant.calltracker.utils
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -25,6 +25,10 @@ object AppPreference {
     private val DARK_MODE_TYPE= "DARK_MODE_TYPE"
     private val LAST_API_CALL= "last_api_call_timestamp"
     private const val APP_NAME = "callTracker:Ishant"
+    private const val REPLY_MSG = "replyMsg"
+    private val KEY_PURGE_MESSAGE_LOGS_LAST_TIME = "pref_purge_message_logs_last_time"
+    private val KEY_AUTO_REPLY_THROTTLE_TIME_MS = "pref_auto_reply_throttle_time_ms"
+    private val KEY_AUTO_REPLY_THROTTLE_DAYS = "pref_auto_reply_throttle_days"
 
     fun init(context: Context) {
         pref = context.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE)
@@ -52,11 +56,24 @@ object AppPreference {
         set(value) = setDataLong(LAST_API_CALL, lastWahtsappApicalled)
 
     var firebaseToken: String
-        get() = getDataString(PREF_IMPLICIT_TOKEN) ?:""
-        set(value) = setDataString(PREF_IMPLICIT_TOKEN,value)
+        get() = getDataString(PREF_IMPLICIT_TOKEN) ?: ""
+        set(value) = setDataString(PREF_IMPLICIT_TOKEN, value)
+    var replyMsg: String
+        get() = getDataString(REPLY_MSG,"Hi,User is not available.") ?: ""
+        set(value) = setDataString(REPLY_MSG, value)
+    var lastPurgedTime: Long
+        get() = getDataLong(KEY_PURGE_MESSAGE_LOGS_LAST_TIME)
+        set(value) = setDataLong(KEY_PURGE_MESSAGE_LOGS_LAST_TIME, value)
+    var autoReplyDelay: Long
+        get() = getDataLong(KEY_AUTO_REPLY_THROTTLE_TIME_MS)
+        set(value) = setDataLong(KEY_AUTO_REPLY_THROTTLE_TIME_MS, value)
+    var autoReplyDelayDays: Int
+        get() = getDataInt(KEY_AUTO_REPLY_THROTTLE_DAYS)
+        set(value) = setDataInt(KEY_AUTO_REPLY_THROTTLE_DAYS, value)
+
 
     var baseUrl: String
-        get() = getDataStringWithDefultValue(PREF_BASE_URL,"wappblaster.in") ?:"wappblaster.in"
+        get() = getDataStringWithDefultValue(PREF_BASE_URL,"wappblaster.in")?:"wappblaster.in"
         set(value) = setDataString(PREF_BASE_URL,value)
 
     var isUserLoggedIn: Boolean
@@ -189,7 +206,8 @@ object AppPreference {
     private fun getDataBoolean(key: String): Boolean {
         return getSharedPreferences().getBoolean(key, false)
     }
-    private fun getDataBoolean(key: String,defaultVlue:Boolean): Boolean {
+
+    private fun getDataBoolean(key: String, defaultVlue: Boolean): Boolean {
         return getSharedPreferences().getBoolean(key, defaultVlue)
     }
 

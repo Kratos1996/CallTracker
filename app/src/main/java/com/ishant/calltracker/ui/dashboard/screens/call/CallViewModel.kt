@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
+
 @HiltViewModel
 class CallViewModel  @Inject constructor(
     private val app:CallTrackerApplication,
@@ -104,5 +105,7 @@ class CallViewModel  @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
+
 
 }

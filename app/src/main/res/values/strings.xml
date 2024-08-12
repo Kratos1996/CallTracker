@@ -88,6 +88,9 @@
         Notification Listener Service. Enable it now?"
     </string>
     <string name="service">Services</string>
+    <string name="sim">Sim</string>
+    <string name="selected">Selected</string>
+    <string name="unselected">Unselected</string>
     <string name="permission_pending">Permissions</string>
     <string name="ristricted_contact">Ristricted Contact</string>
     <string name="start_call_service">Start Call Service</string>
@@ -96,6 +99,9 @@
     <string name="already_running">Already Running</string>
     <string name="not_running">Not Running</string>
     <string name="phone_log">Phone Logs</string>
+    <string name="reply_message">Reply Message</string>
+    <string name="add_reply_message">Add Your Reply Message Here</string>
+    <string name="add_Repeat_reply_message">Message Repeat Time</string>
     <string name="please_check_all_pending_permission_for_call_service_all_permission_is_required">Please check All Pending Permission, For Call Service all Permission is Required</string>
     <string name="no_records_found">No records Found</string>
     <string name="application_manager">Application Manager</string>

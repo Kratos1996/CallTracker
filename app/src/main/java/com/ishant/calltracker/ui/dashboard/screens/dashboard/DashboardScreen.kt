@@ -3,7 +3,6 @@ package com.ishant.calltracker.ui.dashboard.screens.dashboard
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,10 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -29,15 +30,15 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
-import com.ishant.calltracker.service.ServiceRestarterService
-import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
-import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavConstants
+import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isServiceRunning
@@ -52,7 +53,7 @@ import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
-import com.ishant.corelibcompose.toolkit.ui.textstyles.ExtraLargeText
+import com.ishant.corelibcompose.toolkit.ui.text.CustomOutlinedTextFieldWithTrailingIcon
 import com.ishant.corelibcompose.toolkit.ui.textstyles.PS
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SFPRO
@@ -71,6 +72,7 @@ fun DashboardScreen() {
         if (!initialApiCalled.value) {
             initialApiCalled.value = true
         }
+        homeViewModel.getSimList()
     })
     LoadDashboardScreen(context, homeViewModel)
 
@@ -79,6 +81,7 @@ fun DashboardScreen() {
 @Composable
 private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) {
     val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -109,18 +112,27 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 RegularText.Medium(title = AppPreference.loginUser.user?.name ?: "")
                 RegularText.Medium(title = AppPreference.loginUser.user?.email ?: "")
                 RegularText.Medium(title = AppPreference.loginUser.user?.mobile ?: "")
-                RegularText.Underlined(title = context.getString(R.string.url) ?: "", modifier = Modifier.noRippleClickable {
-                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.url)))
-                    context.startActivity(browserIntent)
-                })
+                RegularText.Underlined(
+                    title = context.getString(R.string.url) ?: "",
+                    modifier = Modifier.noRippleClickable {
+                        val browserIntent =
+                            Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.url)))
+                        context.startActivity(browserIntent)
+                    })
             }
         }
 
+        TitleSeparator(title = context.getString(R.string.sim), showArrow = false)
+        SimTileView(context, homeViewModel) {
+
+            homeViewModel.updateSelectedSim(it)
+
+        }
         DashboardCardComponents(
             title = context.getString(R.string.service),
             modifier = Modifier,
             firstBlockText = context.getString(R.string.start_call_service),
-            secondBlockText =   context.getString(R.string.work_manager),
+            secondBlockText = context.getString(R.string.work_manager),
             firstBlock = {
                 if (!homeViewModel.contactPermissionGranted.value && !homeViewModel.phoneLogsPermissionGranted.value && !homeViewModel.readPhoneStatePermissionGranted.value && !homeViewModel.phoneNumberPermissionGranted.value) {
                     context.toast(context.getString(R.string.please_check_all_pending_permission_for_call_service_all_permission_is_required))
@@ -146,10 +158,10 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     })
                 })
             },
-            subFirstBlockText = if (!homeViewModel.callService.value ) {
+            subFirstBlockText = if (!homeViewModel.callService.value) {
                 context.getString(R.string.not_running)
             } else context.getString(R.string.already_running),
-            subSecondBlockText = if (! homeViewModel.managers.value) {
+            subSecondBlockText = if (!homeViewModel.managers.value) {
                 context.getString(R.string.not_running)
             } else context.getString(R.string.already_running)
         )
@@ -166,7 +178,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         homeViewModel.readPhoneStatePermissionGranted.value = false
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             }, secondBlock = {
@@ -176,7 +188,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         homeViewModel.phoneNumberPermissionGranted.value = false
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             },
@@ -198,7 +210,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         homeViewModel.phoneLogsPermissionGranted.value = false
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             }, secondBlock = {
@@ -208,7 +220,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         homeViewModel.contactPermissionGranted.value = false
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             },
@@ -219,6 +231,40 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 R.string.granted
             ) else context.getString(R.string.denied)
         )
+        TitleSeparator(title = context.getString(R.string.reply_message), showArrow = false)
+
+
+            CustomOutlinedTextFieldWithTrailingIcon(
+                inputWrapper = homeViewModel.replyMessageTextWrapper,
+                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
+                hintText = context.getString(R.string.add_reply_message),
+                trailingIcon = {},
+                enabled = true,
+                isDefaultMultiline = true,
+
+                onChanged = {
+                    homeViewModel.replyMessageTextWrapper.dataValue.value = it
+                    AppPreference.replyMsg = homeViewModel.replyMessageTextWrapper.dataValue.value
+                },
+
+                )
+            CustomOutlinedTextFieldWithTrailingIcon(
+                inputWrapper = homeViewModel.replyTimesMessageTextWrapper,
+                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
+                hintText = context.getString(R.string.add_Repeat_reply_message),
+                trailingIcon = {},
+                enabled = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isDefaultMultiline = true,
+                onChanged = {
+                    homeViewModel.replyTimesMessageTextWrapper.dataValue.value = it
+                    AppPreference.autoReplyDelayDays = if(it.isNullOrEmpty())0 else it.toInt()
+                    AppPreference.autoReplyDelay = if(it.isNullOrEmpty())0 else ((homeViewModel.replyTimesMessageTextWrapper.dataValue.value).toInt() * 24 * 60 * 60 * 1000).toLong()
+                },
+
+                )
+
+
 
 
         CoreImageView.FromLocalDrawable(
@@ -332,3 +378,88 @@ private fun DashboardTileView(
 
     }
 }
+
+@Composable
+private fun SimTileView(
+    context: Context,
+    homeViewModel: HomeViewModel,
+    simClick: (Int) -> Unit?,
+) {
+    if (homeViewModel.simList.isNotEmpty()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 110.sdp)
+                .padding(horizontal = 10.sdp, vertical = 10.sdp),
+            horizontalArrangement = Arrangement.spacedBy(10.sdp)
+        ) {
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .shadow(
+                        shape = RoundedCornerShape(10.sdp),
+                        elevation = 10.sdp
+                    )
+                    .paint(
+                        painterResource(id = R.drawable.card_tile),
+                        contentScale = ContentScale.FillBounds
+                    )
+                    .bounceClick {
+                        simClick(homeViewModel.simList.first().subscriptionId)
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                SubHeadingText.Medium(
+                    title = homeViewModel.simList.first().displayName.toString(),
+                    textColor = MaterialTheme.colors.white_only,
+                    fontStyle = SFPRO
+                )
+                RegularText(
+                    title = if (homeViewModel.simList.first().displayName.toString() == homeViewModel.selectedSim.value) context.getString(
+                        R.string.selected
+                    ) else context.getString(R.string.unselected),
+                    textColor = MaterialTheme.colors.white_only,
+                    fontStyle = PS
+                )
+            }
+
+            if (homeViewModel.simList.size > 1) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .shadow(
+                            shape = RoundedCornerShape(10.sdp),
+                            elevation = 10.sdp
+                        )
+                        .paint(
+                            painterResource(id = R.drawable.card_tile),
+                            contentScale = ContentScale.FillBounds
+                        )
+                        .bounceClick {
+                            simClick(homeViewModel.simList.get(1).subscriptionId)
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    SubHeadingText.Medium(
+                        title = homeViewModel.simList[1].displayName.toString(),
+                        textColor = MaterialTheme.colors.white_only,
+                        fontStyle = SFPRO
+                    )
+                    RegularText(
+                        title = if (homeViewModel.simList.get(1).displayName.toString() == homeViewModel.selectedSim.value) context.getString(
+                            R.string.selected
+                        ) else context.getString(R.string.unselected),
+                        textColor = MaterialTheme.colors.white_only,
+                        fontStyle = PS
+                    )
+                }
+            }
+
+        }
+    }
+}
+
+

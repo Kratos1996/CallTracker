@@ -2,9 +2,10 @@ package com.ishant.calltracker.ui.dashboard
 
 import android.content.Context
 import android.os.Handler
+import android.telephony.SubscriptionInfo
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
@@ -20,7 +21,9 @@ import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.receiver.ContactObserver
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Response
+import com.ishant.calltracker.utils.SimUtils
 import com.ishant.calltracker.utils.TelephonyManagerPlus
+import com.ishant.corelibcompose.toolkit.ui.text.InputWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,9 +66,46 @@ class HomeViewModel @Inject constructor(
     val isLoading = MutableStateFlow<Boolean>(false)
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val scopeMain = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    var lastApiCall :String = UploadContactType.PENDING
+    var lastApiCall: String = UploadContactType.PENDING
     val contactMainList = mutableStateListOf<ContactList>()
     val contactDataFilterList = mutableStateListOf<ContactList>()
+
+    val selectedSim = mutableStateOf("")
+    val simList = mutableStateListOf<SubscriptionInfo>()
+
+    val replyMessage by lazy { mutableStateOf(AppPreference.replyMsg) }
+    val replyMessageErrorMessage by lazy { mutableStateOf("") }
+    val replyMessageTextWrapper by lazy {
+        InputWrapper(
+            dataValue = replyMessage,
+            errorStringMessage = replyMessageErrorMessage
+        )
+    }
+    val replyTimesMessage by lazy { mutableStateOf(AppPreference.autoReplyDelayDays.toString()) }
+    val replyTimesMessageErrorMessage by lazy { mutableStateOf("") }
+    val replyTimesMessageTextWrapper by lazy {
+        InputWrapper(
+            dataValue = replyTimesMessage,
+            errorStringMessage = replyTimesMessageErrorMessage
+        )
+    }
+
+    fun getSimList() {
+        simList.clear()
+        simList.addAll(SimUtils(app.applicationContext).getActiveSims())
+        selectedSim.value =
+            SimUtils(app.applicationContext).getSelectedSim()?.displayName.toString()
+    }
+
+    fun updateSelectedSim(simId: Int) {
+
+        SimUtils(app.applicationContext).setSelectedSim(simId)
+        getSimList()
+
+
+    }
+
+
     fun loadContactObserver(context: Context) {
         autoUpdateContactObserver = ContactObserver(context, Handler())
         autoUpdateContactObserver.registerObserver()

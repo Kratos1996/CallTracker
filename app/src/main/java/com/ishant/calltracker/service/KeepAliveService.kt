@@ -1,13 +1,10 @@
 package com.ishant.calltracker.service
 
-import android.Manifest
 import android.app.ActivityManager
 import android.app.Service
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.IBinder
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import com.ishant.calltracker.receiver.NotificationServiceRestartReceiver
 import com.ishant.calltracker.utils.isServiceRunning
 
@@ -17,7 +14,7 @@ class KeepAliveService : Service() {
         super.onCreate()
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.e("DEBUG", "CallTracker : KeepAliveService onStartCommand")
 
         startNotificationService()

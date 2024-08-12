@@ -10,12 +10,12 @@ import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
-import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+
 
 @HiltViewModel
 class CallViewModel  @Inject constructor(
@@ -105,5 +105,7 @@ class CallViewModel  @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
+
 
 }

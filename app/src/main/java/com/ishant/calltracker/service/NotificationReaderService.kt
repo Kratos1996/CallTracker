@@ -5,17 +5,24 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.CanceledException
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.text.SpannableString
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.RemoteInput
 import com.google.gson.Gson
 import com.ishant.calltracker.R
+import com.ishant.calltracker.api.notification.NotificationWear
 import com.ishant.calltracker.api.request.UploadContactRequest
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.DatabaseRepository
+import com.ishant.calltracker.database.room.MessageLogDB
 import com.ishant.calltracker.database.room.UploadContact
 import com.ishant.calltracker.database.room.UploadContactType
 import com.ishant.calltracker.di.BaseUrlInterceptor
@@ -23,32 +30,45 @@ import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.ui.dashboard.DashboardActivity
 import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.utils.DbUtils
 import com.ishant.calltracker.utils.convertDate
 import com.ishant.calltracker.utils.getPhoneNumber
 import com.ishant.calltracker.utils.getPhoneNumberByName
 import com.ishant.calltracker.utils.helper.App
 import com.ishant.calltracker.utils.helper.Constants
-import com.ishant.calltracker.utils.helper.Constants.SUPPORTED_APPS
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
+
 @AndroidEntryPoint
 class NotificationReaderService : NotificationListenerService() {
 
     private val TAG = "NotificationReaderService"
+
     @Inject
     lateinit var baseUrlInterceptor: BaseUrlInterceptor
+    private var dbUtils: DbUtils? = null
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
     @Inject
     lateinit var contactUseCase: ContactUseCase
+
+    @Inject
+    lateinit var messageLogDB: MessageLogDB
+
     @Inject
     lateinit var databaseRepository: DatabaseRepository
+    private val MAX_OLD_NOTIFICATION_CAN_BE_REPLIED_TIME_MS = 2 * 60 * 1000
+    private val LAST_API_CALL_TIMESTAMP = "last_api_call_timestamp"
+    private val RATE_LIMIT_INTERVAL_MS = 1000L // 1 second
 
-    private  val LAST_API_CALL_TIMESTAMP = "last_api_call_timestamp"
-    private  val RATE_LIMIT_INTERVAL_MS = 1000L // 1 second
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
@@ -71,33 +91,92 @@ class NotificationReaderService : NotificationListenerService() {
 
     }
 
-    override fun onNotificationPosted(sbn: StatusBarNotification) {
-        // Check if the notification is from WhatsApp Business
-        Log.d("IshantTest", " Notification "+ Gson().toJson(sbn))
-        for( data in Constants.SUPPORTED_APPS){
-            if(data.packageName == sbn.packageName){
-                val callFromApplication =  data.name
-                val contactName = sbn.notification.extras.getString(Notification.EXTRA_TITLE)
-                val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
-                if(text?.contains("Incoming video call") == true){
-                    Log.d(TAG, "Notification received: $contactName - $text and ${sbn.packageName} ")
-                    sendDataofWhatsapp(contactName, data, text)
-                }else if(text?.contains( "Incoming voice call") == true){
-                    Log.d(TAG, "Notification received: $contactName - $text")
-                    sendDataofWhatsapp(contactName, data, text)
-                }
-                else if(text?.contains("Ongoing voice call") == true ){
-                    Log.d(TAG, "Notification received: $contactName - $text")
-                    sendDataofWhatsapp(contactName, data, text)
-                }
-                else{
-                    Log.d(TAG, "Notification received: $contactName - $text")
-                }
-                break
-            }
+    private fun isGroupMessage(sbn: StatusBarNotification): Boolean {
+        val rawTitle = sbn.notification.extras.getString(Notification.EXTRA_TITLE)
+        val rawText = SpannableString.valueOf("" + sbn.notification.extras["android.text"])
+        val isPossiblyAnImageGrpMsg = (rawTitle != null && ": ".contains(rawTitle)
+                && rawText != null && rawText.toString().startsWith("\uD83D\uDCF7"))
+        return if (!sbn.notification.extras.getBoolean("android.isGroupConversation")) {
+            !isPossiblyAnImageGrpMsg
+        } else {
+            false
+        }
+    }
+
+    private suspend fun canSendReplyNow(sbn: StatusBarNotification): Boolean {
+
+
+        // Time between consecutive replies is 10 secs
+        val DELAY_BETWEEN_REPLY_IN_MILLISEC = 3 * 1000
+        val title = sbn.notification.extras.getString(Notification.EXTRA_TITLE)
+        Log.d(TAG, "canSendReplyNow: " + title)
+        Log.d(TAG, "canSendReplyNow: " + sbn.notification.extras.getString("android.text"))
+        val selfDisplayName = sbn.notification.extras.getString("android.selfDisplayName")
+
+        if (title != null && selfDisplayName != null && title.equals(
+                selfDisplayName,
+                ignoreCase = true
+            )
+        ) {
+            return false
         }
 
+        if (dbUtils == null) {
+            dbUtils = DbUtils(applicationContext, messageLogDB)
+        }
+        val timeDelay = AppPreference.autoReplyDelayDays
+        return if (timeDelay == 0) true else dbUtils!!.getLastRepliedTime(
+            sbn.packageName,
+            title
+        ).size < timeDelay
+
     }
+
+    private suspend fun canReply(sbn: StatusBarNotification): Boolean {
+        return isNewNotification(sbn) &&
+                isGroupMessage(sbn) && AppPreference.isUserLoggedIn && canSendReplyNow(sbn)
+    }
+
+    fun isNewNotification(sbn: StatusBarNotification): Boolean {
+
+        return sbn.notification.`when` == 0L ||
+                System.currentTimeMillis() - sbn.notification.`when` < MAX_OLD_NOTIFICATION_CAN_BE_REPLIED_TIME_MS
+    }
+
+    override fun onNotificationPosted(sbn: StatusBarNotification) {
+        // Check if the notification is from WhatsApp Business
+        scope.launch {
+            Log.d("IshantTest", " Notification " + Gson().toJson(sbn))
+            for (data in Constants.SUPPORTED_APPS) {
+                if (data.packageName == sbn.packageName) {
+                    val callFromApplication = data.name
+                    val contactName = sbn.notification.extras.getString(Notification.EXTRA_TITLE)
+                    val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
+                    if (canReply(sbn)) {
+                        sendReply(sbn)
+                        saveLogs(sbn)
+                    }
+                    if (text?.contains("Incoming video call") == true) {
+                        Log.d(
+                            TAG,
+                            "Notification received: $contactName - $text and ${sbn.packageName} "
+                        )
+                        sendDataofWhatsapp(contactName, data, text)
+                    } else if (text?.contains("Incoming voice call") == true) {
+                        Log.d(TAG, "Notification received: $contactName - $text")
+                        sendDataofWhatsapp(contactName, data, text)
+                    } else if (text?.contains("Ongoing voice call") == true) {
+                        Log.d(TAG, "Notification received: $contactName - $text")
+                        sendDataofWhatsapp(contactName, data, text)
+                    } else {
+                        Log.d(TAG, "Notification received: $contactName - $text")
+                    }
+                    break
+                }
+            }
+        }
+    }
+
 
     private fun sendDataofWhatsapp(
         contactName: String?,
@@ -120,12 +199,109 @@ class NotificationReaderService : NotificationListenerService() {
         saveContact(dataReq)
     }
 
+    private fun saveLogs(sbn: StatusBarNotification) {
+        if (dbUtils == null) {
+            dbUtils = DbUtils(applicationContext, messageLogDB)
+        }
+        dbUtils!!.saveLogs(
+            sbn,
+            sbn.notification.extras.getString(Notification.EXTRA_TITLE),
+            sbn.notification.extras.getString(Notification.EXTRA_TEXT)
+        )
+    }
+
+    private suspend fun sendReply(sbn: StatusBarNotification) {
+        val (_, pendingIntent, remoteInputs1) = extractWearNotification(sbn)
+        if (remoteInputs1.isEmpty()) {
+            return
+        }
+
+
+        val remoteInputs = arrayOfNulls<RemoteInput>(remoteInputs1.size)
+        val localIntent = Intent()
+        localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val localBundle = Bundle()
+
+
+        for ((i, remoteIn) in remoteInputs1.withIndex()) {
+            remoteInputs[i] = remoteIn
+
+            try {
+
+
+                localBundle.putCharSequence(
+                    remoteInputs[i]!!.resultKey, AppPreference.replyMsg
+
+                )
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+            }
+        }
+
+
+        RemoteInput.addResultsToIntent(remoteInputs, localIntent, localBundle)
+        try {
+            if (pendingIntent != null) {
+                if (dbUtils == null) {
+                    dbUtils = DbUtils(applicationContext, messageLogDB)
+                }
+                dbUtils!!.logReply(sbn, sbn.notification.extras.getString(Notification.EXTRA_TITLE))
+                pendingIntent.send(this, 0, localIntent)
+
+                cancelNotification(sbn.key)
+//                if (canPurgeMessages()) {
+                dbUtils!!.purgeMessageLogs()
+                AppPreference.lastPurgedTime = System.currentTimeMillis()
+//                }
+            }
+        } catch (e: CanceledException) {
+            Log.e(TAG, "replyToLastNotification error: " + e.localizedMessage)
+        }
+    }
+
+    private fun canPurgeMessages(): Boolean {
+        val daysBeforePurgeInMS = 30 * 24 * 60 * 60 * 1000L
+        return System.currentTimeMillis() -
+                (AppPreference.lastPurgedTime) > daysBeforePurgeInMS
+    }
+
+    fun extractWearNotification(statusBarNotification: StatusBarNotification): NotificationWear {
+        val wearableExtender =
+            NotificationCompat.WearableExtender(statusBarNotification.notification)
+        val actions = wearableExtender.actions
+        val remoteInputs: MutableList<RemoteInput> = ArrayList(actions.size)
+        var pendingIntent: PendingIntent? = null
+
+        for (act in actions) {
+            if (act != null && act.remoteInputs != null) {
+                for (x in act.remoteInputs!!.indices) {
+                    val remoteInput = act.remoteInputs!![x]
+                    remoteInputs.add(remoteInput)
+                    pendingIntent = act.actionIntent
+                }
+            }
+        }
+        return NotificationWear(
+            statusBarNotification.packageName,
+            pendingIntent,
+            remoteInputs,
+            statusBarNotification.notification.extras,
+            statusBarNotification.tag,
+            UUID.randomUUID().toString()
+        )
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotification(): Notification {
         // Create an intent for the notification
         val intent = Intent(this, DashboardActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         // Build the notification
         val builder = Notification.Builder(this, "notification_reader_channel")

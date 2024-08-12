@@ -12,19 +12,23 @@ object AppPreference {
     private val PREF_IMPLICIT_TOKEN = "PREF_IMPLICIT_TOKEN"
     private val PREF_IMPLICIT_USER = "PREF_IMPLICIT_USER"
     private val PREF_SELECTED_SIM = "PREF_SELECTED_SIM"
-    private val PREF_IS_LOGGED_IN= "PREF_IS_LOGGED_IN"
-    private val PREF_SIM_MANAGER= "PREF_SIM_MANAGER"
-    private val PREF_SIM_CHANGED= "PREF_SIM_CHANGED"
-    private val PREF_SIM1_SELETED= "PREF_SIM_1_SELECTED"
-    private val PREF_SIM2_SELECTED= "PREF_SIM_2_SELECTED"
-    private val PREF_SPECIAL_PERMISION= "PREF_SPECIAL_PERMISSION"
-    private val PREF_AUTO_START_SPECIAL_PERMISSION= "PREF_AUTO_START_SPECIAL_PERMISSION"
-    private val PREF_BASE_URL= "PREF_BASE_URL"
-    private val DARK_MODE= "DARK_MODE"
-    private val THEMES= "THEMES"
-    private val DARK_MODE_TYPE= "DARK_MODE_TYPE"
-    private val LAST_API_CALL= "last_api_call_timestamp"
+    private val PREF_IS_LOGGED_IN = "PREF_IS_LOGGED_IN"
+    private val PREF_SIM_MANAGER = "PREF_SIM_MANAGER"
+    private val PREF_SIM_CHANGED = "PREF_SIM_CHANGED"
+    private val PREF_SIM1_SELETED = "PREF_SIM_1_SELECTED"
+    private val PREF_SIM2_SELECTED = "PREF_SIM_2_SELECTED"
+    private val PREF_SPECIAL_PERMISION = "PREF_SPECIAL_PERMISSION"
+    private val PREF_AUTO_START_SPECIAL_PERMISSION = "PREF_AUTO_START_SPECIAL_PERMISSION"
+    private val PREF_BASE_URL = "PREF_BASE_URL"
+    private val DARK_MODE = "DARK_MODE"
+    private val THEMES = "THEMES"
+    private val DARK_MODE_TYPE = "DARK_MODE_TYPE"
+    private val LAST_API_CALL = "last_api_call_timestamp"
     private const val APP_NAME = "callTracker:Ishant"
+    private const val REPLY_MSG = "replyMsg"
+    private val KEY_PURGE_MESSAGE_LOGS_LAST_TIME = "pref_purge_message_logs_last_time"
+    private val KEY_AUTO_REPLY_THROTTLE_TIME_MS = "pref_auto_reply_throttle_time_ms"
+    private val KEY_AUTO_REPLY_THROTTLE_DAYS = "pref_auto_reply_throttle_days"
 
     fun init(context: Context) {
         pref = context.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE)
@@ -35,6 +39,7 @@ object AppPreference {
         op(editor)
         editor.apply()
     }
+
     var isDarkModeEnable: Boolean
         get() = getDataBoolean(DARK_MODE)
         set(darkmode) {
@@ -44,7 +49,7 @@ object AppPreference {
         get() = getDataBoolean(THEMES)
         set(value) = setDataBoolean(THEMES, isDarkMode)
     var darkModeType: Int
-        get() = getDataInt(DARK_MODE_TYPE,0)
+        get() = getDataInt(DARK_MODE_TYPE, 0)
         set(value) = setDataInt(DARK_MODE_TYPE, darkModeType)
 
     var lastWahtsappApicalled: Long
@@ -52,32 +57,45 @@ object AppPreference {
         set(value) = setDataLong(LAST_API_CALL, lastWahtsappApicalled)
 
     var firebaseToken: String
-        get() = getDataString(PREF_IMPLICIT_TOKEN)?:""
-        set(value) = setDataString(PREF_IMPLICIT_TOKEN,value)
+        get() = getDataString(PREF_IMPLICIT_TOKEN) ?: ""
+        set(value) = setDataString(PREF_IMPLICIT_TOKEN, value)
+    var replyMsg: String
+        get() = getDataString(REPLY_MSG,"Hi,User is not available.") ?: ""
+        set(value) = setDataString(REPLY_MSG, value)
+    var lastPurgedTime: Long
+        get() = getDataLong(KEY_PURGE_MESSAGE_LOGS_LAST_TIME)
+        set(value) = setDataLong(KEY_PURGE_MESSAGE_LOGS_LAST_TIME, value)
+    var autoReplyDelay: Long
+        get() = getDataLong(KEY_AUTO_REPLY_THROTTLE_TIME_MS)
+        set(value) = setDataLong(KEY_AUTO_REPLY_THROTTLE_TIME_MS, value)
+    var autoReplyDelayDays: Int
+        get() = getDataInt(KEY_AUTO_REPLY_THROTTLE_DAYS)
+        set(value) = setDataInt(KEY_AUTO_REPLY_THROTTLE_DAYS, value)
+
 
     var baseUrl: String
-        get() = getDataStringWithDefultValue(PREF_BASE_URL,"wappblaster.in")?:"wappblaster.in"
-        set(value) = setDataString(PREF_BASE_URL,value)
+        get() = getDataStringWithDefultValue(PREF_BASE_URL, "wappblaster.in") ?: "wappblaster.in"
+        set(value) = setDataString(PREF_BASE_URL, value)
 
     var isUserLoggedIn: Boolean
-        get() = getDataBoolean(PREF_IS_LOGGED_IN) ?:false
-        set(value) = setDataBoolean(PREF_IS_LOGGED_IN,value)
+        get() = getDataBoolean(PREF_IS_LOGGED_IN) ?: false
+        set(value) = setDataBoolean(PREF_IS_LOGGED_IN, value)
 
     var isRegister: Boolean
-        get() = getDataBoolean(PREF_SPECIAL_PERMISION) ?:false
-        set(value) = setDataBoolean(PREF_SPECIAL_PERMISION,value)
+        get() = getDataBoolean(PREF_SPECIAL_PERMISION) ?: false
+        set(value) = setDataBoolean(PREF_SPECIAL_PERMISION, value)
 
     var isAutoStartPermissionEnabled: Boolean
-        get() = getDataBoolean(PREF_AUTO_START_SPECIAL_PERMISSION) ?:false
-        set(value) = setDataBoolean(PREF_AUTO_START_SPECIAL_PERMISSION,value)
+        get() = getDataBoolean(PREF_AUTO_START_SPECIAL_PERMISSION) ?: false
+        set(value) = setDataBoolean(PREF_AUTO_START_SPECIAL_PERMISSION, value)
 
     var isSim1Selected: Boolean
         get() = getDataBoolean(PREF_SIM1_SELETED)
-        set(value) = setDataBoolean(PREF_SIM1_SELETED,value)
+        set(value) = setDataBoolean(PREF_SIM1_SELETED, value)
 
     var isSim2Selected: Boolean
         get() = getDataBoolean(PREF_SIM2_SELECTED)
-        set(value) = setDataBoolean(PREF_SIM2_SELECTED,value)
+        set(value) = setDataBoolean(PREF_SIM2_SELECTED, value)
 
     var loginUser: LoginResponse
         get() {
@@ -117,16 +135,17 @@ object AppPreference {
         getSharedPreferences().edit().remove(key).commit()
     }
 
-    private fun getDataString(key: String): String? {
+    private fun getDataString(key: String, defaultVlue: String=""): String? {
         var cbValue: String? = null
         try {
-            cbValue = getSharedPreferences().getString(key, "")
+            cbValue = getSharedPreferences().getString(key, defaultVlue)
         } catch (e: Exception) {
             e.printStackTrace()
         }
         return cbValue
     }
-    private fun getDataStringWithDefultValue(key: String,defaultVlue: String): String? {
+
+    private fun getDataStringWithDefultValue(key: String, defaultVlue: String): String? {
         var cbValue: String? = null
         try {
             cbValue = getSharedPreferences().getString(key, defaultVlue)
@@ -189,7 +208,8 @@ object AppPreference {
     private fun getDataBoolean(key: String): Boolean {
         return getSharedPreferences().getBoolean(key, false)
     }
-    private fun getDataBoolean(key: String,defaultVlue:Boolean): Boolean {
+
+    private fun getDataBoolean(key: String, defaultVlue: Boolean): Boolean {
         return getSharedPreferences().getBoolean(key, defaultVlue)
     }
 

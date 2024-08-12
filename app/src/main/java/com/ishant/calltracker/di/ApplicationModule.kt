@@ -20,6 +20,7 @@ import com.ishant.calltracker.data.ContactRepositoryImpl
 import com.ishant.calltracker.database.room.AppDB
 import com.ishant.calltracker.database.room.CallTrackerDao
 import com.ishant.calltracker.database.room.DatabaseRepository
+import com.ishant.calltracker.database.room.MessageLogDB
 import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.domain.ContactUseCaseImpl
 import com.ishant.calltracker.utils.AppPreference
@@ -64,6 +65,10 @@ object ApplicationModule {
     @Provides
     fun provideDatabase(@ApplicationContext context: Context): AppDB {
         return Room.databaseBuilder(context, AppDB::class.java,"CallTrackerIshantDatabase").fallbackToDestructiveMigration().build()
+    }
+    @Provides
+    fun provideMessagesDatabase(@ApplicationContext context: Context): MessageLogDB {
+        return Room.databaseBuilder(context, MessageLogDB::class.java,"MessageLogDatabase").fallbackToDestructiveMigration().build()
     }
 
     @Provides

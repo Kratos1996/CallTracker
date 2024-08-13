@@ -64,7 +64,9 @@ class DbUtils (val context: Context,val messageLogsDB: MessageLogDB){
 
     suspend fun getLastRepliedTime(packageName: String?, title: String?): List<String> {
 
-        return messageLogsDB!!.replyLogsDao()!!.getLastReplyTimeStamp(title, packageName)
+        return messageLogsDB!!.replyLogsDao()!!.getLastReplyTimeStamp(title, packageName,
+            getCurrentDate()
+        )
     }
 
     val firstRepliedTime: Long

@@ -91,9 +91,14 @@ class HomeViewModel @Inject constructor(
         autoUpdateContactObserver.registerObserver()
     }
     fun loadSimInfo(context: Context){
+        simList.clear()
         simList.addAll(context.showSimInfo())
     }
+    fun setSelectedSim(simSlot:Int,context: Context){
 
+        AppPreference.simSlot = simSlot
+        loadSimInfo(context)
+    }
 
     fun getContacts(search: String) {
         viewModelScope.launch {

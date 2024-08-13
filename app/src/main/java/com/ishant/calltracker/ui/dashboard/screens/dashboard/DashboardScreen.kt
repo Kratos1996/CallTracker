@@ -13,15 +13,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -35,7 +35,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.service.CallService
@@ -56,6 +55,7 @@ import com.ishant.corelibcompose.toolkit.colors.gray_bg_light
 import com.ishant.corelibcompose.toolkit.colors.gray_divider
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
+import com.ishant.corelibcompose.toolkit.ui.checkbox.CustomCheckBox
 import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
@@ -85,26 +85,30 @@ fun DashboardScreen() {
 }
 
 @Composable
-private fun SimInfoList(homeViewModel: HomeViewModel){
+private fun SimInfoList(homeViewModel: HomeViewModel, context: Context){
     val state = rememberLazyListState()
     LazyRow (modifier = Modifier.wrapContentWidth(),
         state = state,
         verticalAlignment = Alignment.CenterVertically) {
-        items(items = homeViewModel.simList){item->
-            SimInfo(item)
+        itemsIndexed(items = homeViewModel.simList){index,item->
+            SimInfo(item,(index+1)){
+                homeViewModel.setSelectedSim(index+1,context)
+            }
         }
     }
 }
 
 @Composable
-fun SimInfo(simInfo: SimInfo){
+fun SimInfo(simInfo: SimInfo,index:Int,onClick:(SimInfo)->Unit){
     Column (
         modifier = Modifier
         .width(150.sdp)
         .padding(10.sdp)
         .background(MaterialTheme.colors.gray_bg_light, shape = RoundedCornerShape(10.sdp))
         .border(width = 1.sdp, color = MaterialTheme.colors.gray_divider, shape = RoundedCornerShape(10.sdp))
-        .padding(horizontal = 20.sdp, vertical = 30.sdp),
+        .padding(horizontal = 20.sdp, vertical = 30.sdp).noRippleClickable {
+                onClick(simInfo)
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -117,6 +121,9 @@ fun SimInfo(simInfo: SimInfo){
             modifier = Modifier
                 .padding(top = 10.sdp)
         )
+        CustomCheckBox.invoke(isChecked = index == AppPreference.simSlot, onChecked = {
+            onClick(simInfo)
+        }, modifier = Modifier.padding(top = 5.sdp).size(20.sdp), text = "")
     }
 }
 
@@ -162,7 +169,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
             }
         }
 
-        SimInfoList(homeViewModel = homeViewModel)
+        SimInfoList(homeViewModel = homeViewModel,context = context)
 
         DashboardCardComponents(
             title = context.getString(R.string.service),
@@ -277,6 +284,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 trailingIcon = {},
                 enabled = true,
                 isDefaultMultiline = true,
+                singleLine = false,
 
                 onChanged = {
                     homeViewModel.replyMessageTextWrapper.dataValue.value = it
@@ -284,21 +292,21 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 },
 
                 )
-            CustomOutlinedTextFieldWithTrailingIcon(
-                inputWrapper = homeViewModel.replyTimesMessageTextWrapper,
-                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
-                hintText = context.getString(R.string.add_Repeat_reply_message),
-                trailingIcon = {},
-                enabled = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isDefaultMultiline = true,
-                onChanged = {
-                    homeViewModel.replyTimesMessageTextWrapper.dataValue.value = it
-                    AppPreference.autoReplyDelayDays = if(it.isNullOrEmpty())0 else it.toInt()
-                    AppPreference.autoReplyDelay = if(it.isNullOrEmpty())0 else ((homeViewModel.replyTimesMessageTextWrapper.dataValue.value).toInt() * 24 * 60 * 60 * 1000).toLong()
-                },
-
-                )
+//            CustomOutlinedTextFieldWithTrailingIcon(
+//                inputWrapper = homeViewModel.replyTimesMessageTextWrapper,
+//                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
+//                hintText = context.getString(R.string.add_Repeat_reply_message),
+//                trailingIcon = {},
+//                enabled = true,
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                isDefaultMultiline = true,
+//                onChanged = {
+//                    homeViewModel.replyTimesMessageTextWrapper.dataValue.value = it
+//                    AppPreference.autoReplyDelayDays = if(it.isNullOrEmpty())0 else it.toInt()
+//                    AppPreference.autoReplyDelay = if(it.isNullOrEmpty())0 else ((homeViewModel.replyTimesMessageTextWrapper.dataValue.value).toInt() * 24 * 60 * 60 * 1000).toLong()
+//                },
+//
+//                )
 
 
 

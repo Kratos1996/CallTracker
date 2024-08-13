@@ -123,11 +123,11 @@ class NotificationReaderService : NotificationListenerService() {
         if (dbUtils == null) {
             dbUtils = DbUtils(applicationContext, messageLogDB)
         }
-        val timeDelay = AppPreference.autoReplyDelayDays
-        return if (timeDelay == 0) true else dbUtils!!.getLastRepliedTime(
+
+        return dbUtils!!.getLastRepliedTime(
             sbn.packageName,
             title
-        ).size < timeDelay
+        ).isEmpty()
 
     }
 

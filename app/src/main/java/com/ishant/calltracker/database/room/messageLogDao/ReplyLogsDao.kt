@@ -10,10 +10,10 @@ interface ReplyLogsDao {
     @Query(
         "SELECT reply_logs.notif_reply_date FROM REPLY_LOGS " +
                 "INNER JOIN app_packages ON app_packages.`index` = reply_logs.`index` " +
-                "WHERE app_packages.package_name=:packageName AND reply_logs.notif_title=:title " +
+                "WHERE app_packages.package_name=:packageName AND reply_logs.notif_title=:title AND reply_logs.notif_reply_date =:currentDate " +
                 "ORDER BY notif_reply_time"
     )
-    suspend fun getLastReplyTimeStamp(title: String?, packageName: String?): List<String>
+    suspend fun getLastReplyTimeStamp(title: String?, packageName: String?,currentDate: String?): List<String>
 
     @Insert
     suspend fun logReply(log: ReplyLogs)

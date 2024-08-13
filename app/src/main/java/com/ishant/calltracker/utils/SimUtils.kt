@@ -30,6 +30,7 @@ class SimUtils(private val context: Context) {
 
     // Set the selected SIM (for demonstration purposes)
     fun setSelectedSim(subscriptionId: Int) {
+        val subscriptionManager = SubscriptionManager.from(context)
         // You can implement your own logic to store the selected SIM
         // For example, you might use SharedPreferences to store the selected SIM.
     }

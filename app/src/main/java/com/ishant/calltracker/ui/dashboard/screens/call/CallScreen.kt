@@ -41,6 +41,7 @@ import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.initiatePhoneCall
 import com.ishant.calltracker.utils.sendSms
+import com.ishant.calltracker.utils.sendSmsUsingSimSlot
 import com.ishant.calltracker.utils.sendWhatsAppMessage
 import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.text_primary
@@ -240,7 +241,7 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
             },
             onClick = {
 
-                context.sendSms(item.mobile?:"",AppPreference.replyMsg)
+                context.sendSmsUsingSimSlot(AppPreference.simSlot,item.mobile?:"",AppPreference.replyMsg)
             }
         )
         MultiMediaView.FromLocal(

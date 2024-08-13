@@ -26,6 +26,7 @@ object AppPreference {
     private val LAST_API_CALL= "last_api_call_timestamp"
     private const val APP_NAME = "callTracker:Ishant"
     private const val REPLY_MSG = "replyMsg"
+    private const val SIM_SLOT = "simSlot"
     private val KEY_PURGE_MESSAGE_LOGS_LAST_TIME = "pref_purge_message_logs_last_time"
     private val KEY_AUTO_REPLY_THROTTLE_TIME_MS = "pref_auto_reply_throttle_time_ms"
     private val KEY_AUTO_REPLY_THROTTLE_DAYS = "pref_auto_reply_throttle_days"
@@ -61,6 +62,9 @@ object AppPreference {
     var replyMsg: String
         get() = getDataStringWithDefultValue(REPLY_MSG,"Hi,User is not available.") ?: ""
         set(value) = setDataString(REPLY_MSG, value)
+    var simSlot : Int
+        get() = getDataInt(SIM_SLOT,1)
+        set(value) = setDataInt(SIM_SLOT, value)
     var lastPurgedTime: Long
         get() = getDataLong(KEY_PURGE_MESSAGE_LOGS_LAST_TIME)
         set(value) = setDataLong(KEY_PURGE_MESSAGE_LOGS_LAST_TIME, value)

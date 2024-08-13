@@ -1,6 +1,7 @@
 package com.ishant.calltracker.utils
 
 import android.Manifest
+import android.accessibilityservice.AccessibilityService
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlarmManager
@@ -9,12 +10,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.SystemClock
+import android.provider.Settings
 import android.telephony.SmsManager
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
+import android.text.TextUtils
+import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
+import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -31,14 +35,15 @@ import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.ui.dashboard.DashboardActivity
-import com.ishant.calltracker.ui.login.ui.login.LoginActivity
 import com.ishant.calltracker.ui.dashboard.screens.contact.newcontact.AddNewContact
+import com.ishant.calltracker.ui.login.ui.login.LoginActivity
 import com.ishant.calltracker.ui.splash.SplashActivity
 import com.ishant.calltracker.workmanager.ServiceCheckWorker
 import readPhoneStatePermission
 import sendSmsPermission
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
+
 
 fun Context.getActivityContext(): AppCompatActivity {
     return when (this) {
@@ -113,7 +118,7 @@ fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?) {
 
     }
 }
-private fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
+fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
     try {
         packageManager.getPackageInfo(packageName, 0)
         return true
@@ -254,3 +259,23 @@ fun Context.startAlarmManager() {
      return simList
 }
 data class SimInfo(val carrierName :String, val simSlot: Int,val carrierId:Int, val countryCode: String)
+
+ fun Context.isAccessibilityOn(clazz: Class<out AccessibilityService?>): Boolean {
+     val am = this.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+     val enabledServices = Settings.Secure.getString(this.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+     val colonSplitter = SimpleStringSplitter(';')
+     colonSplitter.setString(enabledServices)
+     val colonSplitterIterator = colonSplitter.iterator()
+
+     while (colonSplitterIterator.hasNext()) {
+         val componentName = colonSplitterIterator.next()
+         if (componentName.contains(clazz.name)) {
+             return true
+         }
+     }
+     return false
+}
+fun Context.openAccessibilitySettings() {
+    val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+    this.startActivity(intent)
+}

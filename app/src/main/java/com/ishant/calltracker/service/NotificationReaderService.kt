@@ -151,10 +151,10 @@ class NotificationReaderService : NotificationListenerService() {
                     val callFromApplication = data.name
                     val contactName = sbn.notification.extras.getString(Notification.EXTRA_TITLE)
                     val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
-                    if (canReply(sbn)) {
-                        sendReply(sbn)
-                        saveLogs(sbn)
-                    }
+//                    if (canReply(sbn)) {
+//                        sendReply(sbn)
+//                        saveLogs(sbn)
+//                    }
                     if (text?.contains("Incoming video call") == true) {
                         Log.d(
                             TAG,

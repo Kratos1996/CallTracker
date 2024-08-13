@@ -2,6 +2,8 @@ package com.ishant.calltracker.ui.dashboard
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,14 +16,18 @@ import com.ishant.calltracker.app.showAsBottomSheet
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.service.NotificationReaderService
+import com.ishant.calltracker.service.WhatsappAccessibilityService
 import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavHost
 import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.addAutoStartup
+import com.ishant.calltracker.utils.isAccessibilityOn
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.navToCallService
+import com.ishant.calltracker.utils.openAccessibilitySettings
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
+import com.ishant.calltracker.utils.wpService
 import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.theme.CoreTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,6 +61,7 @@ class DashboardActivity : BaseComposeActivity() {
 
             }
         }
+
         viewModel.loadSimInfo(this)
         notificationListenerUtil = NotificationListenerUtil(this)
         notificationListenerPermissionLauncher =
@@ -62,15 +69,22 @@ class DashboardActivity : BaseComposeActivity() {
                 val granted = notificationListenerUtil.isNotificationServiceEnabled()
                 if(granted){
                     val mServiceIntent = Intent(this, NotificationReaderService::class.java)
+
                     startService(mServiceIntent)
+
                 }
             }
         readNotificationService()
+        if(!this.isAccessibilityOn(WhatsappAccessibilityService::class.java)){
+            this.openAccessibilitySettings()
+        }
+
         addAutoStartup()
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
                 if (!isServiceRunning(KeepAliveService::class.java)) { // Replace with your service class
                     keepAliveService()
+                    wpService()
                     startWorkManager(this)
                     startAlarmManager()
                     viewModel.managers.value = true

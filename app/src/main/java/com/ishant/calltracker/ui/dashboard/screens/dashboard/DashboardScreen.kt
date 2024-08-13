@@ -3,6 +3,7 @@ package com.ishant.calltracker.ui.dashboard.screens.dashboard
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -39,15 +40,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
-import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
+import com.ishant.calltracker.service.WhatsappAccessibilityService
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
+import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
 import com.ishant.calltracker.utils.AppPreference
-
 import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.getActivityContext
+import com.ishant.calltracker.utils.isAccessibilityOn
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.navToCallService
+import com.ishant.calltracker.utils.openAccessibilitySettings
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.utils.toast
@@ -85,37 +88,45 @@ fun DashboardScreen() {
 }
 
 @Composable
-private fun SimInfoList(homeViewModel: HomeViewModel, context: Context){
+private fun SimInfoList(homeViewModel: HomeViewModel, context: Context) {
     val state = rememberLazyListState()
-    LazyRow (modifier = Modifier.wrapContentWidth(),
+    LazyRow(
+        modifier = Modifier.wrapContentWidth(),
         state = state,
-        verticalAlignment = Alignment.CenterVertically) {
-        itemsIndexed(items = homeViewModel.simList){index,item->
-            SimInfo(item,(index+1)){
-                homeViewModel.setSelectedSim(index+1,context)
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        itemsIndexed(items = homeViewModel.simList) { index, item ->
+            SimInfo(item, (index + 1)) {
+                homeViewModel.setSelectedSim(index + 1, context)
             }
         }
     }
 }
 
 @Composable
-fun SimInfo(simInfo: SimInfo,index:Int,onClick:(SimInfo)->Unit){
-    Column (
+fun SimInfo(simInfo: SimInfo, index: Int, onClick: (SimInfo) -> Unit) {
+    Column(
         modifier = Modifier
-        .width(150.sdp)
-        .padding(10.sdp)
-        .background(MaterialTheme.colors.gray_bg_light, shape = RoundedCornerShape(10.sdp))
-        .border(width = 1.sdp, color = MaterialTheme.colors.gray_divider, shape = RoundedCornerShape(10.sdp))
-        .padding(horizontal = 20.sdp, vertical = 30.sdp).noRippleClickable {
+            .width(150.sdp)
+            .padding(10.sdp)
+            .background(MaterialTheme.colors.gray_bg_light, shape = RoundedCornerShape(10.sdp))
+            .border(
+                width = 1.sdp,
+                color = MaterialTheme.colors.gray_divider,
+                shape = RoundedCornerShape(10.sdp)
+            )
+            .padding(horizontal = 20.sdp, vertical = 30.sdp).noRippleClickable {
                 onClick(simInfo)
             },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        CoreImageView.FromLocalDrawable(painterResource= R.drawable.sim_card_selected,
+        CoreImageView.FromLocalDrawable(
+            painterResource = R.drawable.sim_card_selected,
             modifier = Modifier
-            .width(30.sdp)
-            .height(45.sdp))
+                .width(30.sdp)
+                .height(45.sdp)
+        )
         RegularText.Medium(
             title = simInfo.carrierName,
             modifier = Modifier
@@ -162,21 +173,33 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 RegularText.Medium(title = AppPreference.loginUser.user?.name ?: "")
                 RegularText.Medium(title = AppPreference.loginUser.user?.email ?: "")
                 RegularText.Medium(title = AppPreference.loginUser.user?.mobile ?: "")
-                RegularText.Underlined(title = context.getString(R.string.url) ?: "", modifier = Modifier.noRippleClickable {
-                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.url)))
-                    context.startActivity(browserIntent)
-                })
+                RegularText.Underlined(
+                    title = context.getString(R.string.url) ?: "",
+                    modifier = Modifier.noRippleClickable {
+                        val browserIntent =
+                            Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.url)))
+                        context.startActivity(browserIntent)
+                    })
             }
         }
 
-        SimInfoList(homeViewModel = homeViewModel,context = context)
+        SimInfoList(homeViewModel = homeViewModel, context = context)
 
         DashboardCardComponents(
             title = context.getString(R.string.service),
             modifier = Modifier,
             firstBlockText = context.getString(R.string.start_call_service),
-            secondBlockText =   context.getString(R.string.work_manager),
+            secondBlockText = context.getString(R.string.work_manager),
             firstBlock = {
+                if (!context.isServiceRunning(WhatsappAccessibilityService::class.java)) {
+                    val mWPIntent = Intent(context, WhatsappAccessibilityService::class.java)
+                    context.startService(mWPIntent)
+                }
+                if(!context.isAccessibilityOn(WhatsappAccessibilityService::class.java)){
+                    context.openAccessibilitySettings()
+                }
+
+
                 if (!homeViewModel.contactPermissionGranted.value && !homeViewModel.phoneLogsPermissionGranted.value && !homeViewModel.readPhoneStatePermissionGranted.value && !homeViewModel.phoneNumberPermissionGranted.value) {
                     context.toast(context.getString(R.string.please_check_all_pending_permission_for_call_service_all_permission_is_required))
                 } else {
@@ -201,10 +224,10 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     })
                 })
             },
-            subFirstBlockText = if (!homeViewModel.callService.value ) {
+            subFirstBlockText = if (!homeViewModel.callService.value) {
                 context.getString(R.string.not_running)
             } else context.getString(R.string.already_running),
-            subSecondBlockText = if (! homeViewModel.managers.value) {
+            subSecondBlockText = if (!homeViewModel.managers.value) {
                 context.getString(R.string.not_running)
             } else context.getString(R.string.already_running)
         )
@@ -221,7 +244,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         homeViewModel.readPhoneStatePermissionGranted.value = false
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             }, secondBlock = {
@@ -231,7 +254,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         homeViewModel.phoneNumberPermissionGranted.value = false
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             },
@@ -253,7 +276,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         homeViewModel.phoneLogsPermissionGranted.value = false
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             }, secondBlock = {
@@ -263,7 +286,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         homeViewModel.contactPermissionGranted.value = false
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             },
@@ -277,21 +300,21 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
         TitleSeparator(title = context.getString(R.string.reply_message), showArrow = false)
 
 
-            CustomOutlinedTextFieldWithTrailingIcon(
-                inputWrapper = homeViewModel.replyMessageTextWrapper,
-                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
-                hintText = context.getString(R.string.add_reply_message),
-                trailingIcon = {},
-                enabled = true,
-                isDefaultMultiline = true,
-                singleLine = false,
+        CustomOutlinedTextFieldWithTrailingIcon(
+            inputWrapper = homeViewModel.replyMessageTextWrapper,
+            modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
+            hintText = context.getString(R.string.add_reply_message),
+            trailingIcon = {},
+            enabled = true,
+            isDefaultMultiline = true,
+            singleLine = false,
 
-                onChanged = {
-                    homeViewModel.replyMessageTextWrapper.dataValue.value = it
-                    AppPreference.replyMsg = homeViewModel.replyMessageTextWrapper.dataValue.value
-                },
+            onChanged = {
+                homeViewModel.replyMessageTextWrapper.dataValue.value = it
+                AppPreference.replyMsg = homeViewModel.replyMessageTextWrapper.dataValue.value
+            },
 
-                )
+            )
 //            CustomOutlinedTextFieldWithTrailingIcon(
 //                inputWrapper = homeViewModel.replyTimesMessageTextWrapper,
 //                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
@@ -307,8 +330,6 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
 //                },
 //
 //                )
-
-
 
 
         CoreImageView.FromLocalDrawable(

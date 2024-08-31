@@ -7,6 +7,7 @@ import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
 import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
+import com.ishant.calltracker.api.response.sms.SendSmsRes
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -39,4 +40,7 @@ interface ApiInterface {
 
     @GET(ApiConstant.CUSTOM_BASE_URL)
     suspend fun getDomains(): UrlResponse
+
+    @GET(ApiConstant.SEND_SMS)
+    suspend fun sendSms(): SendSmsRes
 }

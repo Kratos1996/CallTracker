@@ -6,6 +6,7 @@ import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
 import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
+import com.ishant.calltracker.api.response.sms.SendSmsRes
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,5 +20,6 @@ class ContactRepositoryImpl  @Inject constructor(val api: ApiInterface) :Contact
     override suspend fun getDomains(): UrlResponse = api.getDomains()
     override suspend fun getCallDetails(callType:Int): GetCallsRes = api.getCallDetails(callType)
     override suspend fun uploadCallDetails(data: GetCallsRes.GetCallsData) = api.uploadCallDetails(data)
+    override  suspend fun sendSms() = api.sendSms()
 
 }

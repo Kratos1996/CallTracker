@@ -7,6 +7,7 @@ import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
 import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
+import com.ishant.calltracker.api.response.sms.SendSmsRes
 import com.ishant.calltracker.network.Resource
 import kotlinx.coroutines.flow.Flow
 
@@ -18,4 +19,5 @@ interface ContactUseCase {
     fun getCallDetails(callType:Int):  Flow<Resource<GetCallsRes>>
     fun uploadCallDetails(data: GetCallsRes.GetCallsData): Flow<Resource<UploadCallDataRes>>
     fun uploadContact(uploadContactData: UploadContactRequest):Flow<Resource<ContactSavedResponse>>
+    fun sendSms(): Flow<Resource<SendSmsRes>>
 }

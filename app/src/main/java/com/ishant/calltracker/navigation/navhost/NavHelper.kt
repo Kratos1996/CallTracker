@@ -1,4 +1,4 @@
-package com.ishant.calltracker.ui.navhost
+package com.ishant.calltracker.navigation.navhost
 
 import androidx.navigation.NavController
 import com.ishant.calltracker.app.constant.AppConst

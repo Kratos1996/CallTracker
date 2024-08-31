@@ -1,4 +1,4 @@
-package com.ishant.calltracker.ui.navhost.screens.dashboard
+package com.ishant.calltracker.navigation.navhost.screens.dashboard
 
 
 sealed class AppScreenHome(val route: String) {
@@ -7,5 +7,6 @@ sealed class AppScreenHome(val route: String) {
         data object DashBoardScreenHome : AppScreenHome("nav_dashboard")
         data object ContactScreen : AppScreenHome("nav_contact_screen")
         data object CallScreen : AppScreenHome("nav_call_screen")
+        data object SendSmsScreen : AppScreenHome("nav_send_sms_screen")
     }
 }

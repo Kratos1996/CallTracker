@@ -7,4 +7,5 @@ object ApiConstant {
     const val UPLOAD_WHATSAPP_CONTACT = "v1/whatsappcontact"
     const val UPLOAD_CONTACTS = "v2/contact"
     const val CUSTOM_BASE_URL = "https://wappblaster.in/api/domain"
+    const val SEND_SMS = "v1/sendmessage"
 }

@@ -9,6 +9,7 @@ import com.ishant.calltracker.api.response.LoginResponse
 import com.ishant.calltracker.api.response.UploadContactResponse
 import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
+import com.ishant.calltracker.api.response.sms.SendSmsRes
 import com.ishant.calltracker.data.ContactRepository
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.network.catchExceptions
@@ -88,6 +89,17 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
 
         } catch (e: Exception) {
             catchExceptions<ContactSavedResponse>(e,Gson())
+        }
+    }
+
+    override fun sendSms() = flow {
+        try {
+            emit(Resource.Loading<SendSmsRes>())
+            val response= repository.sendSms()
+            emit(Resource.Success<SendSmsRes>(response))
+
+        } catch (e: Exception) {
+            catchExceptions<SendSmsRes>(e,Gson())
         }
     }
 }

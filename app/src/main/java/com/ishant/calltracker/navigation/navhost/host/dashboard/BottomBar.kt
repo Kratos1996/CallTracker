@@ -1,4 +1,4 @@
-package com.ishant.calltracker.ui.navhost.host.dashboard
+package com.ishant.calltracker.navigation.navhost.host.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.RowScope
@@ -29,7 +29,7 @@ import com.ishant.calltracker.receiver.NotificationServiceRestartReceiver
 import com.ishant.calltracker.receiver.PhoneCallReceiver
 import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
-import com.ishant.calltracker.ui.navhost.screens.dashboard.AppScreenHome
+import com.ishant.calltracker.navigation.navhost.screens.dashboard.AppScreenHome
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.keepAliveService
@@ -52,15 +52,17 @@ fun BottomBar(
     dismiss: (hide: Boolean) -> Unit,
 ) {
     val goBack = BottomBarScreen.Back
-    val homeItem =  BottomBarScreen.Dashboard
+    val homeItem = BottomBarScreen.Dashboard
     val callItem = BottomBarScreen.Call
     val contactItem = BottomBarScreen.Contact
+    val smsItem = BottomBarScreen.Sms
 
     val screens = listOf(
         goBack,
         homeItem,
         callItem,
-        contactItem
+        smsItem,
+        contactItem,
     )
     val context = LocalContext.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -195,5 +197,11 @@ sealed class BottomBarScreen(
         title = "Contact",
         defaultIcon = R.drawable.contact_ico_non_selected,
         selectedIcon = R.drawable.contact_ico_selected
+    )
+    object Sms : BottomBarScreen(
+        route = AppScreenHome.HomeScreen.SendSmsScreen.route,
+        title = "Contact",
+        defaultIcon = R.drawable.sms_icon_non_selected,
+        selectedIcon = R.drawable.sms_icon_selected
     )
 }

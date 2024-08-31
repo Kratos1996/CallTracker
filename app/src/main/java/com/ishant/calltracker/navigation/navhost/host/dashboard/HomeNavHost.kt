@@ -1,4 +1,4 @@
-package com.ishant.calltracker.ui.navhost.host.dashboard
+package com.ishant.calltracker.navigation.navhost.host.dashboard
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -23,8 +23,8 @@ import com.ishant.calltracker.R
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.app.constant.AppConst
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
-import com.ishant.calltracker.ui.navhost.navigateTo
-import com.ishant.calltracker.ui.navhost.screens.dashboard.AppScreenHome
+import com.ishant.calltracker.navigation.navhost.navigateTo
+import com.ishant.calltracker.navigation.navhost.screens.dashboard.AppScreenHome
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.corelibcompose.toolkit.colors.black_60
 import com.ishant.corelibcompose.toolkit.colors.white
@@ -66,6 +66,9 @@ fun HomeNavHost(
 
                     HomeNavConstants.NAV_CALL_SCREEN -> {
                         navController.navigate(AppScreenHome.HomeScreen.CallScreen.route)
+                    }
+                    HomeNavConstants.NAV_SMS_SCREEN -> {
+                        navController.navigate(AppScreenHome.HomeScreen.SendSmsScreen.route)
                     }
 
                     AppConst.NAV_BACK_CLICK -> {
@@ -161,6 +164,7 @@ object HomeNavConstants {
     const val NAV_DASHBOARD_SCREEN = 0
     const val NAV_ALL_CONTACTS_SCREEN = 1
     const val NAV_CALL_SCREEN = 2
+    const val NAV_SMS_SCREEN = 3
 
 
 }

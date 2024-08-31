@@ -17,7 +17,7 @@ import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.service.NotificationReaderService
 import com.ishant.calltracker.service.WhatsappAccessibilityService
-import com.ishant.calltracker.ui.navhost.host.dashboard.HomeNavHost
+import com.ishant.calltracker.navigation.navhost.host.dashboard.HomeNavHost
 import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.isAccessibilityOn

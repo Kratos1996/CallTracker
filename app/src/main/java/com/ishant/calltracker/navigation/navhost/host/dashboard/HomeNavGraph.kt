@@ -1,4 +1,4 @@
-package com.ishant.calltracker.ui.navhost.host.dashboard
+package com.ishant.calltracker.navigation.navhost.host.dashboard
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -11,7 +11,7 @@ import com.ishant.calltracker.app.constant.AppConst
 import com.ishant.calltracker.ui.dashboard.screens.call.CallScreen
 import com.ishant.calltracker.ui.dashboard.screens.contact.ContactScreen
 import com.ishant.calltracker.ui.dashboard.screens.dashboard.DashboardScreen
-import com.ishant.calltracker.ui.navhost.screens.dashboard.AppScreenHome
+import com.ishant.calltracker.navigation.navhost.screens.dashboard.AppScreenHome
 
 @Composable
 fun HomeNavGraph(

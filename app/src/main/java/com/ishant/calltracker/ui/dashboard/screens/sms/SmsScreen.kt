@@ -224,16 +224,17 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                     val WhatsappBusiness: Boolean =
                         isPackageInstalled("com.whatsapp.w4b", packageManager)
                     if (whatsApp && WhatsappBusiness) {
-                        context.getActivityContext().showAsBottomSheet {
+                        context.getActivityContext().showAsBottomSheet { dismiss ->
                             Column (modifier = Modifier.fillMaxWidth().padding(vertical = 10.sdp)) {
                                 RegularText(title = "WhatsApp", modifier = Modifier
                                     .padding(horizontal = 10.sdp , vertical = 15.sdp).bounceClick {
                                     context.sendWhatsAppMessage(
                                         "+91" + item.mobile ?: "",
-                                        item.imageUrl?:""+"\n"+item.message ?: AppPreference.replyMsg,
+                                        item.message ?: AppPreference.replyMsg,
                                         packageName = "com.whatsapp"
                                     )
                                         AppPreference.isServiceEnabled = true
+                                        dismiss()
                                 })
                                 Divider(thickness = 1.sdp, color = MaterialTheme.colors.gray_divider2, modifier = Modifier.padding(horizontal = 10.sdp))
                                 RegularText(title = "WhatsApp Business", modifier = Modifier
@@ -241,9 +242,10 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                                     .bounceClick {
                                         context.sendWhatsAppMessage(
                                             "+91" + item.mobile ?: "",
-                                            item.imageUrl?:""+"\n"+item.message ?: AppPreference.replyMsg,
+                                            item.message ?: AppPreference.replyMsg,
                                             packageName = "com.whatsapp.w4b"
                                         )
+                                        dismiss()
                                         AppPreference.isServiceEnabled = true
                                     })
                             }
@@ -253,7 +255,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                             "+91" + item.mobile ?: "",
                             item.message ?: AppPreference.replyMsg
                         )
-                        AppPreference.isServiceEnabled = true
+                        AppPreference.isServiceEnabled = false
                     }
                 }
 

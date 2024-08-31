@@ -1,6 +1,7 @@
 package com.ishant.calltracker.ui.dashboard.screens.sms
 
 
+import android.content.pm.PackageManager
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -37,19 +39,23 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.sms.SendSmsRes
+import com.ishant.calltracker.app.showAsBottomSheet
 import com.ishant.calltracker.ui.dashboard.screens.call.SmsViewModel
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
+import com.ishant.calltracker.utils.isPackageInstalled
 import com.ishant.calltracker.utils.sendSmsUsingSimSlot
 import com.ishant.calltracker.utils.sendWhatsAppMessage
 import com.ishant.calltracker.utils.toast
+import com.ishant.corelibcompose.toolkit.colors.gray_divider2
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
 import com.ishant.corelibcompose.toolkit.constant.AppConst
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CircularBox
+import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.custom_pullrefresh.CustomPullToRefresh
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
@@ -211,8 +217,40 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
             onClick = {
                 if(item.mobile.isNullOrEmpty()){
                     context.toast("There are some issues with your mobile number.please try again later")
-                }else{
-                    context.sendWhatsAppMessage("+91"+item.mobile?:"",item.message?:AppPreference.replyMsg)
+                }else {
+                    val packageManager: PackageManager = context.packageManager
+                    val whatsApp: Boolean = isPackageInstalled("com.whatsapp", packageManager)
+                    val WhatsappBusiness: Boolean =
+                        isPackageInstalled("com.whatsapp.w4b", packageManager)
+                    if (whatsApp && WhatsappBusiness) {
+                        context.getActivityContext().showAsBottomSheet {
+                            Column (modifier = Modifier.fillMaxWidth().padding(vertical = 10.sdp)) {
+                                RegularText(title = "WhatsApp", modifier = Modifier
+                                    .padding(horizontal = 10.sdp , vertical = 15.sdp).bounceClick {
+                                    context.sendWhatsAppMessage(
+                                        "+91" + item.mobile ?: "",
+                                        item.message ?: AppPreference.replyMsg,
+                                        packageName = "com.whatsapp"
+                                    )
+                                })
+                                Divider(thickness = 1.sdp, color = MaterialTheme.colors.gray_divider2, modifier = Modifier.padding(horizontal = 10.sdp))
+                                RegularText(title = "WhatsApp Business", modifier = Modifier
+                                    .padding(horizontal = 10.sdp , vertical = 15.sdp)
+                                    .bounceClick {
+                                        context.sendWhatsAppMessage(
+                                            "+91" + item.mobile ?: "",
+                                            item.message ?: AppPreference.replyMsg,
+                                            packageName = "com.whatsapp.w4b"
+                                        )
+                                    })
+                            }
+                        }
+                    } else {
+                        context.sendWhatsAppMessage(
+                            "+91" + item.mobile ?: "",
+                            item.message ?: AppPreference.replyMsg
+                        )
+                    }
                 }
 
             }

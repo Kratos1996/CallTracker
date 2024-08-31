@@ -88,7 +88,7 @@ fun Context.initiatePhoneCall(phoneNumber: String) {
         toast("initiatePhoneCall failed")
     }
 }
-fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?) {
+fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?,packageName: String?=null) {
     try {
         if(message.isNullOrEmpty()){
             toast("Please set your desired message to send from the dashboard")
@@ -99,13 +99,17 @@ fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?) {
         val isInstalled2: Boolean = isPackageInstalled("com.whatsapp.w4b", packageManager)
         val i = Intent(Intent.ACTION_VIEW)
         val url = "https://api.whatsapp.com/send?phone=" + phoneNumber + "&text="+ URLEncoder.encode(message,"UTF-8")
-        if(isInstalled1) {
-            i.setPackage("com.whatsapp")
-        }else if(isInstalled2){
-            i.setPackage("com.whatsapp.w4b")
+        if(packageName!=null){
+            i.setPackage(packageName)
         }else{
-            toast("WhatsApp is not installed")
-            return
+            if(isInstalled1) {
+                i.setPackage("com.whatsapp")
+            }else if(isInstalled2){
+                i.setPackage("com.whatsapp.w4b")
+            }else{
+                toast("WhatsApp is not installed")
+                return
+            }
         }
         i.data = Uri.parse(url)
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

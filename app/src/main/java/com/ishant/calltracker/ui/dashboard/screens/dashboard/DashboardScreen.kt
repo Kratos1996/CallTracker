@@ -82,6 +82,7 @@ fun DashboardScreen() {
         if (!initialApiCalled.value) {
             initialApiCalled.value = true
         }
+        AppPreference.isServiceEnabled = false
     })
     LoadDashboardScreen(context, homeViewModel)
 

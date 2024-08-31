@@ -68,7 +68,14 @@ object AppPreference {
         get() = getDataString(PREF_IMPLICIT_TOKEN) ?: ""
         set(value) = setDataString(PREF_IMPLICIT_TOKEN, value)
     var replyMsg: String
-        get() = getDataStringWithDefultValue(REPLY_MSG, "\uD835\uDC0D\uD835\uDC1A\uD835\uDC26\uD835\uDC1A\uD835\uDC2C\uD835\uDC2D\uD835\uDC1E!! \uD83D\uDE4F\uD83C\uDFFC\\n\\nDo You Know How \uD835\uDC0C\uD835\uDC1A\uD835\uDC27\uD835\uDC32 \uD835\uDC13\uD835\uDC28\uD835\uDC2D\uD835\uDC1A\uD835\uDC25 \uD835\uDC02\uD835\uDC1A\uD835\uDC25\uD835\uDC25\uD835\uDC2C Done By Your Staff YesterdayKis Staff Ne Kitne Calls Kiye? \uD835\uDC13\uD835\uDC28\uD835\uDC2D\uD835\uDC1A\uD835\uDC25 \uD835\uDC13\uD835\uDC22\uD835\uDC26\uD835\uDC1E \uD835\uDC12\uD835\uDC29\uD835\uDC1E\uD835\uDC27\uD835\uDC2D \uD835\uDC0E\uD835\uDC27 \uD835\uDC02\uD835\uDC1A\uD835\uDC25\uD835\uDC25 \uD835\uDC03\uD835\uDC2E\uD835\uDC2B\uD835\uDC1A\uD835\uDC2D\uD835\uDC22\uD835\uDC28\uD835\uDC27 (Out Of 8 Hour)?\\n\\nKis Staff Ne Kitne Mins Bat Ki?\\n\\nStaff Customer Se Whatsapp Par Kya Bat Kr rha he?\\n\\nNo  IVR, Work With \uD835\uDC11\uD835\uDC1E\uD835\uDC20\uD835\uDC2E\uD835\uDC25\uD835\uDC1A\uD835\uDC2B \uD835\uDC00\uD835\uDC27\uD835\uDC1D\uD835\uDC2B\uD835\uDC28\uD835\uDC22\uD835\uDC1D \uD835\uDC0F\uD835\uDC21\uD835\uDC28\uD835\uDC27\uD835\uDC1E\\n\\nUse Our \uD835\uDC02\uD835\uDC1A\uD835\uDC25\uD835\uDC25 \uD835\uDC0C\uD835\uDC1A\uD835\uDC27\uD835\uDC1A\uD835\uDC20\uD835\uDC1E\uD835\uDC26\uD835\uDC1E\uD835\uDC27\uD835\uDC2D \uD835\uDC12\uD835\uDC28\uD835\uDC1F\uD835\uDC2D\uD835\uDC30\uD835\uDC1A\uD835\uDC2B\uD835\uDC1E With Your Android Phone And Get\\n\\n Total Calls Done By Your Staff\\n\\nTotal Daily Call Duration\\n\\nSave Your Leads\\n\\nAuto Whatsapp On Each Call\\n\\n\uD835\uDC0F\uD835\uDC2B\uD835\uDC22\uD835\uDC1C\uD835\uDC1E: 200/- Per Staff Per Month (Just Add 200 In Your Salary)\\n\\nCan Increase Team Productivity \uD835\uDC01\uD835\uDC32 \uD835\uDFD0\uD835\uDFCE-\uD835\uDFD1\uD835\uDFCE%\\n\\nTry Demo Now.\\n") ?: ""
+        get() = getDataStringWithDefultValue(REPLY_MSG,
+                "Do You Know\nKis Staff Ne Kitne Calls Kiye?\n" +
+                "Out Of 8 Hour)?\nKis Staff Ne Kitne Mins Bat Ki?\n" +
+                "Use Our With Your Android Phone And Get\n" +
+                "Total Calls Done By Your Staff\n" +
+                "Save Your Leads\n"+
+                "Auto Whatsapp On Each Call: 200/- Per Staff Per Month\n" +
+                "Try Demo Now.\n") ?: ""
         set(value) = setDataString(REPLY_MSG, value)
     var simSlot: Int
         get() = getDataInt(SIM_SLOT, 1)

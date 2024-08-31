@@ -89,6 +89,7 @@ fun Context.initiatePhoneCall(phoneNumber: String) {
     }
 }
 fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?,packageName: String?=null) {
+
     try {
         if(message.isNullOrEmpty()){
             toast("Please set your desired message to send from the dashboard")
@@ -199,7 +200,7 @@ fun Context.startAlarmManager() {
 }
 
 @SuppressLint("MissingPermission")
- fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String, message: String) {
+ fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String,message: String) {
     val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
     readPhoneStatePermission(granted = {
         val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
@@ -211,7 +212,8 @@ fun Context.startAlarmManager() {
             sendSmsPermission(granted ={
                 try {
                     val smsManager = SmsManager.getSmsManagerForSubscriptionId(subscriptionId)
-                    smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+                    val messageParts = smsManager.divideMessage(message)
+                    smsManager.sendMultipartTextMessage(phoneNumber, null, messageParts, null, null)
                     Toast.makeText(this, "SMS sent from SIM $simSlot", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -236,8 +238,6 @@ fun Context.startAlarmManager() {
      readPhoneStatePermission(granted = {
          val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
          val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
-
-         subscriptionManager
          if (subscriptionInfoList != null && subscriptionInfoList.isNotEmpty()) {
              val simInfo = StringBuilder()
              for (subscriptionInfo in subscriptionInfoList) {

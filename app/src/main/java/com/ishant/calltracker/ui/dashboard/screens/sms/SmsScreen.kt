@@ -77,6 +77,7 @@ fun SmsScreen() {
             smsViewModel.searchString = ""
             smsViewModel.getSms()
         }
+        AppPreference.isServiceEnabled = false
     }
     LoadSmsScreen(smsViewModel)
 }
@@ -229,9 +230,10 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                                     .padding(horizontal = 10.sdp , vertical = 15.sdp).bounceClick {
                                     context.sendWhatsAppMessage(
                                         "+91" + item.mobile ?: "",
-                                        item.message ?: AppPreference.replyMsg,
+                                        item.imageUrl?:""+"\n"+item.message ?: AppPreference.replyMsg,
                                         packageName = "com.whatsapp"
                                     )
+                                        AppPreference.isServiceEnabled = true
                                 })
                                 Divider(thickness = 1.sdp, color = MaterialTheme.colors.gray_divider2, modifier = Modifier.padding(horizontal = 10.sdp))
                                 RegularText(title = "WhatsApp Business", modifier = Modifier
@@ -239,9 +241,10 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                                     .bounceClick {
                                         context.sendWhatsAppMessage(
                                             "+91" + item.mobile ?: "",
-                                            item.message ?: AppPreference.replyMsg,
+                                            item.imageUrl?:""+"\n"+item.message ?: AppPreference.replyMsg,
                                             packageName = "com.whatsapp.w4b"
                                         )
+                                        AppPreference.isServiceEnabled = true
                                     })
                             }
                         }
@@ -250,6 +253,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                             "+91" + item.mobile ?: "",
                             item.message ?: AppPreference.replyMsg
                         )
+                        AppPreference.isServiceEnabled = true
                     }
                 }
 
@@ -266,7 +270,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                 if(item.mobile.isNullOrEmpty()){
                     context.toast("There are some issues with your mobile number.please try again later")
                 }else{
-                    context.sendSmsUsingSimSlot(AppPreference.simSlot,item.mobile?:"",item.message?:AppPreference.replyMsg)
+                    context.sendSmsUsingSimSlot(AppPreference.simSlot,item.mobile?:"", item.imageUrl?:""+"\n"+item.message?:AppPreference.replyMsg)
                 }
 
             }

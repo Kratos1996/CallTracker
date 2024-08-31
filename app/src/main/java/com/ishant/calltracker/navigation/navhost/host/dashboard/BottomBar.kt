@@ -68,7 +68,7 @@ fun BottomBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    val bottomBarDestination = currentDestination?.route == BottomBarScreen.Back.route ||currentDestination?.route == AppScreenHome.HomeScreen.DashBoardScreenHome.route || currentDestination?.route == AppScreenHome.HomeScreen.CallScreen.route || currentDestination?.route == AppScreenHome.HomeScreen.ContactScreen.route
+    val bottomBarDestination = currentDestination?.route == BottomBarScreen.Back.route ||currentDestination?.route == AppScreenHome.HomeScreen.DashBoardScreenHome.route || currentDestination?.route == AppScreenHome.HomeScreen.CallScreen.route || currentDestination?.route == AppScreenHome.HomeScreen.ContactScreen.route || currentDestination?.route == AppScreenHome.HomeScreen.SendSmsScreen.route
     if (bottomBarDestination) {
         dismiss(true)
         BottomNavigation(
@@ -200,7 +200,7 @@ sealed class BottomBarScreen(
     )
     object Sms : BottomBarScreen(
         route = AppScreenHome.HomeScreen.SendSmsScreen.route,
-        title = "Contact",
+        title = "Sms",
         defaultIcon = R.drawable.sms_icon_non_selected,
         selectedIcon = R.drawable.sms_icon_selected
     )

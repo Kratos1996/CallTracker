@@ -221,29 +221,7 @@ private fun CallingItem(item: GetCallsRes.GetCallsData, viewModel: CallViewModel
                     top.linkTo(coinCode.bottom)
                 }
         )
-        CoreImageView.FromLocalDrawable(
-            painterResource = R.drawable.ic_whatsapp,
-            modifier = Modifier.constrainAs(wpImg){
-                end.linkTo(msgImg.start, margin = 10.dp)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-            },
-            onClick = {
-              context.sendWhatsAppMessage("+91"+item.mobile?:"",AppPreference.replyMsg)
-            }
-        )
-        CoreImageView.FromLocalDrawable(
-            painterResource = R.drawable.ic_message,
-            modifier = Modifier.constrainAs(msgImg){
-                end.linkTo(coinBalance.start, margin = 10.dp)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-            },
-            onClick = {
 
-                context.sendSmsUsingSimSlot(AppPreference.simSlot,item.mobile?:"",AppPreference.replyMsg)
-            }
-        )
         MultiMediaView.FromLocal(
             mediaDrawable = R.raw.call_ico,
             playAnimation = true,

@@ -261,19 +261,26 @@ fun Context.startAlarmManager() {
 data class SimInfo(val carrierName :String, val simSlot: Int,val carrierId:Int, val countryCode: String)
 
  fun Context.isAccessibilityOn(clazz: Class<out AccessibilityService?>): Boolean {
-     val am = this.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-     val enabledServices = Settings.Secure.getString(this.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
-     val colonSplitter = SimpleStringSplitter(';')
-     colonSplitter.setString(enabledServices)
-     val colonSplitterIterator = colonSplitter.iterator()
+     try {
+         val am = this.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+         val enabledServices = Settings.Secure.getString(
+             this.contentResolver,
+             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+         )
+         val colonSplitter = SimpleStringSplitter(';')
+         colonSplitter.setString(enabledServices)
+         val colonSplitterIterator = colonSplitter.iterator()
 
-     while (colonSplitterIterator.hasNext()) {
-         val componentName = colonSplitterIterator.next()
-         if (componentName.contains(clazz.name)) {
-             return true
+         while (colonSplitterIterator.hasNext()) {
+             val componentName = colonSplitterIterator.next()
+             if (componentName.contains(clazz.name)) {
+                 return true
+             }
          }
+         return false
+     }catch (e:Exception){
+         return false
      }
-     return false
 }
 fun Context.openAccessibilitySettings() {
     val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)

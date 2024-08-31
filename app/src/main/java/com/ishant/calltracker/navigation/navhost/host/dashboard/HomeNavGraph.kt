@@ -12,6 +12,7 @@ import com.ishant.calltracker.ui.dashboard.screens.call.CallScreen
 import com.ishant.calltracker.ui.dashboard.screens.contact.ContactScreen
 import com.ishant.calltracker.ui.dashboard.screens.dashboard.DashboardScreen
 import com.ishant.calltracker.navigation.navhost.screens.dashboard.AppScreenHome
+import com.ishant.calltracker.ui.dashboard.screens.sms.SmsScreen
 
 @Composable
 fun HomeNavGraph(
@@ -45,6 +46,9 @@ fun HomeNavGraph(
         }
         composable(route = AppScreenHome.HomeScreen.ContactScreen.route) {
             ContactScreen()
+        }
+        composable(route = AppScreenHome.HomeScreen.SendSmsScreen.route) {
+            SmsScreen()
         }
     }
 }

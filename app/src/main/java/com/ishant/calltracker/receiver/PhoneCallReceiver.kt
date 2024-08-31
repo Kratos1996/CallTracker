@@ -57,7 +57,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
                 TelephonyManager.EXTRA_STATE_IDLE -> {
                     if (!AppPreference.lastIncommingNum.isNullOrEmpty()) {
-                        if (AppPreference.isUserLoggedIn) {
+                        /*if (AppPreference.isUserLoggedIn) {
                             context.sendSmsUsingSimSlot(
                                 AppPreference.simSlot,
                                 AppPreference.lastIncommingNum,
@@ -68,7 +68,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
 
 
-                        }
+                        }*/
                     }
                     if (!context.isServiceRunning(CallService::class.java)) {
                         // Replace with your service class

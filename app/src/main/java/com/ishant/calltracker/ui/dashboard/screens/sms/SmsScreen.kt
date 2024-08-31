@@ -30,8 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.sms.SendSmsRes
@@ -41,6 +43,7 @@ import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.sendSmsUsingSimSlot
 import com.ishant.calltracker.utils.sendWhatsAppMessage
+import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
 import com.ishant.corelibcompose.toolkit.colors.white
@@ -178,11 +181,14 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
         SubHeadingText.Medium(
             title = item.name?.uppercase() ?: "",
             textColor = MaterialTheme.colors.text_primary,
+            textAlign = TextAlign.Left,
             modifier = Modifier
                 .padding(start = 10.sdp, end = 4.sdp)
                 .constrainAs(coinCode) {
                     start.linkTo(icon.end)
+                    end.linkTo(wpImg.start)
                     top.linkTo(icon.top)
+                    width = Dimension.fillToConstraints
                 }
         )
         RegularText(
@@ -203,47 +209,30 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                 bottom.linkTo(parent.bottom)
             },
             onClick = {
-              context.sendWhatsAppMessage("+91"+item.mobile?:"",AppPreference.replyMsg)
+                if(item.mobile.isNullOrEmpty()){
+                    context.toast("There are some issues with your mobile number.please try again later")
+                }else{
+                    context.sendWhatsAppMessage("+91"+item.mobile?:"",item.message?:AppPreference.replyMsg)
+                }
+
             }
         )
         CoreImageView.FromLocalDrawable(
             painterResource = R.drawable.ic_message,
             modifier = Modifier.constrainAs(msgImg){
-                end.linkTo(coinBalance.start, margin = 10.dp)
-                top.linkTo(parent.top)
+                end.linkTo(parent.end)
+                top.linkTo(icon.top)
                 bottom.linkTo(parent.bottom)
             },
             onClick = {
+                if(item.mobile.isNullOrEmpty()){
+                    context.toast("There are some issues with your mobile number.please try again later")
+                }else{
+                    context.sendSmsUsingSimSlot(AppPreference.simSlot,item.mobile?:"",item.message?:AppPreference.replyMsg)
+                }
 
-                context.sendSmsUsingSimSlot(AppPreference.simSlot,item.mobile?:"",AppPreference.replyMsg)
             }
         )
-        MultiMediaView.FromLocal(
-            mediaDrawable = R.raw.call_ico,
-            playAnimation = true,
-            mediaType = AppConst.MEDIA_TYPE_LOTTIE,
-            roundCorner = 30.sdp,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .height(40.sdp)
-                .width(42.sdp)
-                .constrainAs(coinBalance) {
-                    end.linkTo(parent.end)
-                    top.linkTo(icon.top)
-                }.noRippleClickable(true) {
-                   /* item.type = 1
-                    viewModel.callDetailUpdateOnServer(item) { isSuccess, response ->
-                        if (isSuccess) {
-                            context.toast(response.message)
-                            context.initiatePhoneCall(item.mobile ?: "")
-                            viewModel.getCallDetails()
-                        } else {
-                            context.toast(context.getString(R.string.cannot_initiate_this_call))
-                        }
-                    }*/
-
-                })
-
         LineDivider(modifier = Modifier
             .padding(top = 10.sdp)
             .constrainAs(divider) {

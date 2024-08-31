@@ -297,7 +297,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 R.string.granted
             ) else context.getString(R.string.denied)
         )
-        TitleSeparator(title = context.getString(R.string.reply_message), showArrow = false)
+      /*  TitleSeparator(title = context.getString(R.string.reply_message), showArrow = false)
 
 
         CustomOutlinedTextFieldWithTrailingIcon(
@@ -331,7 +331,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
 //
 //                )
 
-
+*/
         CoreImageView.FromLocalDrawable(
             painterResource = R.drawable.home, modifier = Modifier
                 .fillMaxWidth()

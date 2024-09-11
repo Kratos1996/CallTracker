@@ -1,13 +1,16 @@
 package com.ishant.calltracker.ui.dashboard
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Handler
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.ishant.calltracker.R
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.api.response.WhatsappData
 import com.ishant.calltracker.app.BaseObservableViewModel
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.ContactList
@@ -23,6 +26,7 @@ import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.TelephonyManagerPlus
+import com.ishant.calltracker.utils.isPackageInstalled
 import com.ishant.calltracker.utils.showSimInfo
 import com.ishant.corelibcompose.toolkit.ui.text.InputWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,6 +56,7 @@ class HomeViewModel @Inject constructor(
     lateinit var managerPlus: TelephonyManagerPlus
     private lateinit var autoUpdateContactObserver: ContactObserver
     val simList = mutableStateListOf<SimInfo>()
+    val whatsappList = mutableStateListOf<WhatsappData>()
 
     val readPhoneStatePermissionGranted = mutableStateOf(false)
     val phoneNumberPermissionGranted = mutableStateOf(false)
@@ -94,12 +99,28 @@ class HomeViewModel @Inject constructor(
         simList.clear()
         simList.addAll(context.showSimInfo())
     }
+    fun getWhatsappList(){
+        whatsappList.clear()
+        val packageManager : PackageManager = app.packageManager
+        if(isPackageInstalled("com.whatsapp", packageManager)) {
+            whatsappList.add(WhatsappData("Whatsapp","com.whatsapp", R.drawable.ic_whatsapp))
+        }
+        if(isPackageInstalled("com.whatsapp.w4b", packageManager)){
+            whatsappList.add(WhatsappData("Whatsapp Business","com.whatsapp.w4b",R.drawable.ic_whatsapp_business))
+        }
+
+
+    }
     fun setSelectedSim(simSlot:Int,context: Context){
 
         AppPreference.simSlot = simSlot
         loadSimInfo(context)
     }
 
+    fun setWhatsApp(item: WhatsappData) {
+        AppPreference.whatsappPackage = item.packageName.toString()
+        getWhatsappList()
+    }
     fun getContacts(search: String) {
         viewModelScope.launch {
             isLoading.value = true

@@ -29,6 +29,8 @@ object AppPreference {
     private const val SIM_SLOT = "simSlot"
     private const val LAST_NUM = "lastNum"
     private const val SERVICE_ENABLED = "service_enabled"
+    private const val IS_FROM_SERVICE = "is_from_service"
+    private const val WHATSAPP_PACKAGE = "whatsapp_package"
     private val KEY_PURGE_MESSAGE_LOGS_LAST_TIME = "pref_purge_message_logs_last_time"
     private val KEY_AUTO_REPLY_THROTTLE_TIME_MS = "pref_auto_reply_throttle_time_ms"
     private val KEY_AUTO_REPLY_THROTTLE_DAYS = "pref_auto_reply_throttle_days"
@@ -52,6 +54,11 @@ object AppPreference {
         get() = getDataBoolean(SERVICE_ENABLED,false)
         set(value) {
             setDataBoolean(SERVICE_ENABLED, value)
+        }
+    var isFromService: Boolean
+        get() = getDataBoolean(IS_FROM_SERVICE,false)
+        set(value) {
+            setDataBoolean(IS_FROM_SERVICE, value)
         }
     var isDarkMode: Boolean
         get() = getDataBoolean(THEMES)
@@ -94,6 +101,9 @@ object AppPreference {
     var baseUrl: String
         get() = getDataStringWithDefultValue(PREF_BASE_URL, "wappblaster.in") ?: "wappblaster.in"
         set(value) = setDataString(PREF_BASE_URL, value)
+    var whatsappPackage: String
+        get() = getDataStringWithDefultValue(WHATSAPP_PACKAGE, "com.whatsapp") ?: "com.whatsapp"
+        set(value) = setDataString(WHATSAPP_PACKAGE, value)
 
     var isUserLoggedIn: Boolean
         get() = getDataBoolean(PREF_IS_LOGGED_IN) ?: false

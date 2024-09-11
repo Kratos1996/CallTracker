@@ -28,8 +28,10 @@ class SmsViewModel  @Inject constructor(
     val sendSmsDataMainList = mutableStateListOf<SendSmsRes.SendSmsData>()
     val sendSmsDataFilterList = mutableStateListOf<SendSmsRes.SendSmsData>()
     var isRefreshing = mutableStateOf(false)
-
+    val pendingSms = mutableStateOf(true)
+    val completedSms = mutableStateOf(false)
     fun getSms( ) {
+        val smsType = if (pendingSms.value) 0 else 1
         contactUseCase.sendSms().onEach { response ->
             when(response){
                 is Resource.Error -> {
@@ -46,7 +48,7 @@ class SmsViewModel  @Inject constructor(
                     sendSmsDataMainList.clear()
                     sendSmsDataFilterList.clear()
                     response.data?.let {
-                        sendSmsDataMainList.addAll(it.sendSmsData)
+                        sendSmsDataMainList.addAll(it.sendSmsData.filter { smsType == it.status })
                     }
                     filterSearch()
                 }

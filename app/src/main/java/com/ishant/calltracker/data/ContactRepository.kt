@@ -8,6 +8,7 @@ import com.ishant.calltracker.api.response.UploadContactResponse
 import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.api.response.sms.SendSmsRes
+import okhttp3.RequestBody
 
 
 interface ContactRepository {
@@ -23,5 +24,6 @@ interface ContactRepository {
 
     suspend fun uploadCallDetails(data: GetCallsRes.GetCallsData): UploadCallDataRes
     suspend fun sendSms(): SendSmsRes
+    suspend fun changeStatus(id:RequestBody,status:RequestBody): SendSmsRes
 
 }

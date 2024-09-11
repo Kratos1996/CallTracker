@@ -11,7 +11,6 @@ import com.ishant.calltracker.databinding.CallUploadedOnServerItemBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.ArrayList
 
 class UploadContactAdapter(
     var context: Context,

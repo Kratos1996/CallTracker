@@ -63,6 +63,7 @@ class DashboardActivity : BaseComposeActivity() {
         }
 
         viewModel.loadSimInfo(this)
+        viewModel.getWhatsappList()
         notificationListenerUtil = NotificationListenerUtil(this)
         notificationListenerPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

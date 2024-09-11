@@ -4,11 +4,11 @@ package com.ishant.calltracker.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.telephony.TelephonyManager
 import android.util.Log
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.api.response.sms.SendSmsRes
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
@@ -20,12 +20,11 @@ import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.service.WhatsappAccessibilityService
 import com.ishant.calltracker.utils.AppPreference
-import com.ishant.calltracker.utils.isPackageInstalled
+import com.ishant.calltracker.utils.isAccessibilityOn
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.sendSmsUsingSimSlot
 import com.ishant.calltracker.utils.sendWhatsAppMessage
 import com.ishant.calltracker.utils.serviceContactUploadRestarter
-import com.ishant.calltracker.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +32,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 
@@ -48,6 +48,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
     @Inject
     lateinit var baseUrlInterceptor: BaseUrlInterceptor
 
+    private val serviceScope = CoroutineScope(Dispatchers.IO)
     override fun onReceive(context: Context, intent: Intent?) {
 
         if (intent?.action == TelephonyManager.ACTION_PHONE_STATE_CHANGED) {
@@ -70,6 +71,10 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
                         }*/
                     }
+                    if (context.isAccessibilityOn(WhatsappAccessibilityService::class.java) && AppPreference.isUserLoggedIn) {
+                        serviceScope.launch { getSms(context) }
+
+                    }
                     if (!context.isServiceRunning(CallService::class.java)) {
                         // Replace with your service class
                         handleCallData(intent, context)
@@ -88,7 +93,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                 }
 
                 TelephonyManager.EXTRA_STATE_RINGING -> {
-                    if(!context.isServiceRunning(WhatsappAccessibilityService::class.java)) {
+                    if (!context.isServiceRunning(WhatsappAccessibilityService::class.java)) {
                         val mWPIntent = Intent(context, WhatsappAccessibilityService::class.java)
                         context.startService(mWPIntent)
                     }
@@ -100,6 +105,82 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
             }
         }
+
+    }
+
+    suspend fun getSms(context: Context) {
+
+
+        contactUseCase.sendSms().onEach { response ->
+            when (response) {
+                is Resource.Error -> {
+
+                }
+
+                is Resource.Loading -> {
+
+                }
+
+                is Resource.Success -> {
+
+
+                    response.data?.let {
+                        sendMessages(it.sendSmsData.filter { it.status != 1 } as ArrayList<SendSmsRes.SendSmsData>,
+                            context)
+                    }
+                }
+            }
+        }.launchIn(CoroutineScope(Dispatchers.Main))
+    }
+
+    fun changeStatus(context: Context, id: Int?) {
+        Log.d("TAG", "changeStatus: " + id)
+        contactUseCase.changeStatus(id!!.toString().toRequestBody(), "1".toRequestBody())
+            .onEach { response ->
+                when (response) {
+                    is Resource.Error -> {
+
+                    }
+
+                    is Resource.Loading -> {
+
+                    }
+
+                    is Resource.Success -> {
+
+
+                        response.data?.let {
+                        }
+                    }
+                }
+            }.launchIn(CoroutineScope(Dispatchers.Main))
+    }
+
+
+    suspend fun sendMessages(sendSmsData: ArrayList<SendSmsRes.SendSmsData>, context: Context) {
+
+
+        if (sendSmsData.isNotEmpty()) {
+            val smsList = sendSmsData
+            val item = smsList.first()
+            context.sendSmsUsingSimSlot(
+                AppPreference.simSlot,
+                item.mobile ?: "",
+                item.imageUrl ?: "" + "\n" + item.message ?: AppPreference.replyMsg
+            )
+            context.sendWhatsAppMessage(
+                "+91" + item.mobile ?: "",
+                item.message ?: AppPreference.replyMsg
+            )
+            AppPreference.isServiceEnabled = true
+            AppPreference.isFromService = true
+            changeStatus(context, smsList.first().id)
+            smsList.removeFirst()
+
+            delay(3000)
+            sendMessages(smsList, context)
+        }
+
 
     }
 

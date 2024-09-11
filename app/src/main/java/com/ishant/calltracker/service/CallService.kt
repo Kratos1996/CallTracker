@@ -14,6 +14,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import com.google.gson.Gson
 import com.ishant.calltracker.api.request.UploadContactRequest
+import com.ishant.calltracker.api.response.sms.SendSmsRes
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.database.room.DatabaseRepository
 import com.ishant.calltracker.database.room.UploadContact
@@ -25,15 +26,20 @@ import com.ishant.calltracker.receiver.LastCallDetailsCollector
 import com.ishant.calltracker.receiver.PhoneCallReceiver
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.callForegroundService
+import com.ishant.calltracker.utils.isAccessibilityOn
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.navToCallService
+import com.ishant.calltracker.utils.sendSmsUsingSimSlot
+import com.ishant.calltracker.utils.sendWhatsAppMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody.Companion.toRequestBody
 import readPhoneNumberPermission
 import readPhoneStatePermission
 import javax.inject.Inject
@@ -48,6 +54,7 @@ class CallService : Service() {
 
     @Inject
     lateinit var databaseRepository: DatabaseRepository
+
     @Inject
     lateinit var baseUrlInterceptor: BaseUrlInterceptor
 
@@ -56,31 +63,40 @@ class CallService : Service() {
 
 
     private val phoneStateListener = object : PhoneStateListener() {
-            override fun onCallStateChanged(state: Int, phoneNumber: String?) {
-                when (state) {
-                    TelephonyManager.CALL_STATE_IDLE -> {
-                        handleCallData(phoneNumber ?: "", this@CallService)
-                    }
+        override fun onCallStateChanged(state: Int, phoneNumber: String?) {
+            when (state) {
+                TelephonyManager.CALL_STATE_IDLE -> {
+                    handleCallData(phoneNumber ?: "", this@CallService)
                 }
             }
         }
+    }
 
     @SuppressLint("ForegroundServiceType")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
+
             readPhoneStatePermission(granted = {
                 readPhoneNumberPermission(granted = {
-                   // telecomManager = getSystemService(TELECOM_SERVICE) as TelecomManager
-                    telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-                    callForegroundService(){ notificationId,notification ->
+                    // telecomManager = getSystemService(TELECOM_SERVICE) as TelecomManager
+                    telephonyManager =
+                        getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                    callForegroundService() { notificationId, notification ->
                         startForeground(notificationId, notification)
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                        val telephonyManager =
+                            getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                         myTelephonyCallback = MyTelephonyCallback(this)
-                        telephonyManager.registerTelephonyCallback(mainExecutor, myTelephonyCallback!!)
+                        telephonyManager.registerTelephonyCallback(
+                            mainExecutor,
+                            myTelephonyCallback!!
+                        )
                     } else {
-                        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
+                        telephonyManager.listen(
+                            phoneStateListener,
+                            PhoneStateListener.LISTEN_CALL_STATE
+                        )
                         callStateReceiver = PhoneCallReceiver()
                         val filter = IntentFilter().apply {
                             addAction("android.intent.action.PHONE_STATE")
@@ -89,6 +105,7 @@ class CallService : Service() {
                     }
                 })
             })
+
         } catch (e: Exception) {
 
         }
@@ -106,7 +123,7 @@ class CallService : Service() {
         return binder
     }
 
-    private fun handleCallData(phoneNumber: String, context: Context){
+    private fun handleCallData(phoneNumber: String, context: Context) {
         if (AppPreference.isUserLoggedIn && phoneNumber.isNotEmpty()) {
             val data = LastCallDetailsCollector(databaseRepository = databaseRepository)
             CoroutineScope(Dispatchers.IO).launch {
@@ -114,13 +131,14 @@ class CallService : Service() {
                 val callerData = data.collectLastCallDetails(context)
                 if (callerData != null && callerData.data.isNotEmpty()) {
                     saveContact(callerData)
+//                    getSms(context)
                 }
             }
         }
     }
 
     private fun saveContact(uploadContacts: UploadContactRequest?) {
-        if(uploadContacts?.data?.isNotEmpty() == true){
+        if (uploadContacts?.data?.isNotEmpty() == true) {
             baseUrlInterceptor.setBaseUrl(AppPreference.baseUrl)
             contactUseCase.uploadContacts(request = uploadContacts).onEach { result ->
                 when (result) {
@@ -151,13 +169,19 @@ class CallService : Service() {
     }
 
 
+
     override fun onTaskRemoved(rootIntent: Intent?) {
         if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
-            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > CallService > TaskRemoved > CallService is not running. Restarting...")
+            Log.e(
+                ServiceRestarterService.TAG,
+                "CallTracker : Service > CallService > TaskRemoved > CallService is not running. Restarting..."
+            )
             navToCallService()
-        }
-        else{
-            Log.e(ServiceRestarterService.TAG, "CallTracker : Service > CallService > TaskRemoved > CallService service is running....")
+        } else {
+            Log.e(
+                ServiceRestarterService.TAG,
+                "CallTracker : Service > CallService > TaskRemoved > CallService service is running...."
+            )
         }
         super.onTaskRemoved(rootIntent)
     }
@@ -178,7 +202,8 @@ class CallService : Service() {
     }
 
     @androidx.annotation.RequiresApi(Build.VERSION_CODES.S)
-    inner class MyTelephonyCallback(private val context: Context) : TelephonyCallback(), TelephonyCallback.CallStateListener {
+    inner class MyTelephonyCallback(private val context: Context) : TelephonyCallback(),
+        TelephonyCallback.CallStateListener {
 
         override fun onCallStateChanged(state: Int) {
             if (state == TelephonyManager.CALL_STATE_IDLE) {
@@ -190,7 +215,7 @@ class CallService : Service() {
                                 }*/
 
                     val phoneNumber = telephonyManager.line1Number
-                    handleCallData(phoneNumber ?: "", this@CallService)
+                    //    handleCallData(phoneNumber ?: "", this@CallService)
                 }
 
             }

@@ -8,11 +8,14 @@ import com.ishant.calltracker.api.response.UploadContactResponse
 import com.ishant.calltracker.api.response.UrlResponse
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.api.response.sms.SendSmsRes
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface ApiInterface {
@@ -43,4 +46,8 @@ interface ApiInterface {
 
     @GET(ApiConstant.SEND_SMS)
     suspend fun sendSms(): SendSmsRes
+
+    @Multipart
+    @POST(ApiConstant.CHANGE_STATUS)
+    suspend fun changeStatus(@Part("id")id:RequestBody,@Part("status")status:RequestBody,): SendSmsRes
 }

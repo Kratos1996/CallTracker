@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
+import com.ishant.calltracker.api.response.WhatsappData
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.service.WhatsappAccessibilityService
@@ -81,6 +82,7 @@ fun DashboardScreen() {
     LaunchedEffect(key1 = Unit, block = {
         if (!initialApiCalled.value) {
             initialApiCalled.value = true
+
         }
         AppPreference.isServiceEnabled = false
     })
@@ -103,7 +105,56 @@ private fun SimInfoList(homeViewModel: HomeViewModel, context: Context) {
         }
     }
 }
+@Composable
+private fun WhatsappList(homeViewModel: HomeViewModel, context: Context) {
+    val state = rememberLazyListState()
+    LazyRow(
+        modifier = Modifier.wrapContentWidth(),
+        state = state,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        itemsIndexed(items = homeViewModel.whatsappList) { index, item ->
+            WhatsappInfo(item, (index + 1)) {
+                homeViewModel.setWhatsApp(item)
+            }
+        }
+    }
+}
 
+@Composable
+fun WhatsappInfo(whatsappData: WhatsappData, index: Int, onClick: (WhatsappData) -> Unit) {
+    Column(
+        modifier = Modifier
+            .width(150.sdp)
+            .padding(10.sdp)
+            .background(MaterialTheme.colors.gray_bg_light, shape = RoundedCornerShape(10.sdp))
+            .border(
+                width = 1.sdp,
+                color = MaterialTheme.colors.gray_divider,
+                shape = RoundedCornerShape(10.sdp)
+            )
+            .padding(horizontal = 20.sdp, vertical = 30.sdp).noRippleClickable {
+                onClick(whatsappData)
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CoreImageView.FromLocalDrawable(
+            painterResource = whatsappData.image?:0,
+            modifier = Modifier
+                .width(45.sdp)
+                .height(45.sdp)
+        )
+        RegularText.Medium(
+            title = whatsappData.name?:"",
+            modifier = Modifier
+                .padding(top = 10.sdp)
+        )
+        CustomCheckBox.invoke(isChecked = whatsappData.packageName==AppPreference.whatsappPackage, onChecked = {
+            onClick(whatsappData)
+        }, modifier = Modifier.padding(top = 5.sdp).size(20.sdp), text = "")
+    }
+}
 @Composable
 fun SimInfo(simInfo: SimInfo, index: Int, onClick: (SimInfo) -> Unit) {
     Column(
@@ -185,7 +236,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
         }
 
         SimInfoList(homeViewModel = homeViewModel, context = context)
-
+        WhatsappList(homeViewModel = homeViewModel, context = context)
         DashboardCardComponents(
             title = context.getString(R.string.service),
             modifier = Modifier,

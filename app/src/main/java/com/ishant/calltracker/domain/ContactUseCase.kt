@@ -10,6 +10,7 @@ import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.api.response.sms.SendSmsRes
 import com.ishant.calltracker.network.Resource
 import kotlinx.coroutines.flow.Flow
+import okhttp3.RequestBody
 
 interface ContactUseCase {
     fun loginNow(mobile:String, password:String ): Flow<Resource<LoginResponse>>
@@ -20,4 +21,5 @@ interface ContactUseCase {
     fun uploadCallDetails(data: GetCallsRes.GetCallsData): Flow<Resource<UploadCallDataRes>>
     fun uploadContact(uploadContactData: UploadContactRequest):Flow<Resource<ContactSavedResponse>>
     fun sendSms(): Flow<Resource<SendSmsRes>>
+    fun changeStatus(id: RequestBody, status: RequestBody): Flow<Resource<SendSmsRes>>
 }

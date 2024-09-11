@@ -100,18 +100,24 @@ fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?,packageNam
         val isInstalled2: Boolean = isPackageInstalled("com.whatsapp.w4b", packageManager)
         val i = Intent(Intent.ACTION_VIEW)
         val url = "https://api.whatsapp.com/send?phone=" + phoneNumber + "&text="+ URLEncoder.encode(message,"UTF-8")
-        if(packageName!=null){
-            i.setPackage(packageName)
+        if(!isInstalled1&&!isInstalled2){
+            toast("WhatsApp is not installed")
+            return
         }else{
-            if(isInstalled1) {
-                i.setPackage("com.whatsapp")
-            }else if(isInstalled2){
-                i.setPackage("com.whatsapp.w4b")
-            }else{
-                toast("WhatsApp is not installed")
-                return
-            }
+            i.setPackage(AppPreference.whatsappPackage)
         }
+//        if(packageName!=null){
+//            i.setPackage(packageName)
+//        }else{
+//            if(isInstalled1) {
+//                i.setPackage("com.whatsapp")
+//            }else if(isInstalled2){
+//                i.setPackage("com.whatsapp.w4b")
+//            }else{
+//                toast("WhatsApp is not installed")
+//                return
+//            }
+//        }
         i.data = Uri.parse(url)
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if(i.resolveActivity(packageManager) != null){
@@ -200,7 +206,7 @@ fun Context.startAlarmManager() {
 }
 
 @SuppressLint("MissingPermission")
- fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String,message: String) {
+ fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String, message: String) {
     val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
     readPhoneStatePermission(granted = {
         val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
@@ -238,6 +244,8 @@ fun Context.startAlarmManager() {
      readPhoneStatePermission(granted = {
          val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
          val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
+
+         subscriptionManager
          if (subscriptionInfoList != null && subscriptionInfoList.isNotEmpty()) {
              val simInfo = StringBuilder()
              for (subscriptionInfo in subscriptionInfoList) {

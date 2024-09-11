@@ -16,6 +16,7 @@ import com.ishant.calltracker.network.catchExceptions
 import com.ishant.calltracker.utils.AppPreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.RequestBody
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,9 +37,9 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
         Log.e("Login","BaseUrl : ${AppPreference.baseUrl}")
         try {
             emit(Resource.Loading<UploadContactResponse>())
-            val response= repository.uploadContacts(request)
-
-            emit(Resource.Success<UploadContactResponse>(response))
+//            val response= repository.uploadContacts(request)
+//
+//            emit(Resource.Success<UploadContactResponse>(response))
 
         } catch (e: Exception) {
             catchExceptions<UploadContactResponse>(e,Gson())
@@ -96,6 +97,16 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
         try {
             emit(Resource.Loading<SendSmsRes>())
             val response= repository.sendSms()
+            emit(Resource.Success<SendSmsRes>(response))
+
+        } catch (e: Exception) {
+            catchExceptions<SendSmsRes>(e,Gson())
+        }
+    }
+    override fun changeStatus(id:RequestBody,status:RequestBody) = flow {
+        try {
+            emit(Resource.Loading<SendSmsRes>())
+            val response= repository.changeStatus(id,status)
             emit(Resource.Success<SendSmsRes>(response))
 
         } catch (e: Exception) {

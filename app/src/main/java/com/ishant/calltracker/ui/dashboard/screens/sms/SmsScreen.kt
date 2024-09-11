@@ -1,12 +1,14 @@
 package com.ishant.calltracker.ui.dashboard.screens.sms
 
 
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.content.pm.PackageManager
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,8 +22,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +29,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -39,7 +38,6 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.sms.SendSmsRes
-import com.ishant.calltracker.app.showAsBottomSheet
 import com.ishant.calltracker.ui.dashboard.screens.call.SmsViewModel
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
 import com.ishant.calltracker.utils.AppPreference
@@ -48,18 +46,13 @@ import com.ishant.calltracker.utils.isPackageInstalled
 import com.ishant.calltracker.utils.sendSmsUsingSimSlot
 import com.ishant.calltracker.utils.sendWhatsAppMessage
 import com.ishant.calltracker.utils.toast
-import com.ishant.corelibcompose.toolkit.colors.gray_divider2
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
-import com.ishant.corelibcompose.toolkit.constant.AppConst
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CircularBox
-import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
-import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.custom_pullrefresh.CustomPullToRefresh
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
-import com.ishant.corelibcompose.toolkit.ui.imageLib.MultiMediaView
 import com.ishant.corelibcompose.toolkit.ui.other.OtherModifiers.LineDivider
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
@@ -108,7 +101,9 @@ private fun LoadSmsScreen(
                 state = lazyColumnListState,
                 contentPadding = PaddingValues(bottom = 60.sdp)
             ) {
+                item { CallTab(smsViewModel = smsViewModel) }
                 item { SearchViewWithCheckBox(viewModel = smsViewModel) }
+
                 smsDataList(smsViewModel)
             }
         }
@@ -157,11 +152,42 @@ private fun LazyListScope.smsDataList(
 }
 
 
+@Composable
+private fun CallTab(smsViewModel: SmsViewModel) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.sdp)
+    ) {
+        DashboardCommon.Tab(
+            title = stringResource(id = R.string.pending),
+            isSelected = smsViewModel.pendingSms.value
+        ) {
+            smsViewModel.pendingSms.value = true
+            smsViewModel.completedSms.value = false
+            smsViewModel.getSms()
+//            smsViewModel.getCallDetails()
+        }
+        DashboardCommon.Tab(
+            title = stringResource(id = R.string.completed),
+            isSelected = smsViewModel.completedSms.value
+        ) {
+            smsViewModel.pendingSms.value = false
+            smsViewModel.completedSms.value = true
+            smsViewModel.getSms()
+//            smsViewModel.getCallDetails()
+        }
+    }
+}
 
 @Composable
 private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
     val randomColor = DashboardCommon.getRandomColor()
     val context = LocalContext.current
+    val packageManager: PackageManager = context.packageManager
+    val whatsApp: Boolean = isPackageInstalled("com.whatsapp", packageManager)
+    val WhatsappBusiness: Boolean =
+        isPackageInstalled("com.whatsapp.w4b", packageManager)
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
@@ -169,7 +195,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
             .padding(top = 12.sdp, start = 12.sdp, end = 12.sdp)
 
     ) {
-        val (icon, coinCode, coinName, coinBalance,msgImg,wpImg, divider) = createRefs()
+        val (icon, coinCode, coinName, coinBalance, msgImg, wpImg, divider) = createRefs()
         CircularBox(
             modifier = Modifier
                 .height(28.sdp)
@@ -208,73 +234,77 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                     top.linkTo(coinCode.bottom)
                 }
         )
-        CoreImageView.FromLocalDrawable(
-            painterResource = R.drawable.ic_whatsapp,
-            modifier = Modifier.constrainAs(wpImg){
+        if (item.status != 1) {
+            Row(modifier = Modifier.constrainAs(wpImg) {
                 end.linkTo(msgImg.start, margin = 10.dp)
                 top.linkTo(parent.top)
                 bottom.linkTo(parent.bottom)
-            },
-            onClick = {
-                if(item.mobile.isNullOrEmpty()){
-                    context.toast("There are some issues with your mobile number.please try again later")
-                }else {
-                    val packageManager: PackageManager = context.packageManager
-                    val whatsApp: Boolean = isPackageInstalled("com.whatsapp", packageManager)
-                    val WhatsappBusiness: Boolean =
-                        isPackageInstalled("com.whatsapp.w4b", packageManager)
-                    if (whatsApp && WhatsappBusiness) {
-                        context.getActivityContext().showAsBottomSheet {
-                            Column (modifier = Modifier.fillMaxWidth().padding(vertical = 10.sdp)) {
-                                RegularText(title = "WhatsApp", modifier = Modifier
-                                    .padding(horizontal = 10.sdp , vertical = 15.sdp).bounceClick {
-                                    context.sendWhatsAppMessage(
-                                        "+91" + item.mobile ?: "",
-                                        item.imageUrl?:""+"\n"+item.message ?: AppPreference.replyMsg,
-                                        packageName = "com.whatsapp"
-                                    )
-                                        AppPreference.isServiceEnabled = true
-                                })
-                                Divider(thickness = 1.sdp, color = MaterialTheme.colors.gray_divider2, modifier = Modifier.padding(horizontal = 10.sdp))
-                                RegularText(title = "WhatsApp Business", modifier = Modifier
-                                    .padding(horizontal = 10.sdp , vertical = 15.sdp)
-                                    .bounceClick {
-                                        context.sendWhatsAppMessage(
-                                            "+91" + item.mobile ?: "",
-                                            item.imageUrl?:""+"\n"+item.message ?: AppPreference.replyMsg,
-                                            packageName = "com.whatsapp.w4b"
-                                        )
-                                        AppPreference.isServiceEnabled = true
-                                    })
+            }) {
+//                if (WhatsappBusiness) {
+//                    CoreImageView.FromLocalDrawable(
+//                        painterResource = R.drawable.ic_whatsapp_business,
+//                        modifier = Modifier,
+//                        onClick = {
+//                            if (item.mobile.isNullOrEmpty()) {
+//                                context.toast("There are some issues with your mobile number.please try again later")
+//                            } else {
+//                                AppPreference.isFromService = false
+//                                AppPreference.isServiceEnabled = true
+//                                context.sendWhatsAppMessage(
+//                                    "+91" + item.mobile ?: "",
+//                                    item.message ?: AppPreference.replyMsg,
+//                                    "com.whatsapp.w4b"
+//                                )
+//
+//                            }
+//
+//
+//                        }
+//                    )
+//                }
+
+                    CoreImageView.FromLocalDrawable(
+                        painterResource = R.drawable.ic_whatsapp,
+                        modifier = Modifier,
+                        onClick = {
+                            if (item.mobile.isNullOrEmpty()) {
+                                context.toast("There are some issues with your mobile number.please try again later")
+                            } else {
+                                AppPreference.isFromService = false
+                                AppPreference.isServiceEnabled = true
+                                context.sendWhatsAppMessage(
+                                    "+91" + item.mobile ?: "",
+                                    item.message ?: AppPreference.replyMsg,
+                                    "com.whatsapp"
+                                )
                             }
+
+
                         }
+                    )
+
+            }
+            CoreImageView.FromLocalDrawable(
+                painterResource = R.drawable.ic_message,
+                modifier = Modifier.constrainAs(msgImg) {
+                    end.linkTo(parent.end)
+                    top.linkTo(icon.top)
+                    bottom.linkTo(parent.bottom)
+                },
+                onClick = {
+                    if (item.mobile.isNullOrEmpty()) {
+                        context.toast("There are some issues with your mobile number.please try again later")
                     } else {
-                        context.sendWhatsAppMessage(
-                            "+91" + item.mobile ?: "",
-                            item.message ?: AppPreference.replyMsg
+                        context.sendSmsUsingSimSlot(
+                            AppPreference.simSlot,
+                            item.mobile ?: "",
+                            item.imageUrl ?: "" + "\n" + item.message ?: AppPreference.replyMsg
                         )
-                        AppPreference.isServiceEnabled = true
                     }
-                }
 
-            }
-        )
-        CoreImageView.FromLocalDrawable(
-            painterResource = R.drawable.ic_message,
-            modifier = Modifier.constrainAs(msgImg){
-                end.linkTo(parent.end)
-                top.linkTo(icon.top)
-                bottom.linkTo(parent.bottom)
-            },
-            onClick = {
-                if(item.mobile.isNullOrEmpty()){
-                    context.toast("There are some issues with your mobile number.please try again later")
-                }else{
-                    context.sendSmsUsingSimSlot(AppPreference.simSlot,item.mobile?:"", item.imageUrl?:""+"\n"+item.message?:AppPreference.replyMsg)
                 }
-
-            }
-        )
+            )
+        }
         LineDivider(modifier = Modifier
             .padding(top = 10.sdp)
             .constrainAs(divider) {

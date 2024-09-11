@@ -22,72 +22,61 @@ import javax.inject.Singleton
 
 @Singleton
 class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepository):ContactUseCase {
-    override fun loginNow(mobile: String, password: String): Flow<Resource<LoginResponse>> = flow {
+    override fun loginNow(mobile: String, password: String) = flow {
         try {
             emit(Resource.Loading<LoginResponse>())
             val response= repository.loginNow(mobile,password)
-
             emit(Resource.Success<LoginResponse>(response))
-
         } catch (e: Exception) { catchExceptions<LoginResponse>(e,Gson())
         }
     }
 
-    override fun uploadContacts(request: UploadContactRequest): Flow<Resource<UploadContactResponse>> = flow {
+    override fun uploadContacts(request: UploadContactRequest) = flow {
         Log.e("Login","BaseUrl : ${AppPreference.baseUrl}")
         try {
             emit(Resource.Loading<UploadContactResponse>())
-//            val response= repository.uploadContacts(request)
-//
-//            emit(Resource.Success<UploadContactResponse>(response))
-
+            val response= repository.uploadContacts(request)
+            emit(Resource.Success<UploadContactResponse>(response))
         } catch (e: Exception) {
             catchExceptions<UploadContactResponse>(e,Gson())
         }
     }
 
-    override fun getDomains(): Flow<Resource<UrlResponse>>  = flow {
+    override fun getDomains()  = flow {
         try {
             emit(Resource.Loading<UrlResponse>())
             val response= repository.getDomains()
-
             emit(Resource.Success<UrlResponse>(response))
-
         } catch (e: Exception) {
             catchExceptions<UrlResponse>(e,Gson())
         }
     }
 
-    override fun getCallDetails(callType:Int): Flow<Resource<GetCallsRes>> = flow {
+    override fun getCallDetails(callType:Int) = flow {
         try {
             emit(Resource.Loading<GetCallsRes>())
             val response= repository.getCallDetails(callType)
-
             emit(Resource.Success<GetCallsRes>(response))
-
         } catch (e: Exception) {
             catchExceptions<GetCallsRes>(e,Gson())
         }
     }
 
-    override fun uploadCallDetails(data: GetCallsRes.GetCallsData): Flow<Resource<UploadCallDataRes>> = flow {
+    override fun uploadCallDetails(data: GetCallsRes.GetCallsData) = flow {
         try {
             emit(Resource.Loading<UploadCallDataRes>())
             val response= repository.uploadCallDetails(data)
-
             emit(Resource.Success<UploadCallDataRes>(response))
-
         } catch (e: Exception) {
             catchExceptions<UploadCallDataRes>(e,Gson())
         }
     }
 
-    override fun uploadContact(uploadContactData: UploadContactRequest ):Flow<Resource<ContactSavedResponse>> = flow {
+    override fun uploadContact(uploadContactData: UploadContactRequest ) = flow {
         try {
             emit(Resource.Loading<ContactSavedResponse>())
             val response= repository.uploadContact(uploadContactData)
             emit(Resource.Success<ContactSavedResponse>(response))
-
         } catch (e: Exception) {
             catchExceptions<ContactSavedResponse>(e,Gson())
         }
@@ -98,7 +87,6 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
             emit(Resource.Loading<SendSmsRes>())
             val response= repository.sendSms()
             emit(Resource.Success<SendSmsRes>(response))
-
         } catch (e: Exception) {
             catchExceptions<SendSmsRes>(e,Gson())
         }
@@ -108,7 +96,6 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
             emit(Resource.Loading<SendSmsRes>())
             val response= repository.changeStatus(id,status)
             emit(Resource.Success<SendSmsRes>(response))
-
         } catch (e: Exception) {
             catchExceptions<SendSmsRes>(e,Gson())
         }

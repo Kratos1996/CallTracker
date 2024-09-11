@@ -158,15 +158,13 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
 
     suspend fun sendMessages(sendSmsData: ArrayList<SendSmsRes.SendSmsData>, context: Context) {
-
-
         if (sendSmsData.isNotEmpty()) {
             val smsList = sendSmsData
             val item = smsList.first()
             context.sendSmsUsingSimSlot(
                 AppPreference.simSlot,
                 item.mobile ?: "",
-                item.imageUrl ?: "" + "\n" + item.message ?: AppPreference.replyMsg
+                 item.message ?: AppPreference.replyMsg
             )
             context.sendWhatsAppMessage(
                 "+91" + item.mobile ?: "",
@@ -176,12 +174,9 @@ class PhoneCallReceiver : BroadcastReceiver() {
             AppPreference.isFromService = true
             changeStatus(context, smsList.first().id)
             smsList.removeFirst()
-
             delay(3000)
             sendMessages(smsList, context)
         }
-
-
     }
 
     private fun handleCallData(intent: Intent, context: Context) {

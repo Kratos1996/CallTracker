@@ -298,7 +298,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                         context.sendSmsUsingSimSlot(
                             AppPreference.simSlot,
                             item.mobile ?: "",
-                            item.imageUrl ?: "" + "\n" + item.message ?: AppPreference.replyMsg
+                             item.message ?: AppPreference.replyMsg
                         )
                     }
 

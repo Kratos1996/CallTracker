@@ -210,8 +210,6 @@ fun Context.startAlarmManager() {
     val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
     readPhoneStatePermission(granted = {
         val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
-        Log.d("TAG", "sendSmsUsingSimSlot: "+subscriptionInfoList.toString())
-        Log.d("TAG", "sendSmsUsingSimSlot: "+simSlot)
         if (subscriptionInfoList != null && subscriptionInfoList.size >= simSlot) {
             val subscriptionInfo: SubscriptionInfo = subscriptionInfoList[simSlot-1]
             val subscriptionId = subscriptionInfo.subscriptionId

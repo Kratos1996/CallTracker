@@ -109,6 +109,9 @@ class HomeViewModel @Inject constructor(
             whatsappList.add(WhatsappData("Whatsapp Business","com.whatsapp.w4b",R.drawable.ic_whatsapp_business))
         }
 
+        if (whatsappList.size==1){
+            AppPreference.whatsappPackage = whatsappList.first().packageName.toString()
+        }
 
     }
     fun setSelectedSim(simSlot:Int,context: Context){

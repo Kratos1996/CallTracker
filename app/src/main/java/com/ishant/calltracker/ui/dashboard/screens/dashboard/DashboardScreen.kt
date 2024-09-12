@@ -247,9 +247,9 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     val mWPIntent = Intent(context, WhatsappAccessibilityService::class.java)
                     context.startService(mWPIntent)
                 }
-                if(!context.isAccessibilityOn(WhatsappAccessibilityService::class.java)){
-                    context.openAccessibilitySettings()
-                }
+//                if(!context.isAccessibilityOn(WhatsappAccessibilityService::class.java)){
+//                    context.openAccessibilitySettings()
+//                }
 
 
                 if (!homeViewModel.contactPermissionGranted.value && !homeViewModel.phoneLogsPermissionGranted.value && !homeViewModel.readPhoneStatePermissionGranted.value && !homeViewModel.phoneNumberPermissionGranted.value) {

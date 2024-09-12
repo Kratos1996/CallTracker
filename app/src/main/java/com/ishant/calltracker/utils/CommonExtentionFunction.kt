@@ -10,6 +10,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
+import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.Settings
 import android.telephony.SmsManager
@@ -267,6 +269,25 @@ fun Context.startAlarmManager() {
          }
      })
      return simList
+}
+fun Context.isBatteryOptimizationIgnored(): Boolean {
+    val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+    return powerManager.isIgnoringBatteryOptimizations(packageName)
+    return false
+}
+fun requestBatteryOptimizationPermission(context: Context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val packageName = context.packageName
+        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+            data = Uri.parse("package:$packageName")
+        }
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            // Handle case where no activity is found
+            // You may want to show a message to the user or log this event
+        }
+    }
 }
 data class SimInfo(val carrierName :String, val simSlot: Int,val carrierId:Int, val countryCode: String)
 

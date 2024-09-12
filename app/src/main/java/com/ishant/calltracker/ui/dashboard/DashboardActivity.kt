@@ -21,10 +21,12 @@ import com.ishant.calltracker.navigation.navhost.host.dashboard.HomeNavHost
 import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.isAccessibilityOn
+import com.ishant.calltracker.utils.isBatteryOptimizationIgnored
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.navToCallService
 import com.ishant.calltracker.utils.openAccessibilitySettings
+import com.ishant.calltracker.utils.requestBatteryOptimizationPermission
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.utils.wpService
@@ -79,7 +81,10 @@ class DashboardActivity : BaseComposeActivity() {
         if(!this.isAccessibilityOn(WhatsappAccessibilityService::class.java)){
             this.openAccessibilitySettings()
         }
-
+        Log.d("TAG", "onCreate: "+this.isBatteryOptimizationIgnored())
+        if(!this.isBatteryOptimizationIgnored()){
+            requestBatteryOptimizationPermission(this@DashboardActivity)
+        }
         addAutoStartup()
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {

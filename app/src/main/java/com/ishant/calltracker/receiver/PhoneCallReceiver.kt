@@ -88,7 +88,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                             ServiceRestarterService.TAG,
                             "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService service is running...."
                         )
-                        //  handleCallData(intent, context)
+                          handleCallData(intent, context)
                     }
                 }
 
@@ -196,6 +196,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
     }
 
     private fun saveContact(uploadContacts: UploadContactRequest?) {
+        Log.e("CallTracker : ", "CallTracker: Contact Not Saved"+uploadContacts?.data?.isNotEmpty())
         if (uploadContacts?.data?.isNotEmpty() == true) {
             baseUrlInterceptor.setBaseUrl(AppPreference.baseUrl)
             contactUseCase.uploadContacts(request = uploadContacts).onEach { result ->

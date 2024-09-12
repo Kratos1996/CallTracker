@@ -32,7 +32,7 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
     }
 
     override fun uploadContacts(request: UploadContactRequest) = flow {
-        Log.e("Login","BaseUrl : ${AppPreference.baseUrl}")
+        //Log.e("uploadContacts","BaseUrl : ${AppPreference.baseUrl}")
         try {
             emit(Resource.Loading<UploadContactResponse>())
             val response= repository.uploadContacts(request)

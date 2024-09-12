@@ -131,7 +131,7 @@ class CallService : Service() {
                 val callerData = data.collectLastCallDetails(context)
                 if (callerData != null && callerData.data.isNotEmpty()) {
                     saveContact(callerData)
-//                    getSms(context)
+
                 }
             }
         }

@@ -174,7 +174,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
             AppPreference.isFromService = true
             changeStatus(context, smsList.first().id)
             smsList.removeFirst()
-            delay(3000)
+            delay(5000)
             sendMessages(smsList, context)
         }
     }

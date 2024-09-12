@@ -20,7 +20,6 @@ import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
 import com.ishant.calltracker.service.WhatsappAccessibilityService
 import com.ishant.calltracker.utils.AppPreference
-import com.ishant.calltracker.utils.isAccessibilityOn
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.sendSmsUsingSimSlot
 import com.ishant.calltracker.utils.sendWhatsAppMessage
@@ -71,7 +70,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
                         }*/
                     }
-                    if (context.isAccessibilityOn(WhatsappAccessibilityService::class.java) && AppPreference.isUserLoggedIn) {
+                    if (AppPreference.isUserLoggedIn) {
                         serviceScope.launch { getSms(context) }
 
                     }
@@ -88,7 +87,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                             ServiceRestarterService.TAG,
                             "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService service is running...."
                         )
-                          handleCallData(intent, context)
+                        handleCallData(intent, context)
                     }
                 }
 
@@ -164,7 +163,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
             context.sendSmsUsingSimSlot(
                 AppPreference.simSlot,
                 item.mobile ?: "",
-                 item.message ?: AppPreference.replyMsg
+                item.message ?: AppPreference.replyMsg
             )
             context.sendWhatsAppMessage(
                 "+91" + item.mobile ?: "",
@@ -174,7 +173,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
             AppPreference.isFromService = true
             changeStatus(context, smsList.first().id)
             smsList.removeFirst()
-            delay(5000)
+            delay(15000)
             sendMessages(smsList, context)
         }
     }
@@ -196,7 +195,10 @@ class PhoneCallReceiver : BroadcastReceiver() {
     }
 
     private fun saveContact(uploadContacts: UploadContactRequest?) {
-        Log.e("CallTracker : ", "CallTracker: Contact Not Saved"+uploadContacts?.data?.isNotEmpty())
+        Log.e(
+            "CallTracker : ",
+            "CallTracker: Contact Not Saved" + uploadContacts?.data?.isNotEmpty()
+        )
         if (uploadContacts?.data?.isNotEmpty() == true) {
             baseUrlInterceptor.setBaseUrl(AppPreference.baseUrl)
             contactUseCase.uploadContacts(request = uploadContacts).onEach { result ->

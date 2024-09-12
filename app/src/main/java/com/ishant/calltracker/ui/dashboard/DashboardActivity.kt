@@ -78,9 +78,7 @@ class DashboardActivity : BaseComposeActivity() {
                 }
             }
         readNotificationService()
-        if(!this.isAccessibilityOn(WhatsappAccessibilityService::class.java)){
-            this.openAccessibilitySettings()
-        }
+
         Log.d("TAG", "onCreate: "+this.isBatteryOptimizationIgnored())
         if(!this.isBatteryOptimizationIgnored()){
             requestBatteryOptimizationPermission(this@DashboardActivity)

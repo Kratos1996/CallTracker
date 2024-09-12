@@ -39,7 +39,7 @@ interface ApiInterface {
 
 
     @POST(ApiConstant.UPLOAD_CONTACTS)
-    suspend fun uploadContacts(@Body request : UploadContactRequest): UploadContactResponse
+   suspend fun uploadContacts(@Body request : UploadContactRequest): UploadContactResponse
 
     @GET(ApiConstant.CUSTOM_BASE_URL)
     suspend fun getDomains(): UrlResponse

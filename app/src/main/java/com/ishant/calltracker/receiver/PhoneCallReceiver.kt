@@ -88,7 +88,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                             ServiceRestarterService.TAG,
                             "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService service is running...."
                         )
-                          handleCallData(intent, context)
+                        handleCallData(intent, context)
                     }
                 }
 
@@ -158,20 +158,22 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
 
     suspend fun sendMessages(sendSmsData: ArrayList<SendSmsRes.SendSmsData>, context: Context) {
+
         if (sendSmsData.isNotEmpty()) {
             val smsList = sendSmsData
             val item = smsList.first()
+            AppPreference.isServiceEnabled = true
+            AppPreference.isFromService = true
             context.sendSmsUsingSimSlot(
                 AppPreference.simSlot,
                 item.mobile ?: "",
-                 item.message ?: AppPreference.replyMsg
+                item.message ?: AppPreference.replyMsg
             )
             context.sendWhatsAppMessage(
                 "+91" + item.mobile ?: "",
                 item.message ?: AppPreference.replyMsg
             )
-            AppPreference.isServiceEnabled = true
-            AppPreference.isFromService = true
+
             changeStatus(context, smsList.first().id)
             smsList.removeFirst()
             delay(5000)
@@ -196,7 +198,10 @@ class PhoneCallReceiver : BroadcastReceiver() {
     }
 
     private fun saveContact(uploadContacts: UploadContactRequest?) {
-        Log.e("CallTracker : ", "CallTracker: Contact Not Saved"+uploadContacts?.data?.isNotEmpty())
+        Log.e(
+            "CallTracker : ",
+            "CallTracker: Contact Not Saved" + uploadContacts?.data?.isNotEmpty()
+        )
         if (uploadContacts?.data?.isNotEmpty() == true) {
             baseUrlInterceptor.setBaseUrl(AppPreference.baseUrl)
             contactUseCase.uploadContacts(request = uploadContacts).onEach { result ->

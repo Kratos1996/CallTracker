@@ -1,8 +1,10 @@
 package com.ishant.calltracker.ui.dashboard.screens.dashboard
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import checkPermission
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.WhatsappData
 import com.ishant.calltracker.service.CallService
@@ -43,8 +46,10 @@ import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.service.WhatsappAccessibilityService
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
+import com.ishant.calltracker.utils.AppLifecycleCallback
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.SimInfo
+import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isAccessibilityOn
 import com.ishant.calltracker.utils.isBatteryOptimizationIgnored
@@ -56,6 +61,7 @@ import com.ishant.calltracker.utils.requestBatteryOptimizationPermission
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.utils.toast
+import com.ishant.calltracker.utils.wpService
 import com.ishant.corelibcompose.toolkit.colors.gray_bg_light
 import com.ishant.corelibcompose.toolkit.colors.gray_divider
 import com.ishant.corelibcompose.toolkit.colors.white
@@ -69,6 +75,10 @@ import com.ishant.corelibcompose.toolkit.ui.textstyles.PS
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SFPRO
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SubHeadingText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import readPhoneContactPermission
 import readPhoneLogPermission
 import readPhoneNumberPermission
@@ -85,6 +95,35 @@ fun DashboardScreen() {
 
         }
         AppPreference.isServiceEnabled = false
+        CoroutineScope(Dispatchers.Main).launch {
+            AppLifecycleCallback.lifecycleCallback.collectLatest { lifecycle ->
+                Log.d("TAG", "DashboardScreen: "+lifecycle)
+
+                when (lifecycle) {
+
+                    "Resumed" -> {
+
+
+                        homeViewModel.contactPermissionGranted.value=!context.checkPermission(Manifest.permission.READ_CONTACTS)
+                        homeViewModel.phoneLogsPermissionGranted.value=!context.checkPermission(Manifest.permission.READ_CALL_LOG)
+                        homeViewModel.readPhoneStatePermissionGranted.value=!context.checkPermission(Manifest.permission.READ_PHONE_STATE)
+                        homeViewModel.phoneNumberPermissionGranted.value=!context.checkPermission(Manifest.permission.READ_PHONE_NUMBERS)
+                        homeViewModel.loadSimInfo(context)
+                    }
+
+                    "Paused" -> {
+
+                    }
+
+                    "Stopped" -> {
+
+                    }else->{
+                    }
+
+                }
+            }
+        }
+
     })
     LoadDashboardScreen(context, homeViewModel)
 

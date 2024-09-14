@@ -22,8 +22,9 @@ class WhatsappAccessibilityService : AccessibilityService() {
             // Handle the event
         }
         if (AppPreference.isServiceEnabled) {
+
             if (rootInActiveWindow == null) {
-                return
+             return
             }
 
             val rootInActiveWindow = AccessibilityNodeInfoCompat.wrap(
@@ -34,30 +35,31 @@ class WhatsappAccessibilityService : AccessibilityService() {
             val messageNodeList =
                 rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.whatsapp:id/entry")
             if (messageNodeList == null || messageNodeList.isEmpty()) {
-                return
+               return
             }
 
-            if(AppPreference.isFromService){
+            if(messageNodeList.isEmpty()){
                 performGlobalAction(GLOBAL_ACTION_BACK)
             }
+
 
             // check if the whatsapp message EditText field is filled with text and ending with your suffix (explanation above)
             val messageField = messageNodeList[0]
             if (messageField.text == null || messageField.text.isEmpty()
             ) { // So your service doesn't process any message, but the ones ending your apps suffix
-                return
+               return
             }
 
             // Whatsapp send button id
             val sendMessageNodeInfoList =
                 rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.whatsapp:id/send")
             if (sendMessageNodeInfoList == null || sendMessageNodeInfoList.isEmpty()) {
-                return
+              return
             }
 
             val sendMessageButton = sendMessageNodeInfoList[0]
             if (!sendMessageButton.isVisibleToUser) {
-                return
+              return
             }
 
             // Now fire a click on the send button

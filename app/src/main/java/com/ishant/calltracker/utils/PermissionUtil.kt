@@ -2,11 +2,14 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -159,6 +162,12 @@ fun Context.readPhoneContactPermission(granted:()->Unit, rejected:(() -> Unit)? 
     )
 }
 
+fun Context.checkPermission(permissionString: String):Boolean{
+    return ContextCompat.checkSelfPermission(
+        this,
+        permissionString
+    ) != PackageManager.PERMISSION_GRANTED
+}
 fun Context.writePhoneContactPermission(granted:()->Unit, rejected:(() -> Unit)? = null ){
     takePermissions(
         permissions = Manifest.permission.WRITE_CONTACTS,
@@ -178,6 +187,7 @@ private fun Context.takePermissions(permissions :String, title:String, granted:(
             override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
                 rejected?.let { it() }
                 if(permissionDeniedResponse.isPermanentlyDenied){
+                    Log.d("TAG", "onPermissionDenied: ")
                    /* showCommonDialog(title = getString(R.string.required_permission),message = title ,context){
                         navToSetting(context.getActivityContext())
                     }*/
@@ -188,6 +198,7 @@ private fun Context.takePermissions(permissions :String, title:String, granted:(
                 permissionRequest: PermissionRequest,
                 permissionToken: PermissionToken
             ) {
+                Log.d("TAG", "onPermissionRationaleShouldBeShown: "+permissionRequest.name)
                 permissionToken.continuePermissionRequest()
                 rejected?.let { it() }
                 /*showCommonDialog(title = getString(R.string.required_permission),message = title,context){

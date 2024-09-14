@@ -6,6 +6,7 @@ package com.ishant.calltracker.app
 * */
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
+import com.ishant.calltracker.utils.AppLifecycleCallback
 import com.ishant.calltracker.utils.AppPreference
 
 import com.ishant.corelibcompose.toolkit.constant.AppConstants
@@ -26,6 +27,7 @@ class CallTrackerApplication  : Application(){
         AppPreference.init(this)
         ToolKitPref.init(this)
         updateAppTheme()
+        registerActivityLifecycleCallbacks(AppLifecycleCallback())
     }
     fun toggleAppTheme() {
         isDark.value = !isDark.value

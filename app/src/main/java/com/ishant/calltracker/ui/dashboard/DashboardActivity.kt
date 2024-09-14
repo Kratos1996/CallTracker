@@ -1,23 +1,26 @@
 package com.ishant.calltracker.ui.dashboard
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
+import checkPermission
 import com.ishant.calltracker.R
 import com.ishant.calltracker.app.BaseComposeActivity
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.app.showAsBottomSheet
+import com.ishant.calltracker.navigation.navhost.host.dashboard.HomeNavHost
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.service.NotificationReaderService
 import com.ishant.calltracker.service.WhatsappAccessibilityService
-import com.ishant.calltracker.navigation.navhost.host.dashboard.HomeNavHost
 import com.ishant.calltracker.utils.NotificationListenerUtil
 import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.isAccessibilityOn
@@ -47,30 +50,21 @@ class DashboardActivity : BaseComposeActivity() {
     private lateinit var notificationListenerPermissionLauncher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.loadContactObserver(this)
+
+            readPhoneContactPermission(granted = {
+                viewModel.loadContactObserver(this)
+            })
+
+
+
         val data = viewModel.managerPlus.getSimCardPhoneNumbers(this)
         takePhoneNetworkPermission()
-        setContent {
-            CoreTheme(
-                darkTheme = CallTrackerApplication.isDark.value
-            ) {
-                HomeNavHost(
-                    homeViewModel = viewModel,
-                    onNavigate = { nav ->
 
-                    }
-                )
-
-            }
-        }
-
-        viewModel.loadSimInfo(this)
-        viewModel.getWhatsappList()
         notificationListenerUtil = NotificationListenerUtil(this)
         notificationListenerPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 val granted = notificationListenerUtil.isNotificationServiceEnabled()
-                if(granted){
+                if (granted) {
                     val mServiceIntent = Intent(this, NotificationReaderService::class.java)
 
                     startService(mServiceIntent)
@@ -78,16 +72,17 @@ class DashboardActivity : BaseComposeActivity() {
                 }
             }
         readNotificationService()
-        if(!this.isAccessibilityOn(WhatsappAccessibilityService::class.java)){
+        if (!this.isAccessibilityOn(WhatsappAccessibilityService::class.java)) {
             this.openAccessibilitySettings()
         }
-        Log.d("TAG", "onCreate: "+this.isBatteryOptimizationIgnored())
-        if(!this.isBatteryOptimizationIgnored()){
+        Log.d("TAG", "onCreate: " + this.isBatteryOptimizationIgnored())
+        if (!this.isBatteryOptimizationIgnored()) {
             requestBatteryOptimizationPermission(this@DashboardActivity)
         }
         addAutoStartup()
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
+                viewModel.loadSimInfo(this)
                 if (!isServiceRunning(KeepAliveService::class.java)) { // Replace with your service class
                     keepAliveService()
                     wpService()
@@ -95,7 +90,7 @@ class DashboardActivity : BaseComposeActivity() {
                     startAlarmManager()
                     viewModel.managers.value = true
                     viewModel.callService.value = true
-                }else{
+                } else {
                     viewModel.managers.value = true
                     viewModel.callService.value = true
                 }
@@ -115,11 +110,28 @@ class DashboardActivity : BaseComposeActivity() {
                 )
             }
         }
+        viewModel.loadSimInfo(this)
+        viewModel.getWhatsappList()
+        setContent {
+            CoreTheme(
+                darkTheme = CallTrackerApplication.isDark.value
+            ) {
+                HomeNavHost(
+                    homeViewModel = viewModel,
+                    onNavigate = { nav ->
+
+                    }
+                )
+
+            }
+        }
     }
 
     private fun readNotificationService() {
-        if(!notificationListenerUtil.isNotificationServiceEnabled()){
-            notificationListenerUtil.requestNotificationListenerPermission(notificationListenerPermissionLauncher)
+        if (!notificationListenerUtil.isNotificationServiceEnabled()) {
+            notificationListenerUtil.requestNotificationListenerPermission(
+                notificationListenerPermissionLauncher
+            )
         }
     }
 
@@ -133,16 +145,16 @@ class DashboardActivity : BaseComposeActivity() {
         })
     }
 
-    private fun takeCallLogsPermission(){
+    private fun takeCallLogsPermission() {
         readPhoneContactPermission(
             granted = {
                 viewModel.contactPermissionGranted.value = true
                 readPhoneLogPermission(granted = {
                     viewModel.phoneLogsPermissionGranted.value = true
-                }){
-                    if(!isNotificationPermissionGranted(this)) {
+                }) {
+                    if (!isNotificationPermissionGranted(this)) {
                         requestNotificationPermission(this)
-                    }else{
+                    } else {
                         if (!isServiceRunning(CallService::class.java)) { // Replace with your service class
                             startAlarmManager()
                             navToCallService()
@@ -153,7 +165,6 @@ class DashboardActivity : BaseComposeActivity() {
             }
         )
     }
-
 
 
 }

@@ -71,13 +71,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
                         }*/
                     }
-                    if (context.isAccessibilityOn(WhatsappAccessibilityService::class.java) && AppPreference.isUserLoggedIn&& intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)!=null) {
-                        val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
-                        Log.d("TAG", "isAccessibilityOn: "+phoneNumber)
 
-                        serviceScope.launch { getSms(context) }
-
-                    }
                     if (!context.isServiceRunning(CallService::class.java)) {
                         // Replace with your service class
                         handleCallData(intent, context)
@@ -92,6 +86,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                             "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService service is running...."
                         )
                         handleCallData(intent, context)
+
                     }
                 }
 
@@ -161,32 +156,27 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
 
     suspend fun sendMessages(sendSmsData: ArrayList<SendSmsRes.SendSmsData>, context: Context) {
-        AppPreference.isServiceEnabled = true
-          //AppPreference.isFromService = true
-        context.sendWhatsAppMessage(
-            "+91" + 7014410587 ?: "",
-            "Test HI" ?: AppPreference.replyMsg
-        )
-//        if (sendSmsData.isNotEmpty()) {
-//            val smsList = sendSmsData
-//            val item = smsList.first()
-//            AppPreference.isServiceEnabled = true
-//            AppPreference.isFromService = true
-//            context.sendSmsUsingSimSlot(
-//                AppPreference.simSlot,
-//                item.mobile ?: "",
-//                item.message ?: AppPreference.replyMsg
-//            )
-//            context.sendWhatsAppMessage(
-//                "+91" + item.mobile ?: "",
-//                item.message ?: AppPreference.replyMsg
-//            )
-//
-//            changeStatus(context, smsList.first().id)
-//            smsList.removeFirst()
-//            delay(5000)
-//            sendMessages(smsList, context)
-//        }
+
+        if (sendSmsData.isNotEmpty()) {
+            val smsList = sendSmsData
+            val item = smsList.first()
+            AppPreference.isServiceEnabled = true
+            AppPreference.isFromService = true
+            context.sendSmsUsingSimSlot(
+                AppPreference.simSlot,
+                item.mobile ?: "",
+                item.message ?: AppPreference.replyMsg
+            )
+            context.sendWhatsAppMessage(
+                "+91" + item.mobile ?: "",
+                item.message ?: AppPreference.replyMsg
+            )
+
+            changeStatus(context, smsList.first().id)
+            smsList.removeFirst()
+            delay(5000)
+            sendMessages(smsList, context)
+        }
     }
 
     private fun handleCallData(intent: Intent, context: Context) {
@@ -199,6 +189,10 @@ class PhoneCallReceiver : BroadcastReceiver() {
                     val callerData = data.collectLastCallDetails(context)
                     if (callerData != null && callerData.data.isNotEmpty()) {
                         saveContact(callerData)
+                        delay(4000)
+                        if (context.isAccessibilityOn(WhatsappAccessibilityService::class.java) && AppPreference.isUserLoggedIn&& intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)!=null) {
+                            serviceScope.launch { getSms(context) }
+                        }
                     }
                 }
             }

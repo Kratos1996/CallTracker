@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,12 +45,12 @@ import com.ishant.calltracker.api.response.WhatsappData
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.service.WhatsappAccessibilityService
+import com.ishant.calltracker.ui.dashboard.DashboardActivity
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
 import com.ishant.calltracker.utils.AppLifecycleCallback
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.SimInfo
-import com.ishant.calltracker.utils.addAutoStartup
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.isAccessibilityOn
 import com.ishant.calltracker.utils.isBatteryOptimizationIgnored
@@ -61,7 +62,6 @@ import com.ishant.calltracker.utils.requestBatteryOptimizationPermission
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.utils.toast
-import com.ishant.calltracker.utils.wpService
 import com.ishant.corelibcompose.toolkit.colors.gray_bg_light
 import com.ishant.corelibcompose.toolkit.colors.gray_divider
 import com.ishant.corelibcompose.toolkit.colors.white
@@ -97,17 +97,23 @@ fun DashboardScreen() {
         AppPreference.isServiceEnabled = false
         CoroutineScope(Dispatchers.Main).launch {
             AppLifecycleCallback.lifecycleCallback.collectLatest { lifecycle ->
-                Log.d("TAG", "DashboardScreen: "+lifecycle)
+                Log.d("TAG", "DashboardScreen: " + lifecycle)
 
                 when (lifecycle) {
 
                     "Resumed" -> {
 
 
-                        homeViewModel.contactPermissionGranted.value=!context.checkPermission(Manifest.permission.READ_CONTACTS)
-                        homeViewModel.phoneLogsPermissionGranted.value=!context.checkPermission(Manifest.permission.READ_CALL_LOG)
-                        homeViewModel.readPhoneStatePermissionGranted.value=!context.checkPermission(Manifest.permission.READ_PHONE_STATE)
-                        homeViewModel.phoneNumberPermissionGranted.value=!context.checkPermission(Manifest.permission.READ_PHONE_NUMBERS)
+                        homeViewModel.contactPermissionGranted.value =
+                            !context.checkPermission(Manifest.permission.READ_CONTACTS)
+                        homeViewModel.phoneLogsPermissionGranted.value =
+                            !context.checkPermission(Manifest.permission.READ_CALL_LOG)
+                        homeViewModel.readPhoneStatePermissionGranted.value =
+                            !context.checkPermission(Manifest.permission.READ_PHONE_STATE)
+                        homeViewModel.phoneNumberPermissionGranted.value =
+                            !context.checkPermission(Manifest.permission.READ_PHONE_NUMBERS)
+                        homeViewModel.notificationPermissionGranted.value =
+                            (context as DashboardActivity).notificationListenerUtil.isNotificationServiceEnabled()
                         homeViewModel.loadSimInfo(context)
                     }
 
@@ -117,7 +123,9 @@ fun DashboardScreen() {
 
                     "Stopped" -> {
 
-                    }else->{
+                    }
+
+                    else -> {
                     }
 
                 }
@@ -236,6 +244,43 @@ fun SimInfo(simInfo: SimInfo, index: Int, onClick: (SimInfo) -> Unit) {
     }
 }
 
+@Composable
+fun NotificationCheck(homeViewModel: HomeViewModel, context: Context) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.sdp)
+            .background(MaterialTheme.colors.gray_bg_light, shape = RoundedCornerShape(10.sdp))
+            .border(
+                width = 1.sdp,
+                color = MaterialTheme.colors.gray_divider,
+                shape = RoundedCornerShape(10.sdp)
+            )
+            .padding(horizontal = 20.sdp, vertical = 30.sdp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RegularText.Medium(
+            title = "Track Whatsapp Calls",
+            modifier = Modifier.padding(end = 5.sdp)
+        )
+        CustomCheckBox.invoke(
+            isChecked = homeViewModel.notificationPermissionGranted.value,
+            onChecked = {
+                if ((context as DashboardActivity).notificationListenerUtil.isNotificationServiceEnabled()) {
+                    val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                    context.startActivity(intent)
+                } else {
+                    (context as DashboardActivity).readNotificationService()
+                }
+
+            },
+            modifier = Modifier.size(20.sdp),
+            text = ""
+        )
+    }
+}
+
 
 @Composable
 private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) {
@@ -283,6 +328,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
 
         SimInfoList(homeViewModel = homeViewModel, context = context)
         WhatsappList(homeViewModel = homeViewModel, context = context)
+        NotificationCheck(homeViewModel = homeViewModel, context = context)
         DashboardCardComponents(
             title = context.getString(R.string.service),
             modifier = Modifier,

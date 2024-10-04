@@ -234,34 +234,12 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                     top.linkTo(coinCode.bottom)
                 }
         )
-        if (item.status != 1) {
+      //  if (item.status != 1) {
             Row(modifier = Modifier.constrainAs(wpImg) {
                 end.linkTo(msgImg.start, margin = 10.dp)
                 top.linkTo(parent.top)
                 bottom.linkTo(parent.bottom)
             }) {
-//                if (WhatsappBusiness) {
-//                    CoreImageView.FromLocalDrawable(
-//                        painterResource = R.drawable.ic_whatsapp_business,
-//                        modifier = Modifier,
-//                        onClick = {
-//                            if (item.mobile.isNullOrEmpty()) {
-//                                context.toast("There are some issues with your mobile number.please try again later")
-//                            } else {
-//                                AppPreference.isFromService = false
-//                                AppPreference.isServiceEnabled = true
-//                                context.sendWhatsAppMessage(
-//                                    "+91" + item.mobile ?: "",
-//                                    item.message ?: AppPreference.replyMsg,
-//                                    "com.whatsapp.w4b"
-//                                )
-//
-//                            }
-//
-//
-//                        }
-//                    )
-//                }
 
                     CoreImageView.FromLocalDrawable(
                         painterResource = R.drawable.ic_whatsapp,
@@ -304,7 +282,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
 
                 }
             )
-        }
+//        }
         LineDivider(modifier = Modifier
             .padding(top = 10.sdp)
             .constrainAs(divider) {

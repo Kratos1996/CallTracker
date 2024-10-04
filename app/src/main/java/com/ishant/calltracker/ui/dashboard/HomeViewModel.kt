@@ -62,6 +62,7 @@ class HomeViewModel @Inject constructor(
     val phoneNumberPermissionGranted = mutableStateOf(false)
     val phoneLogsPermissionGranted = mutableStateOf(false)
     val contactPermissionGranted = mutableStateOf(false)
+    val notificationPermissionGranted = mutableStateOf(false)
     val callService = mutableStateOf(false)
     val managers = mutableStateOf(false)
 

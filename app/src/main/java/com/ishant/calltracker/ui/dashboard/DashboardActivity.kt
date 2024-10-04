@@ -71,13 +71,9 @@ class DashboardActivity : BaseComposeActivity() {
 
                 }
             }
-        readNotificationService()
+
         if (!this.isAccessibilityOn(WhatsappAccessibilityService::class.java)) {
             this.openAccessibilitySettings()
-        }
-        Log.d("TAG", "onCreate: " + this.isBatteryOptimizationIgnored())
-        if (!this.isBatteryOptimizationIgnored()) {
-            requestBatteryOptimizationPermission(this@DashboardActivity)
         }
         addAutoStartup()
         readPhoneStatePermission(granted = {
@@ -127,7 +123,7 @@ class DashboardActivity : BaseComposeActivity() {
         }
     }
 
-    private fun readNotificationService() {
+     fun readNotificationService() {
         if (!notificationListenerUtil.isNotificationServiceEnabled()) {
             notificationListenerUtil.requestNotificationListenerPermission(
                 notificationListenerPermissionLauncher

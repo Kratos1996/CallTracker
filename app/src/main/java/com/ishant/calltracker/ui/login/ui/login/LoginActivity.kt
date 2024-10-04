@@ -169,7 +169,7 @@ class LoginActivity : BaseComposeActivity() {
         binding.loginBtn.setOnClickListener {
             requestWriteContact()
         }
-        readNotificationService()
+//        readNotificationService()
         lifecycleScope.launch {
             loginViewModel.databaseRepository.deleteAll()
         }

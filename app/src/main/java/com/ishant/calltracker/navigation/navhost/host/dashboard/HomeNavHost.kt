@@ -22,13 +22,23 @@ import androidx.navigation.compose.rememberNavController
 import com.ishant.calltracker.R
 import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.app.constant.AppConst
+import com.ishant.calltracker.app.showAsBottomSheet
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.navigation.navhost.navigateTo
 import com.ishant.calltracker.navigation.navhost.screens.dashboard.AppScreenHome
+import com.ishant.calltracker.receiver.BootReceiver
+import com.ishant.calltracker.receiver.NotificationServiceRestartReceiver
+import com.ishant.calltracker.receiver.PhoneCallReceiver
+import com.ishant.calltracker.receiver.ServiceCheckReceiver
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.getActivityContext
+import com.ishant.calltracker.utils.keepAliveService
+import com.ishant.calltracker.utils.stopServiceCall
+import com.ishant.calltracker.utils.stopServiceContact
 import com.ishant.corelibcompose.toolkit.colors.black_60
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
+import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.progressindicator.ProgressDialog
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
@@ -90,9 +100,28 @@ fun HomeNavHost(
     Scaffold(
         topBar = {
             OneDayCartToolbar(
-                leftIconVisible = false,
+                leftIconVisible = true,
                 onClickBack = {
-                    navController.popBackStack()
+                    context.getActivityContext().showAsBottomSheet{dismiss ->
+                        CommonAlertBottomSheet(
+                            msg = "Do you want to Logout?",
+                            positiveText = "Yes",
+                            onPositiveClick = {
+                                AppPreference.logout()
+                                context.stopServiceContact()
+                                context.stopServiceCall()
+                                context.keepAliveService()
+                                context.unregisterReceiver(PhoneCallReceiver())
+                                context.unregisterReceiver(ServiceCheckReceiver())
+                                context.unregisterReceiver(NotificationServiceRestartReceiver())
+                                context.unregisterReceiver(BootReceiver())
+                                context.getActivityContext().finish()
+                            },
+                            negativeText = "No",
+                            onNegativeClick = {
+                                dismiss.invoke()
+                            })
+                    }
                 }, title = context.getString(R.string.app_name),
                 rightIcon = {
                     Box(

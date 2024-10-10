@@ -5,9 +5,11 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.text.SpannableString
@@ -151,19 +153,56 @@ class NotificationReaderService : NotificationListenerService() {
                     val callFromApplication = data.name
                     val contactName = sbn.notification.extras.getString(Notification.EXTRA_TITLE)
                     val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
+
 //                    if (canReply(sbn)) {
 //                        sendReply(sbn)
 //                        saveLogs(sbn)
 //                    }
+                    Log.d(TAG, "phoneNumberFromContact: "+contactName)
                     if (text?.contains("Incoming video call") == true) {
-                        Log.d(
-                            TAG,
-                            "Notification received: $contactName - $text and ${sbn.packageName} "
-                        )
-                        sendDataofWhatsapp(contactName, data, text)
-                    } else if (text?.contains("Incoming voice call") == true) {
-                        Log.d(TAG, "Notification received: $contactName - $text")
-                        sendDataofWhatsapp(contactName, data, text)
+                        if (contactName != null) {
+                            // First, attempt to get the phone number from the contact name
+                            val phoneNumberFromContact = getPhoneNumberFromContactName(applicationContext, contactName)
+
+                            Log.d(TAG, "phoneNumberFromContact: "+phoneNumberFromContact)
+                            if (phoneNumberFromContact != null) {
+                                // Contact is saved in the phone; phone number found
+                                sendDataofWhatsapp(contactName, data, text)
+                                Log.d("NotificationListener", "Stored Contact: $contactName, Phone Number: $phoneNumberFromContact")
+                            } else {
+                                // Contact is not saved in the phone; try to extract phone number from the notification text
+                                val phoneNumberFromNotification = extractPhoneNumber(text)
+
+                                if (phoneNumberFromNotification != null) {
+                                    sendDataofWhatsapp(contactName, data, text)
+                                   // Log.d("NotificationListener", "Unstored Contact: $title, Phone Number: $phoneNumberFromNotification")
+                                } else {
+                                   // Log.d("NotificationListener", "Phone number not found for $title in notification text")
+                                }
+                            }
+
+                    }} else if (text?.contains("Incoming voice call") == true) {
+                        if (contactName != null) {
+                            // First, attempt to get the phone number from the contact name
+                            val phoneNumberFromContact = getPhoneNumberFromContactName(applicationContext, contactName)
+                            Log.d(TAG, "phoneNumberFromContact: "+phoneNumberFromContact)
+                            if (phoneNumberFromContact != null) {
+                                // Contact is saved in the phone; phone number found
+                                sendDataofWhatsapp(contactName, data, text)
+                                Log.d("NotificationListener", "Stored Contact: $contactName, Phone Number: $phoneNumberFromContact")
+                            } else {
+                                // Contact is not saved in the phone; try to extract phone number from the notification text
+                                val phoneNumberFromNotification = extractPhoneNumber(text)
+
+                                if (phoneNumberFromNotification != null) {
+                                    sendDataofWhatsapp(contactName, data, text)
+                                    // Log.d("NotificationListener", "Unstored Contact: $title, Phone Number: $phoneNumberFromNotification")
+                                } else {
+                                    // Log.d("NotificationListener", "Phone number not found for $title in notification text")
+                                }
+                            }
+
+                        }
                     } else if (text?.contains("Ongoing voice call") == true) {
                         Log.d(TAG, "Notification received: $contactName - $text")
                         sendDataofWhatsapp(contactName, data, text)
@@ -177,6 +216,37 @@ class NotificationReaderService : NotificationListenerService() {
 
     }
 
+
+    private fun extractPhoneNumber(text: String?): String? {
+        // Regular expression to match phone numbers in the notification text
+        val phonePattern = "\\+?[0-9. ()-]{7,}".toRegex()
+        return text?.let { phonePattern.find(it)?.value }
+    }
+    fun getPhoneNumberFromContactName(context: Context, contactName: String): String? {
+        val contentResolver = context.contentResolver
+        val uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+
+        // Query the contact by the name (display name)
+        val selection = "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} = ?"
+        val selectionArgs = arrayOf(contactName)
+
+        val cursor = contentResolver.query(
+            uri,
+            arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
+            selection,
+            selectionArgs,
+            null
+        )
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                // Get the phone number from the cursor
+                val phoneNumberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                return it.getString(phoneNumberIndex)
+            }
+        }
+        return null
+    }
     private fun sendDataofWhatsapp(
         contactName: String?,
         data: App,

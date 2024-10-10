@@ -24,8 +24,11 @@ class DatabaseRepository @Inject constructor(val db: AppDB, val context: Context
         return db.getDao().getSingleContact(phone)
     }
 
-    suspend fun getRestrictedContact(phone:String,isFav: Boolean): ContactList {
+    suspend fun getRestrictedContact(phone:String,isFav: Boolean): ContactList? {
         return db.getDao().getSingleRestrictedContact(phone,isFav)
+    }
+    suspend fun getRestrictedContact(phone:String,): ContactList? {
+        return db.getDao().getSingleRestrictedContact(phone,)
     }
 
     suspend fun setRestrictedContact(phone:String,isFav:Boolean){

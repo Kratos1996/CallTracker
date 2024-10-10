@@ -3,6 +3,7 @@ package com.ishant.calltracker.ui.dashboard
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Handler
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -62,6 +63,7 @@ class HomeViewModel @Inject constructor(
     val phoneNumberPermissionGranted = mutableStateOf(false)
     val phoneLogsPermissionGranted = mutableStateOf(false)
     val contactPermissionGranted = mutableStateOf(false)
+    val notificationPermissionGranted = mutableStateOf(false)
     val callService = mutableStateOf(false)
     val managers = mutableStateOf(false)
 
@@ -247,6 +249,7 @@ class HomeViewModel @Inject constructor(
 
 
     fun setRistricted(item: ContactList, it: Boolean) {
+        Log.d("TAG", "setRistricted: "+it)
         viewModelScope.launch {
             setRestrictedContact(item.phoneNumber, it)
         }

@@ -42,7 +42,9 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
             val cursor: Cursor? = context.contentResolver.query(CallLog.Calls.CONTENT_URI, projection, bundle, null)
             cursor?.use { cursorData ->
                 while (cursorData.moveToNext() && callsCount < callsToShow) {
-                    val callerNumber = cursorData.getString(cursorData.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
+                    var callerNumber = cursorData.getString(cursorData.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
+                    var callerNumberAlt = cursorData.getString(cursorData.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
+
                     val callerName = getContactName(context, callerNumber)
                     val callType = getCallType(cursorData.getInt(cursorData.getColumnIndexOrThrow(CallLog.Calls.TYPE)))
                     val callDuration: Long = cursorData.getLong(cursorData.getColumnIndexOrThrow(CallLog.Calls.DURATION))
@@ -51,10 +53,19 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                         phone = callerNumber,
                         isFav = true
                     )
+                    if(callerNumberAlt.startsWith("+91"
+                        )){
+                        callerNumberAlt =   callerNumberAlt.removeRange(0,3)
+                    }
+                    val dataContactDatabaseAlt = databaseRepository.getRestrictedContact(
+                        phone = callerNumberAlt,
+                        isFav = true
+                    )
                     Log.d("LastCallDetails", "CallTracker:  Caller Name: $callerName")
                     Log.d("LastCallDetails", "CallTracker:  Caller Number: $callerNumber")
                     Log.d("LastCallDetails", "CallTracker:  Call Type: $callType")
                     Log.d("LastCallDetails", "CallTracker:  Call Duration: $callDuration")
+                    Log.d("dataContactDatabase", "CallTracker:  Call Duration: $dataContactDatabase")
                     // Add more details as needed
                     // Implement your logic to save or use the call details
                     val durationFormat = String.format(
@@ -64,7 +75,7 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                         callDuration % 60
                     )
 
-                    if (dataContactDatabase == null ||  dataContactDatabase.isFav == false) {
+                    if (dataContactDatabase == null &&dataContactDatabaseAlt == null) {
                         dataUploadList.add(
                             UploadContactRequest.UploadContactData(
                                 sourceMobileNo = getPhoneNumber(),
@@ -106,7 +117,7 @@ class LastCallDetailsCollector(val databaseRepository: DatabaseRepository) {
                     val callDateTime: Long = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))
                     val dataContactDatabase = databaseRepository.getRestrictedContact(
                         phone = callerName,
-                        isFav = true
+                        isFav = false
                     )
                     Log.d("LastCallDetails", "CallTracker:  Caller Name: $callerName")
                     Log.d("LastCallDetails", "CallTracker:  Caller Number: $callerNumber")

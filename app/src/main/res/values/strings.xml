@@ -84,6 +84,7 @@
 
     <!-- Strings related to the Alert Dialog -->
     <string name="notification_listener_service">"Notification Listener Service"</string>
+    <string name="notification">"Notifications"</string>
     <string name="notification_listener_service_explanation">"For the app. to work you need to enable the
         Notification Listener Service. Enable it now?"
     </string>

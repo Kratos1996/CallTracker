@@ -58,7 +58,7 @@ fun BottomBar(
     val smsItem = BottomBarScreen.Sms
 
     val screens = listOf(
-        goBack,
+//        goBack,
         homeItem,
         callItem,
         smsItem,
@@ -83,29 +83,29 @@ fun BottomBar(
                     screen = screen,
                     currentDestination = currentDestination,
                     onClick = {
-                        if (screen.route == BottomBarScreen.Back.route) {
-                           //
-                            context.getActivityContext().showAsBottomSheet{dismiss ->
-                                CommonAlertBottomSheet(
-                                    msg = "Do you want to Logout?",
-                                    positiveText = "Yes",
-                                    onPositiveClick = {
-                                        AppPreference.logout()
-                                        context.stopServiceContact()
-                                        context.stopServiceCall()
-                                        context.keepAliveService()
-                                        context.unregisterReceiver(PhoneCallReceiver())
-                                        context.unregisterReceiver(ServiceCheckReceiver())
-                                        context.unregisterReceiver(NotificationServiceRestartReceiver())
-                                        context.unregisterReceiver(BootReceiver())
-                                        context.getActivityContext().finish()
-                                    },
-                                    negativeText = "No",
-                                    onNegativeClick = {
-                                        dismiss.invoke()
-                                    })
-                            }
-                        } else if (currentDestination?.route != screen.route) {
+//                        if (screen.route == BottomBarScreen.Back.route) {
+//                           //
+//                            context.getActivityContext().showAsBottomSheet{dismiss ->
+//                                CommonAlertBottomSheet(
+//                                    msg = "Do you want to Logout?",
+//                                    positiveText = "Yes",
+//                                    onPositiveClick = {
+//                                        AppPreference.logout()
+//                                        context.stopServiceContact()
+//                                        context.stopServiceCall()
+//                                        context.keepAliveService()
+//                                        context.unregisterReceiver(PhoneCallReceiver())
+//                                        context.unregisterReceiver(ServiceCheckReceiver())
+//                                        context.unregisterReceiver(NotificationServiceRestartReceiver())
+//                                        context.unregisterReceiver(BootReceiver())
+//                                        context.getActivityContext().finish()
+//                                    },
+//                                    negativeText = "No",
+//                                    onNegativeClick = {
+//                                        dismiss.invoke()
+//                                    })
+//                            }
+//                        } else if (currentDestination?.route != screen.route) {
                             navController.navigate(screen.route) {
                                 navController.graph.startDestinationRoute?.let { route ->
                                     popUpTo(route) { saveState = true }
@@ -114,17 +114,17 @@ fun BottomBar(
                                 restoreState = true
                             }
                         }
-                    }
+                  //  }
                 )
-                if (screen == BottomBarScreen.Back) {
-                    Divider(
-                        color = MaterialTheme.colors.gray_bg_dark,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(1.sdp)
-                            .padding(top = 6.sdp, bottom = 8.sdp)
-                    )
-                }
+//                if (screen == BottomBarScreen.Back) {
+//                    Divider(
+//                        color = MaterialTheme.colors.gray_bg_dark,
+//                        modifier = Modifier
+//                            .fillMaxHeight()
+//                            .width(1.sdp)
+//                            .padding(top = 6.sdp, bottom = 8.sdp)
+//                    )
+//                }
             }
         }
     } else {

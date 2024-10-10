@@ -1,8 +1,10 @@
 package com.ishant.calltracker.ui.dashboard.screens.dashboard
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,21 +39,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import checkPermission
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.WhatsappData
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
-import com.ishant.calltracker.service.WhatsappAccessibilityService
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon.TitleSeparator
+import com.ishant.calltracker.utils.AppLifecycleCallback
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.getActivityContext
-import com.ishant.calltracker.utils.isAccessibilityOn
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.navToCallService
-import com.ishant.calltracker.utils.openAccessibilitySettings
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.utils.toast
@@ -64,15 +65,20 @@ import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
-import com.ishant.corelibcompose.toolkit.ui.text.CustomOutlinedTextFieldWithTrailingIcon
 import com.ishant.corelibcompose.toolkit.ui.textstyles.PS
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SFPRO
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SubHeadingText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import readPhoneContactPermission
 import readPhoneLogPermission
 import readPhoneNumberPermission
 import readPhoneStatePermission
+import readPostNotificationPermission
+import requestNotificationPermission
 
 @Composable
 fun DashboardScreen() {
@@ -84,7 +90,47 @@ fun DashboardScreen() {
             initialApiCalled.value = true
 
         }
-        AppPreference.isServiceEnabled = false
+        CoroutineScope(Dispatchers.Main).launch {
+            AppLifecycleCallback.lifecycleCallback.collectLatest { lifecycle ->
+                Log.d("TAG", "DashboardScreen: " + lifecycle)
+
+                when (lifecycle) {
+
+                    "Resumed" -> {
+
+
+                        homeViewModel.contactPermissionGranted.value =
+                            !context.checkPermission(Manifest.permission.READ_CONTACTS)
+                        homeViewModel.phoneLogsPermissionGranted.value =
+                            !context.checkPermission(Manifest.permission.READ_CALL_LOG)
+                        homeViewModel.readPhoneStatePermissionGranted.value =
+                            !context.checkPermission(Manifest.permission.READ_PHONE_STATE)
+                        homeViewModel.phoneNumberPermissionGranted.value =
+                            !context.checkPermission(Manifest.permission.READ_PHONE_NUMBERS)
+                        homeViewModel.notificationPermissionGranted.value =
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                !context.checkPermission(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                true
+                            }
+                        homeViewModel.loadSimInfo(context)
+                    }
+
+                    "Paused" -> {
+
+                    }
+
+                    "Stopped" -> {
+
+                    }
+
+                    else -> {
+                    }
+
+                }
+            }
+        }
+
     })
     LoadDashboardScreen(context, homeViewModel)
 
@@ -105,6 +151,7 @@ private fun SimInfoList(homeViewModel: HomeViewModel, context: Context) {
         }
     }
 }
+
 @Composable
 private fun WhatsappList(homeViewModel: HomeViewModel, context: Context) {
     val state = rememberLazyListState()
@@ -140,21 +187,27 @@ fun WhatsappInfo(whatsappData: WhatsappData, index: Int, onClick: (WhatsappData)
         verticalArrangement = Arrangement.Center
     ) {
         CoreImageView.FromLocalDrawable(
-            painterResource = whatsappData.image?:0,
+            painterResource = whatsappData.image ?: 0,
             modifier = Modifier
                 .width(45.sdp)
                 .height(45.sdp)
         )
         RegularText.Medium(
-            title = whatsappData.name?:"",
+            title = whatsappData.name ?: "",
             modifier = Modifier
                 .padding(top = 10.sdp)
         )
-        CustomCheckBox.invoke(isChecked = whatsappData.packageName==AppPreference.whatsappPackage, onChecked = {
-            onClick(whatsappData)
-        }, modifier = Modifier.padding(top = 5.sdp).size(20.sdp), text = "")
+        CustomCheckBox.invoke(
+            isChecked = whatsappData.packageName == AppPreference.whatsappPackage,
+            onChecked = {
+                onClick(whatsappData)
+            },
+            modifier = Modifier.padding(top = 5.sdp).size(20.sdp),
+            text = ""
+        )
     }
 }
+
 @Composable
 fun SimInfo(simInfo: SimInfo, index: Int, onClick: (SimInfo) -> Unit) {
     Column(
@@ -243,13 +296,6 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
             firstBlockText = context.getString(R.string.start_call_service),
             secondBlockText = context.getString(R.string.work_manager),
             firstBlock = {
-                if (!context.isServiceRunning(WhatsappAccessibilityService::class.java)) {
-                    val mWPIntent = Intent(context, WhatsappAccessibilityService::class.java)
-                    context.startService(mWPIntent)
-                }
-
-
-
                 if (!homeViewModel.contactPermissionGranted.value && !homeViewModel.phoneLogsPermissionGranted.value && !homeViewModel.readPhoneStatePermissionGranted.value && !homeViewModel.phoneNumberPermissionGranted.value) {
                     context.toast(context.getString(R.string.please_check_all_pending_permission_for_call_service_all_permission_is_required))
                 } else {
@@ -347,41 +393,60 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                 R.string.granted
             ) else context.getString(R.string.denied)
         )
-      /*  TitleSeparator(title = context.getString(R.string.reply_message), showArrow = false)
+        DashboardSingleTileView(
+            firstBlockText = context.getString(R.string.notification),
+            subFirstBlockText = if (homeViewModel.notificationPermissionGranted.value) context.getString(
+                R.string.granted
+            ) else context.getString(R.string.denied),
+            firstBlock = {
+                if (!homeViewModel.notificationPermissionGranted.value) {
+                    context.readPostNotificationPermission(granted = {
+                        homeViewModel.notificationPermissionGranted.value = true
+                    }, rejected = {
+                        Log.d("TAG", "LoadDashboardScreen: ")
+                        homeViewModel.notificationPermissionGranted.value = false
+                       requestNotificationPermission(context )
+                    })
+                }else{
+                    context.toast("Already Granted")
+                }
+            }
+        )
+        /*  TitleSeparator(title = context.getString(R.string.reply_message), showArrow = false)
 
 
-        CustomOutlinedTextFieldWithTrailingIcon(
-            inputWrapper = homeViewModel.replyMessageTextWrapper,
-            modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
-            hintText = context.getString(R.string.add_reply_message),
-            trailingIcon = {},
-            enabled = true,
-            isDefaultMultiline = true,
-            singleLine = false,
+          CustomOutlinedTextFieldWithTrailingIcon(
+              inputWrapper = homeViewModel.replyMessageTextWrapper,
+              modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
+              hintText = context.getString(R.string.add_reply_message),
+              trailingIcon = {},
+              enabled = true,
+              isDefaultMultiline = true,
+              singleLine = false,
 
-            onChanged = {
-                homeViewModel.replyMessageTextWrapper.dataValue.value = it
-                AppPreference.replyMsg = homeViewModel.replyMessageTextWrapper.dataValue.value
-            },
+              onChanged = {
+                  homeViewModel.replyMessageTextWrapper.dataValue.value = it
+                  AppPreference.replyMsg = homeViewModel.replyMessageTextWrapper.dataValue.value
+              },
 
-            )
-//            CustomOutlinedTextFieldWithTrailingIcon(
-//                inputWrapper = homeViewModel.replyTimesMessageTextWrapper,
-//                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
-//                hintText = context.getString(R.string.add_Repeat_reply_message),
-//                trailingIcon = {},
-//                enabled = true,
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                isDefaultMultiline = true,
-//                onChanged = {
-//                    homeViewModel.replyTimesMessageTextWrapper.dataValue.value = it
-//                    AppPreference.autoReplyDelayDays = if(it.isNullOrEmpty())0 else it.toInt()
-//                    AppPreference.autoReplyDelay = if(it.isNullOrEmpty())0 else ((homeViewModel.replyTimesMessageTextWrapper.dataValue.value).toInt() * 24 * 60 * 60 * 1000).toLong()
-//                },
-//
-//                )
+              )
+  //            CustomOutlinedTextFieldWithTrailingIcon(
+  //                inputWrapper = homeViewModel.replyTimesMessageTextWrapper,
+  //                modifier = Modifier.padding(horizontal = 10.sdp, vertical = 10.sdp),
+  //                hintText = context.getString(R.string.add_Repeat_reply_message),
+  //                trailingIcon = {},
+  //                enabled = true,
+  //                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+  //                isDefaultMultiline = true,
+  //                onChanged = {
+  //                    homeViewModel.replyTimesMessageTextWrapper.dataValue.value = it
+  //                    AppPreference.autoReplyDelayDays = if(it.isNullOrEmpty())0 else it.toInt()
+  //                    AppPreference.autoReplyDelay = if(it.isNullOrEmpty())0 else ((homeViewModel.replyTimesMessageTextWrapper.dataValue.value).toInt() * 24 * 60 * 60 * 1000).toLong()
+  //                },
+  //
+  //                )
 
-*/
+  */
         CoreImageView.FromLocalDrawable(
             painterResource = R.drawable.home, modifier = Modifier
                 .fillMaxWidth()
@@ -490,6 +555,53 @@ private fun DashboardTileView(
                 fontStyle = PS
             )
         }
+
+    }
+}
+
+@Composable
+private fun DashboardSingleTileView(
+    firstBlockText: String,
+    subFirstBlockText: String = "",
+    firstBlock: (() -> Unit?)?,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = 110.sdp)
+            .padding(horizontal = 10.sdp, vertical = 10.sdp),
+        horizontalArrangement = Arrangement.Start
+    ) {
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .shadow(
+                    shape = RoundedCornerShape(10.sdp),
+                    elevation = 10.sdp
+                )
+                .paint(
+                    painterResource(id = R.drawable.card_tile),
+                    contentScale = ContentScale.FillBounds
+                )
+                .bounceClick {
+                    firstBlock?.invoke()
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            SubHeadingText.Medium(
+                title = firstBlockText,
+                textColor = MaterialTheme.colors.white_only,
+                fontStyle = SFPRO
+            )
+            RegularText(
+                title = subFirstBlockText,
+                textColor = MaterialTheme.colors.white_only,
+                fontStyle = PS
+            )
+        }
+
 
     }
 }

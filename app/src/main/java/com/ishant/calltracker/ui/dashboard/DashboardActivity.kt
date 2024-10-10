@@ -29,7 +29,7 @@ import com.ishant.calltracker.utils.openAccessibilitySettings
 
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
-import com.ishant.calltracker.utils.wpService
+
 import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.theme.CoreTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,6 +38,7 @@ import readPhoneContactPermission
 import readPhoneLogPermission
 import readPhoneNumberPermission
 import readPhoneStatePermission
+import readPostNotificationPermission
 import requestNotificationPermission
 
 @AndroidEntryPoint
@@ -78,14 +79,18 @@ class DashboardActivity : BaseComposeActivity() {
                 }
             }
         readNotificationService()
-
+        readPostNotificationPermission(granted = {
+            viewModel.notificationPermissionGranted.value = true
+        }, rejected = {
+            viewModel.notificationPermissionGranted.value = false
+        })
 
         addAutoStartup()
         readPhoneStatePermission(granted = {
             readPhoneNumberPermission(granted = {
                 if (!isServiceRunning(KeepAliveService::class.java)) { // Replace with your service class
                     keepAliveService()
-                    wpService()
+
                     startWorkManager(this)
                     startAlarmManager()
                     viewModel.managers.value = true

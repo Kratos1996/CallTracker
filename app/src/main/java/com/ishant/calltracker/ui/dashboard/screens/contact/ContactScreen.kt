@@ -250,7 +250,7 @@ private fun ContactDataItem(item: ContactList, viewModel: HomeViewModel) {
             if(item.isFav == isChecked){
                 isChecked = !isChecked
             }
-            viewModel.setRistricted(item, isChecked)
+            viewModel.setRistricted(item, checked)
         }
 
 

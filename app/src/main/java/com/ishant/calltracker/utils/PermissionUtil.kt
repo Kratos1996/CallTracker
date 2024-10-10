@@ -2,11 +2,14 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -25,6 +28,18 @@ fun Context.readPhoneStatePermission(granted:()->Unit, rejected:(() -> Unit)? = 
         granted = granted,
         rejected =rejected
     )
+}
+fun Context.readPostNotificationPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        takePermissions(
+            permissions = Manifest.permission.POST_NOTIFICATIONS,
+            title = getString(R.string.notification),
+            granted = granted,
+            rejected =rejected
+        )
+    }else{
+        granted()
+    }
 }
 fun Context.sendSmsPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
     takePermissions(
@@ -166,6 +181,12 @@ fun Context.writePhoneContactPermission(granted:()->Unit, rejected:(() -> Unit)?
         granted = granted,
         rejected =rejected
     )
+}
+fun Context.checkPermission(permissionString: String):Boolean{
+    return ContextCompat.checkSelfPermission(
+        this,
+        permissionString
+    ) != PackageManager.PERMISSION_GRANTED
 }
 private fun Context.takePermissions(permissions :String, title:String, granted:()->Unit, rejected:(() -> Unit)? = null){
     val context = this

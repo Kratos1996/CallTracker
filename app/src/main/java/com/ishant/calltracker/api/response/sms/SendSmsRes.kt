@@ -5,7 +5,10 @@ import com.google.gson.annotations.SerializedName
 
 data class SendSmsRes(
     @SerializedName("data")
-    val sendSmsData: ArrayList<SendSmsData> = arrayListOf()
+    val sendSmsData: ArrayList<SendSmsData> = arrayListOf(),
+    @SerializedName("smsdata")
+    val smsdata: String? = ""
+
 ) {
     data class SendSmsData(
         @SerializedName("country_code")

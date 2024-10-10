@@ -38,6 +38,8 @@ interface CallTrackerDao {
 
     @Query("Select * From ContactList where phoneNumber=:phone and isFav=:isFav")
     suspend fun getSingleRestrictedContact(phone:String,isFav: Boolean): ContactList
+    @Query("Select * From ContactList where phoneNumber=:phone ")
+    suspend fun getSingleRestrictedContact(phone:String,): ContactList
 
 
     @Query("Update ContactList set isFav=:isFav Where phoneNumber=:phone")

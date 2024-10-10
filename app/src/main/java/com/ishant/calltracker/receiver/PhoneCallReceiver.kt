@@ -92,10 +92,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                 }
 
                 TelephonyManager.EXTRA_STATE_RINGING -> {
-                    if (!context.isServiceRunning(WhatsappAccessibilityService::class.java)) {
-                        val mWPIntent = Intent(context, WhatsappAccessibilityService::class.java)
-                        context.startService(mWPIntent)
-                    }
+
                     AppPreference.lastIncommingNum =
                         intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER) ?: ""
 
@@ -124,8 +121,9 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
 
                     response.data?.let {
-                        sendMessages(it.sendSmsData.filter { it.status != 1 } as ArrayList<SendSmsRes.SendSmsData>,
-                            context)
+                        //sendMessages(it.sendSmsData.filter { it.status != 1 } as ArrayList<SendSmsRes.SendSmsData>,
+                      //  it.smsdata
+//                            context)
                     }
                 }
             }
@@ -156,25 +154,25 @@ class PhoneCallReceiver : BroadcastReceiver() {
     }
 
 
-    suspend fun sendMessages(sendSmsData: ArrayList<SendSmsRes.SendSmsData>, context: Context) {
+    suspend fun sendMessages(sendSmsData: ArrayList<SendSmsRes.SendSmsData>, smsData:String,context: Context) {
         if (sendSmsData.isNotEmpty()) {
             val smsList = sendSmsData
             val item = smsList.first()
             context.sendSmsUsingSimSlot(
                 AppPreference.simSlot,
                 item.mobile ?: "",
-                item.message ?: AppPreference.replyMsg
+                smsData ?: AppPreference.replyMsg
             )
             context.sendWhatsAppMessage(
                 "+91" + item.mobile ?: "",
-                item.message ?: AppPreference.replyMsg
+                smsData ?: AppPreference.replyMsg
             )
             AppPreference.isServiceEnabled = true
             AppPreference.isFromService = true
             changeStatus(context, smsList.first().id)
             smsList.removeFirst()
             delay(15000)
-            sendMessages(smsList, context)
+            sendMessages(smsList, smsData,context)
         }
     }
 

@@ -234,7 +234,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                     top.linkTo(coinCode.bottom)
                 }
         )
-        if (item.status != 1) {
+      //  if (item.status != 1) {
             Row(modifier = Modifier.constrainAs(wpImg) {
                 end.linkTo(msgImg.start, margin = 10.dp)
                 top.linkTo(parent.top)
@@ -274,7 +274,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                                 AppPreference.isServiceEnabled = true
                                 context.sendWhatsAppMessage(
                                     "+91" + item.mobile ?: "",
-                                    item.message ?: AppPreference.replyMsg,
+                                    viewModel.smsRes.value?.smsdata ?: AppPreference.replyMsg,
                                     "com.whatsapp"
                                 )
                             }
@@ -298,13 +298,13 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                         context.sendSmsUsingSimSlot(
                             AppPreference.simSlot,
                             item.mobile ?: "",
-                             item.message ?: AppPreference.replyMsg
+                            viewModel.smsRes.value?.smsdata ?: AppPreference.replyMsg
                         )
                     }
 
                 }
             )
-        }
+//        }
         LineDivider(modifier = Modifier
             .padding(top = 10.sdp)
             .constrainAs(divider) {

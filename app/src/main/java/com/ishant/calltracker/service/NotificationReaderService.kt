@@ -220,7 +220,7 @@ class NotificationReaderService : NotificationListenerService() {
     private fun extractPhoneNumber(text: String?): String? {
         // Regular expression to match phone numbers in the notification text
         val phonePattern = "\\+?[0-9. ()-]{7,}".toRegex()
-        return text?.let { phonePattern.find(it)?.value }
+        return text?.let { phonePattern.find(it)?.value }?.replace(" ","")
     }
     fun getPhoneNumberFromContactName(context: Context, contactName: String): String? {
         val contentResolver = context.contentResolver

@@ -121,9 +121,9 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
 
                     response.data?.let {
-                        //sendMessages(it.sendSmsData.filter { it.status != 1 } as ArrayList<SendSmsRes.SendSmsData>,
-                      //  it.smsdata
-//                            context)
+                        sendMessages(it.sendSmsData.filter { it.status != 1 } as ArrayList<SendSmsRes.SendSmsData>,
+                        it.smsdata?:AppPreference.replyMsg,
+                            context)
                     }
                 }
             }

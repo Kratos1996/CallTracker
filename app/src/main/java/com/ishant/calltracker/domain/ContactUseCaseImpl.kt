@@ -33,11 +33,11 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
 
     override fun uploadContacts(request: UploadContactRequest) = flow {
         //Log.e("uploadContacts","BaseUrl : ${AppPreference.baseUrl}")
-        Log.d("TAG", "uploadContact1: "+request)
+
         try {
             emit(Resource.Loading<UploadContactResponse>())
-//            val response= repository.uploadContacts(request)
-//            emit(Resource.Success<UploadContactResponse>(response))
+            val response= repository.uploadContacts(request)
+            emit(Resource.Success<UploadContactResponse>(response))
         } catch (e: Exception) {
             catchExceptions<UploadContactResponse>(e,Gson())
         }
@@ -64,18 +64,18 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
     }
 
     override fun uploadCallDetails(data: GetCallsRes.GetCallsData) = flow {
-        Log.d("TAG", "uploadContact2: "+data)
+
         try {
             emit(Resource.Loading<UploadCallDataRes>())
-//            val response= repository.uploadCallDetails(data)
-//            emit(Resource.Success<UploadCallDataRes>(response))
+            val response= repository.uploadCallDetails(data)
+            emit(Resource.Success<UploadCallDataRes>(response))
         } catch (e: Exception) {
             catchExceptions<UploadCallDataRes>(e,Gson())
         }
     }
 
     override fun uploadContact(uploadContactData: UploadContactRequest ) = flow {
-        Log.d("TAG", "uploadContact3: "+uploadContactData)
+
         try {
             emit(Resource.Loading<ContactSavedResponse>())
 //            val response= repository.uploadContact(uploadContactData)

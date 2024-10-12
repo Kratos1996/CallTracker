@@ -113,6 +113,7 @@ fun DashboardScreen() {
                             } else {
                                 true
                             }
+                        homeViewModel.getWhatsappList()
                         homeViewModel.loadSimInfo(context)
                     }
 

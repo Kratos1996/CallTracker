@@ -42,12 +42,14 @@ fun Context.readPostNotificationPermission(granted:()->Unit, rejected:(() -> Uni
     }
 }
 fun Context.sendSmsPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
-    takePermissions(
-        permissions = Manifest.permission.SEND_SMS,
-        title = getString(R.string.phone_message_permission),
-        granted = granted,
-        rejected =rejected
-    )
+    this.readPhoneStatePermission(granted = {
+        takePermissions(
+            permissions = Manifest.permission.SEND_SMS,
+            title = getString(R.string.phone_message_permission),
+            granted = granted,
+            rejected = rejected
+        )
+    })
 }
 
 fun Context.takeForegroundService(granted:()->Unit, rejected:(() -> Unit)? = null){

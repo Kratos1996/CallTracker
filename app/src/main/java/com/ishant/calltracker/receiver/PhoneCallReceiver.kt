@@ -165,13 +165,13 @@ class PhoneCallReceiver : BroadcastReceiver() {
             )
             context.sendWhatsAppMessage(
                 "+91" + item.mobile ?: "",
-                smsData ?: AppPreference.replyMsg
+                item.message ?: AppPreference.replyMsg
             )
             AppPreference.isServiceEnabled = true
             AppPreference.isFromService = true
             changeStatus(context, smsList.first().id)
             smsList.removeFirst()
-            delay(15000)
+            delay(5000)
             sendMessages(smsList, smsData,context)
         }
     }

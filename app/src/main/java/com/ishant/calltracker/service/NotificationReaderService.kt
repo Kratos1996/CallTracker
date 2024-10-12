@@ -158,57 +158,57 @@ class NotificationReaderService : NotificationListenerService() {
 //                        sendReply(sbn)
 //                        saveLogs(sbn)
 //                    }
-                    Log.d(TAG, "phoneNumberFromContact: "+contactName)
-                    if (text?.contains("Incoming video call") == true) {
-                        if (contactName != null) {
-                            // First, attempt to get the phone number from the contact name
-                            val phoneNumberFromContact = getPhoneNumberFromContactName(applicationContext, contactName)
-
-                            Log.d(TAG, "phoneNumberFromContact: "+phoneNumberFromContact)
-                            if (phoneNumberFromContact != null) {
-                                // Contact is saved in the phone; phone number found
-                                sendDataofWhatsapp(contactName, data, text)
-                                Log.d("NotificationListener", "Stored Contact: $contactName, Phone Number: $phoneNumberFromContact")
-                            } else {
-                                // Contact is not saved in the phone; try to extract phone number from the notification text
-                                val phoneNumberFromNotification = extractPhoneNumber(text)
-
-                                if (phoneNumberFromNotification != null) {
-                                    sendDataofWhatsapp(contactName, data, text)
-                                   // Log.d("NotificationListener", "Unstored Contact: $title, Phone Number: $phoneNumberFromNotification")
-                                } else {
-                                   // Log.d("NotificationListener", "Phone number not found for $title in notification text")
-                                }
-                            }
-
-                    }} else if (text?.contains("Incoming voice call") == true) {
-                        if (contactName != null) {
-                            // First, attempt to get the phone number from the contact name
-                            val phoneNumberFromContact = getPhoneNumberFromContactName(applicationContext, contactName)
-                            Log.d(TAG, "phoneNumberFromContact: "+phoneNumberFromContact)
-                            if (phoneNumberFromContact != null) {
-                                // Contact is saved in the phone; phone number found
-                                sendDataofWhatsapp(contactName, data, text)
-                                Log.d("NotificationListener", "Stored Contact: $contactName, Phone Number: $phoneNumberFromContact")
-                            } else {
-                                // Contact is not saved in the phone; try to extract phone number from the notification text
-                                val phoneNumberFromNotification = extractPhoneNumber(text)
-
-                                if (phoneNumberFromNotification != null) {
-                                    sendDataofWhatsapp(contactName, data, text)
-                                    // Log.d("NotificationListener", "Unstored Contact: $title, Phone Number: $phoneNumberFromNotification")
-                                } else {
-                                    // Log.d("NotificationListener", "Phone number not found for $title in notification text")
-                                }
-                            }
-
-                        }
-                    } else if (text?.contains("Ongoing voice call") == true) {
-                        Log.d(TAG, "Notification received: $contactName - $text")
-                        sendDataofWhatsapp(contactName, data, text)
-                    } else {
-                        Log.d(TAG, "Notification received: $contactName - $text")
-                    }
+//                    Log.d(TAG, "phoneNumberFromContact: "+contactName)
+//                    if (text?.contains("Incoming video call") == true) {
+//                        if (contactName != null) {
+//                            // First, attempt to get the phone number from the contact name
+//                            val phoneNumberFromContact = getPhoneNumberFromContactName(applicationContext, contactName)
+//
+//                            Log.d(TAG, "phoneNumberFromContact: "+phoneNumberFromContact)
+//                            if (phoneNumberFromContact != null) {
+//                                // Contact is saved in the phone; phone number found
+//                                sendDataofWhatsapp(contactName, data, text)
+//                                Log.d("NotificationListener", "Stored Contact: $contactName, Phone Number: $phoneNumberFromContact")
+//                            } else {
+//                                // Contact is not saved in the phone; try to extract phone number from the notification text
+//                                val phoneNumberFromNotification = extractPhoneNumber(text)
+//
+//                                if (phoneNumberFromNotification != null) {
+//                                    sendDataofWhatsapp(contactName, data, text)
+//                                   // Log.d("NotificationListener", "Unstored Contact: $title, Phone Number: $phoneNumberFromNotification")
+//                                } else {
+//                                   // Log.d("NotificationListener", "Phone number not found for $title in notification text")
+//                                }
+//                            }
+//
+//                    }} else if (text?.contains("Incoming voice call") == true) {
+//                        if (contactName != null) {
+//                            // First, attempt to get the phone number from the contact name
+//                            val phoneNumberFromContact = getPhoneNumberFromContactName(applicationContext, contactName)
+//                            Log.d(TAG, "phoneNumberFromContact: "+phoneNumberFromContact)
+//                            if (phoneNumberFromContact != null) {
+//                                // Contact is saved in the phone; phone number found
+//                                sendDataofWhatsapp(contactName, data, text)
+//                                Log.d("NotificationListener", "Stored Contact: $contactName, Phone Number: $phoneNumberFromContact")
+//                            } else {
+//                                // Contact is not saved in the phone; try to extract phone number from the notification text
+//                                val phoneNumberFromNotification = extractPhoneNumber(text)
+//
+//                                if (phoneNumberFromNotification != null) {
+//                                    sendDataofWhatsapp(contactName, data, text)
+//                                    // Log.d("NotificationListener", "Unstored Contact: $title, Phone Number: $phoneNumberFromNotification")
+//                                } else {
+//                                    // Log.d("NotificationListener", "Phone number not found for $title in notification text")
+//                                }
+//                            }
+//
+//                        }
+//                    } else if (text?.contains("Ongoing voice call") == true) {
+//                        Log.d(TAG, "Notification received: $contactName - $text")
+//                        sendDataofWhatsapp(contactName, data, text)
+//                    } else {
+//                        Log.d(TAG, "Notification received: $contactName - $text")
+//                    }
                     break
                 }
             }

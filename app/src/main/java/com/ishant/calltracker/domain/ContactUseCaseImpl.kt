@@ -78,8 +78,8 @@ class ContactUseCaseImpl @Inject constructor(private val repository: ContactRepo
 
         try {
             emit(Resource.Loading<ContactSavedResponse>())
-//            val response= repository.uploadContact(uploadContactData)
-//            emit(Resource.Success<ContactSavedResponse>(response))
+            val response= repository.uploadContact(uploadContactData)
+            emit(Resource.Success<ContactSavedResponse>(response))
         } catch (e: Exception) {
             catchExceptions<ContactSavedResponse>(e,Gson())
         }

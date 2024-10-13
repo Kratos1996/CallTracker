@@ -16,15 +16,15 @@ hilt {
     enableExperimentalClasspathAggregation = true
 }
 android {
-    namespace = "com.ishant.callsoftware"
+    namespace = "com.ishant.jagtap"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ishant.callsoftware"
+        applicationId = "com.ishant.jagtap"
         minSdk = 25
         targetSdk = 34
-        versionCode = 17
-        versionName = "2.0.2"
+        versionCode = 1
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,7 +34,7 @@ android {
         this.outputs.all {
             if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
                 this.outputFileName =
-                    "CallSoftware${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
+                    "ShankarJagtap${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
             }
         }
     }

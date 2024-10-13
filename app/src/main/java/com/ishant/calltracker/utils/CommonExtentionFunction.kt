@@ -17,7 +17,6 @@ import android.provider.Settings
 import android.telephony.SmsManager
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
-import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
@@ -90,23 +89,34 @@ fun Context.initiatePhoneCall(phoneNumber: String) {
         toast("initiatePhoneCall failed")
     }
 }
-fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?,packageName: String?=null) {
+
+fun Context.sendWhatsAppMessage(
+    phoneNumber: String,
+    message: String?,
+    packageName: String? = null
+) {
 
     try {
-        if(message.isNullOrEmpty()){
+        if (message.isNullOrEmpty()) {
             toast("Please set your desired message to send from the dashboard")
             return
         }
-        val packageManager : PackageManager =packageManager
+        val packageManager: PackageManager = packageManager
         val isInstalled1: Boolean = isPackageInstalled("com.whatsapp", packageManager)
         val isInstalled2: Boolean = isPackageInstalled("com.whatsapp.w4b", packageManager)
         val i = Intent(Intent.ACTION_VIEW)
-        val url = "https://api.whatsapp.com/send?phone=" + phoneNumber + "&text="+ URLEncoder.encode(message,"UTF-8")
-        if(!isInstalled1&&!isInstalled2){
+        val url =
+            "https://api.whatsapp.com/send?phone=" + phoneNumber + "&text=" + URLEncoder.encode(
+                message,
+                "UTF-8"
+            )
+        if (!isInstalled1 && !isInstalled2) {
             toast("WhatsApp is not installed")
             return
-        }else{
+        } else {
+
             i.setPackage(AppPreference.whatsappPackage)
+
         }
 //        if(packageName!=null){
 //            i.setPackage(packageName)
@@ -122,8 +132,8 @@ fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?,packageNam
 //        }
         i.data = Uri.parse(url)
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if(i.resolveActivity(packageManager) != null){
-            startActivity(i,null)
+        if (i.resolveActivity(packageManager) != null) {
+            startActivity(i, null)
         }
 
     } catch (e: Exception) {
@@ -131,6 +141,7 @@ fun Context.sendWhatsAppMessage(phoneNumber: String, message: String?,packageNam
 
     }
 }
+
 fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
     try {
         packageManager.getPackageInfo(packageName, 0)
@@ -139,7 +150,8 @@ fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boo
         return false
     }
 }
-fun Context.sendSms(phoneNumber: String,msgStr:String){
+
+fun Context.sendSms(phoneNumber: String, msgStr: String) {
     if (ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.SEND_SMS
@@ -155,7 +167,7 @@ fun Context.sendSms(phoneNumber: String,msgStr:String){
         return
     }
     try {
-        if(msgStr.isNullOrEmpty()){
+        if (msgStr.isNullOrEmpty()) {
             toast("Please set your desired message to send from the dashboard")
             return
         }
@@ -208,14 +220,15 @@ fun Context.startAlarmManager() {
 }
 
 @SuppressLint("MissingPermission")
- fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String, message: String) {
-    val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+fun Context.sendSmsUsingSimSlot(simSlot: Int, phoneNumber: String, message: String) {
+    val subscriptionManager =
+        getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
     readPhoneStatePermission(granted = {
         val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
         if (subscriptionInfoList != null && subscriptionInfoList.size >= simSlot) {
-            val subscriptionInfo: SubscriptionInfo = subscriptionInfoList[simSlot-1]
+            val subscriptionInfo: SubscriptionInfo = subscriptionInfoList[simSlot - 1]
             val subscriptionId = subscriptionInfo.subscriptionId
-            sendSmsPermission(granted ={
+            sendSmsPermission(granted = {
                 try {
                     val smsManager = SmsManager.getSmsManagerForSubscriptionId(subscriptionId)
                     val messageParts = smsManager.divideMessage(message)
@@ -226,53 +239,56 @@ fun Context.startAlarmManager() {
                     Toast.makeText(this, "Failed to send SMS from SIM $simSlot", Toast.LENGTH_SHORT)
                         .show()
                 }
-            }){
-                Toast.makeText(this, "Phone Send SMS Permission Required", Toast.LENGTH_SHORT).show()
+            }) {
+                Toast.makeText(this, "Phone Send SMS Permission Required", Toast.LENGTH_SHORT)
+                    .show()
             }
-        }
-        else {
+        } else {
             Toast.makeText(this, "Invalid SIM slot", Toast.LENGTH_SHORT).show()
         }
     }
-    ){
+    ) {
         Toast.makeText(this, "Phone State Permission Required", Toast.LENGTH_SHORT).show()
     }
 }
 
- fun Context.showSimInfo() : List<SimInfo> {
-     val simList = ArrayList<SimInfo>()
-     readPhoneStatePermission(granted = {
-         val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-         val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
-         if (subscriptionInfoList != null && subscriptionInfoList.isNotEmpty()) {
-             val simInfo = StringBuilder()
-             for (subscriptionInfo in subscriptionInfoList) {
-                 simList.add(
+fun Context.showSimInfo(): List<SimInfo> {
+    val simList = ArrayList<SimInfo>()
+    readPhoneStatePermission(granted = {
+        val subscriptionManager =
+            getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+        val subscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
+        if (subscriptionInfoList != null && subscriptionInfoList.isNotEmpty()) {
+            val simInfo = StringBuilder()
+            for (subscriptionInfo in subscriptionInfoList) {
+                simList.add(
                     SimInfo(
                         carrierName = subscriptionInfo.carrierName.toString(),
                         simSlot = subscriptionInfo.simSlotIndex,
                         carrierId = subscriptionInfo.subscriptionId,
                         countryCode = subscriptionInfo.countryIso
                     )
-                 )
-                 simInfo.append("Carrier Name: ${subscriptionInfo.carrierName}\n")
-                 simInfo.append("Country Iso: ${subscriptionInfo.countryIso}\n")
-                 simInfo.append("Subscription ID: ${subscriptionInfo.subscriptionId}\n")
-                 simInfo.append("Sim Slot Index: ${subscriptionInfo.simSlotIndex}\n")
-                 simInfo.append("------------------------------------------------\n")
-             }
-             Log.e("SimData", Gson().toJson(simInfo))
-         } else {
-             Toast.makeText(this, "Dual SIM support requires API 22+", Toast.LENGTH_SHORT).show()
-         }
-     })
-     return simList
+                )
+                simInfo.append("Carrier Name: ${subscriptionInfo.carrierName}\n")
+                simInfo.append("Country Iso: ${subscriptionInfo.countryIso}\n")
+                simInfo.append("Subscription ID: ${subscriptionInfo.subscriptionId}\n")
+                simInfo.append("Sim Slot Index: ${subscriptionInfo.simSlotIndex}\n")
+                simInfo.append("------------------------------------------------\n")
+            }
+            Log.e("SimData", Gson().toJson(simInfo))
+        } else {
+            Toast.makeText(this, "Dual SIM support requires API 22+", Toast.LENGTH_SHORT).show()
+        }
+    })
+    return simList
 }
+
 fun Context.isBatteryOptimizationIgnored(): Boolean {
     val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
     return powerManager.isIgnoringBatteryOptimizations(packageName)
     return false
 }
+
 fun requestBatteryOptimizationPermission(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val packageName = context.packageName
@@ -287,30 +303,37 @@ fun requestBatteryOptimizationPermission(context: Context) {
         }
     }
 }
-data class SimInfo(val carrierName :String, val simSlot: Int,val carrierId:Int, val countryCode: String)
 
- fun Context.isAccessibilityOn(clazz: Class<out AccessibilityService?>): Boolean {
-     try {
-         val am = this.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-         val enabledServices = Settings.Secure.getString(
-             this.contentResolver,
-             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-         )
-         val colonSplitter = SimpleStringSplitter(';')
-         colonSplitter.setString(enabledServices)
-         val colonSplitterIterator = colonSplitter.iterator()
+data class SimInfo(
+    val carrierName: String,
+    val simSlot: Int,
+    val carrierId: Int,
+    val countryCode: String
+)
 
-         while (colonSplitterIterator.hasNext()) {
-             val componentName = colonSplitterIterator.next()
-             if (componentName.contains(clazz.name)) {
-                 return true
-             }
-         }
-         return false
-     }catch (e:Exception){
-         return false
-     }
+fun Context.isAccessibilityOn(clazz: Class<out AccessibilityService?>): Boolean {
+    try {
+        val am = this.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val enabledServices = Settings.Secure.getString(
+            this.contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        )
+        val colonSplitter = SimpleStringSplitter(';')
+        colonSplitter.setString(enabledServices)
+        val colonSplitterIterator = colonSplitter.iterator()
+
+        while (colonSplitterIterator.hasNext()) {
+            val componentName = colonSplitterIterator.next()
+            if (componentName.contains(clazz.name)) {
+                return true
+            }
+        }
+        return false
+    } catch (e: Exception) {
+        return false
+    }
 }
+
 fun Context.openAccessibilitySettings() {
     val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
     this.startActivity(intent)

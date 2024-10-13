@@ -183,6 +183,7 @@ class AutoStartHelper private constructor() {
         }
     }
 
+
     private fun autoStartXiaomi(context: Context) {
         if (isPackageExists(context, PACKAGE_XIAOMI_MAIN)) {
             showAlert(context) { dialog: DialogInterface?, which: Int ->

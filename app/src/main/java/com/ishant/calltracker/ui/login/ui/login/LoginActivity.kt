@@ -157,15 +157,15 @@ class LoginActivity : BaseComposeActivity() {
         context = this
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        notificationListenerPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                val granted = notificationListenerUtil.isNotificationServiceEnabled()
-                if(granted){
-                    val mServiceIntent = Intent(this, NotificationReaderService::class.java)
-                    startService(mServiceIntent)
-                }
-            }
-        notificationListenerUtil = NotificationListenerUtil(this)
+//        notificationListenerPermissionLauncher =
+//            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//                val granted = notificationListenerUtil.isNotificationServiceEnabled()
+//                if(granted){
+//                    val mServiceIntent = Intent(this, NotificationReaderService::class.java)
+//                    startService(mServiceIntent)
+//                }
+//            }
+//        notificationListenerUtil = NotificationListenerUtil(this)
         binding.loginBtn.setOnClickListener {
             requestWriteContact()
         }

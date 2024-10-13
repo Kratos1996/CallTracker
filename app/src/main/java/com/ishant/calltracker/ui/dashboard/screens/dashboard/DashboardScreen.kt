@@ -35,6 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,6 +44,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import checkPermission
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.WhatsappData
+import com.ishant.calltracker.app.showAsBottomSheet
+import com.ishant.calltracker.receiver.BootReceiver
+import com.ishant.calltracker.receiver.NotificationServiceRestartReceiver
+import com.ishant.calltracker.receiver.PhoneCallReceiver
+import com.ishant.calltracker.receiver.ServiceCheckReceiver
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.KeepAliveService
 import com.ishant.calltracker.ui.dashboard.HomeViewModel
@@ -55,16 +62,21 @@ import com.ishant.calltracker.utils.keepAliveService
 import com.ishant.calltracker.utils.navToCallService
 import com.ishant.calltracker.utils.startAlarmManager
 import com.ishant.calltracker.utils.startWorkManager
+import com.ishant.calltracker.utils.stopServiceCall
+import com.ishant.calltracker.utils.stopServiceContact
 import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.gray_bg_light
 import com.ishant.corelibcompose.toolkit.colors.gray_divider
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
+import com.ishant.corelibcompose.toolkit.ui.button.CoreButton
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CustomCheckBox
 import com.ishant.corelibcompose.toolkit.ui.clickables.bounceClick
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
+import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
+import com.ishant.corelibcompose.toolkit.ui.sdp.ssp
 import com.ishant.corelibcompose.toolkit.ui.textstyles.PS
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SFPRO
@@ -250,7 +262,7 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize().padding(bottom = 100.sdp)
             .background(MaterialTheme.colors.white)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -451,8 +463,43 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
         CoreImageView.FromLocalDrawable(
             painterResource = R.drawable.home, modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 15.sdp)
+
         )
+
+
+
+
+        CoreButton.ButtonRegularTextBoldNew(
+            title = context.getString(R.string.logout), modifier = Modifier.fillMaxWidth().padding( 10.sdp).height(50.sdp) , background = Brush.verticalGradient(
+                listOf(Color(context.resources.getColor(R.color.shadow)),Color(context.resources.getColor(R.color.shadow)))
+            ),onClick = {
+                context.getActivityContext().showAsBottomSheet{dismiss ->
+                    CommonAlertBottomSheet(
+                        msg = "Do you want to Logout?",
+                        positiveText = "Yes",
+                        onPositiveClick = {
+                            AppPreference.logout()
+                            context.stopServiceContact()
+                            context.stopServiceCall()
+                            context.keepAliveService()
+                            context.unregisterReceiver(PhoneCallReceiver())
+                            context.unregisterReceiver(ServiceCheckReceiver())
+                            context.unregisterReceiver(NotificationServiceRestartReceiver())
+                            context.unregisterReceiver(BootReceiver())
+                            context.getActivityContext().finish()
+                        },
+                        negativeText = "No",
+                        onNegativeClick = {
+                            dismiss.invoke()
+                        })
+                }
+            })
+
+
+
+
+
+
     }
 }
 

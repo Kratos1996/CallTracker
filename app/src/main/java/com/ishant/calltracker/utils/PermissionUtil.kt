@@ -1,10 +1,12 @@
 import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +20,8 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.ishant.calltracker.R
 import com.ishant.calltracker.utils.getActivityContext
+import com.ishant.calltracker.utils.helper.Constants
+import com.ishant.calltracker.utils.helper.CustomDialog
 import com.ishant.calltracker.utils.navToSetting
 import com.ishant.calltracker.utils.showCommonDialog
 
@@ -50,6 +54,32 @@ fun Context.sendSmsPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
             rejected = rejected
         )
     })
+}
+
+
+ fun showDrawOverAlert(context: Context, onClickListener: DialogInterface.OnClickListener) {
+    val customDialog = CustomDialog(context)
+    val bundle = Bundle()
+    bundle.putString(
+        Constants.PERMISSION_DIALOG_TITLE,
+        context.getString(R.string.over_lay_permission)
+    )
+    bundle.putString(
+        Constants.PERMISSION_DIALOG_MSG,
+        """
+                ${context.getString(R.string.overlay_permission_dialog_message)}
+                
+                ${context.getString(R.string.device_based_settings_message)}
+                """.trimIndent()
+    )
+    customDialog.showDialog(bundle, "Overlay") { dialog, which ->
+        if (which == -2) {
+            //Decline
+        } else {
+            //Accept
+            onClickListener.onClick(dialog, which)
+        }
+    }
 }
 
 fun Context.takeForegroundService(granted:()->Unit, rejected:(() -> Unit)? = null){

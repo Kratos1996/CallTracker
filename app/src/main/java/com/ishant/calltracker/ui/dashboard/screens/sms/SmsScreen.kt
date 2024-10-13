@@ -274,7 +274,7 @@ private fun SmsItem(item: SendSmsRes.SendSmsData, viewModel: SmsViewModel) {
                                 AppPreference.isServiceEnabled = true
                                 context.sendWhatsAppMessage(
                                     "+91" + item.mobile ?: "",
-                                    viewModel.smsRes.value?.smsdata ?: AppPreference.replyMsg,
+                                    item.message ?: AppPreference.replyMsg,
                                     "com.whatsapp"
                                 )
                             }

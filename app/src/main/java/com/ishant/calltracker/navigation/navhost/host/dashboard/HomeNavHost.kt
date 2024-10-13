@@ -100,7 +100,7 @@ fun HomeNavHost(
     Scaffold(
         topBar = {
             OneDayCartToolbar(
-                leftIconVisible = true,
+                leftIconVisible = false,
                 onClickBack = {
                     context.getActivityContext().showAsBottomSheet{dismiss ->
                         CommonAlertBottomSheet(

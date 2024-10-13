@@ -2,6 +2,7 @@ package com.ishant.calltracker.ui.dashboard
 
 import android.Manifest
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -54,6 +55,7 @@ import readPhoneStatePermission
 import readPostNotificationPermission
 import requestNotificationPermission
 import sendSmsPermission
+import showDrawOverAlert
 import takeForegroundContactService
 import writePhoneContactPermission
 
@@ -98,19 +100,20 @@ class DashboardActivity : BaseComposeActivity() {
 
 
 
+
         viewModel.loadSimInfo(this)
         viewModel.getWhatsappList()
-        notificationListenerUtil = NotificationListenerUtil(this)
-        notificationListenerPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                val granted = notificationListenerUtil.isNotificationServiceEnabled()
-                if (granted) {
-                    val mServiceIntent = Intent(this, NotificationReaderService::class.java)
-
-                    startService(mServiceIntent)
-
-                }
-            }
+//        notificationListenerUtil = NotificationListenerUtil(this)
+//        notificationListenerPermissionLauncher =
+//            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//                val granted = notificationListenerUtil.isNotificationServiceEnabled()
+//                if (granted) {
+//                    val mServiceIntent = Intent(this, NotificationReaderService::class.java)
+//
+//                    startService(mServiceIntent)
+//
+//                }
+//            }
 //        readNotificationService()
         readPostNotificationPermission(granted = {
             viewModel.notificationPermissionGranted.value = true
@@ -145,6 +148,14 @@ class DashboardActivity : BaseComposeActivity() {
             rejected = {
                 viewModel.sendSmsPermissionGranted.value = false
             })
+        if (!Settings.canDrawOverlays(this)) {
+            showDrawOverAlert(this,){ dialog: DialogInterface, which: Int ->
+                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${packageName}"))
+                startActivity(intent, )
+                dialog.dismiss()
+                }
+
+        }
         onBackPressedWaAppBlaster(this) {
             showAsBottomSheet { dismiss ->
                 CommonAlertBottomSheet(msg = stringResource(R.string.do_you_want_to_close_application),
@@ -171,6 +182,8 @@ class DashboardActivity : BaseComposeActivity() {
             !this.checkPermission(Manifest.permission.READ_PHONE_STATE)
         viewModel.phoneNumberPermissionGranted.value =
             !this.checkPermission(Manifest.permission.READ_PHONE_NUMBERS)
+        viewModel.sendSmsPermissionGranted.value =
+            !this.checkPermission(Manifest.permission.SEND_SMS)
         viewModel.notificationPermissionGranted.value =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 !this.checkPermission(Manifest.permission.POST_NOTIFICATIONS)

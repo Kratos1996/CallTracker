@@ -18,7 +18,6 @@ import com.ishant.calltracker.domain.ContactUseCase
 import com.ishant.calltracker.network.Resource
 import com.ishant.calltracker.service.CallService
 import com.ishant.calltracker.service.ServiceRestarterService
-import com.ishant.calltracker.service.WhatsappAccessibilityService
 import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.isServiceRunning
 import com.ishant.calltracker.utils.sendSmsUsingSimSlot
@@ -56,7 +55,9 @@ class PhoneCallReceiver : BroadcastReceiver() {
             when (intent.getStringExtra(TelephonyManager.EXTRA_STATE)) {
 
                 TelephonyManager.EXTRA_STATE_IDLE -> {
-                    if (!AppPreference.lastIncommingNum.isNullOrEmpty()) {
+                    Log.d("TAG", "onReceive: ")
+                    Log.d("TAG", "onReceive: ")
+                    if (!intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER).isNullOrEmpty()) {
                         /*if (AppPreference.isUserLoggedIn) {
                             context.sendSmsUsingSimSlot(
                                 AppPreference.simSlot,
@@ -69,13 +70,13 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
 
                         }*/
-                    }
-                    if (AppPreference.isUserLoggedIn) {
-                        serviceScope.launch { getSms(context) }
+
 
                     }
+
                     if (!context.isServiceRunning(CallService::class.java)) {
                         // Replace with your service class
+
                         handleCallData(intent, context)
                         Log.e(
                             ServiceRestarterService.TAG,
@@ -185,14 +186,14 @@ class PhoneCallReceiver : BroadcastReceiver() {
                     delay(2000)
                     val callerData = data.collectLastCallDetails(context)
                     if (callerData != null && callerData.data.isNotEmpty()) {
-                        saveContact(callerData)
+                        saveContact(callerData,context)
                     }
                 }
             }
         }
     }
 
-    private fun saveContact(uploadContacts: UploadContactRequest?) {
+    private fun saveContact(uploadContacts: UploadContactRequest?, context: Context) {
         Log.e(
             "CallTracker : ",
             "CallTracker: Contact Not Saved" + uploadContacts?.data?.isNotEmpty()
@@ -218,6 +219,8 @@ class PhoneCallReceiver : BroadcastReceiver() {
                     is Resource.Success -> {
                         delay(1000)
                         CallTrackerApplication.isRefreshUi.value = true
+                        delay(2000)
+                        serviceScope.launch { getSms(context) }
                     }
                 }
             }.launchIn(

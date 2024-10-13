@@ -23,8 +23,8 @@ android {
         applicationId = "com.ishant.callsoftware"
         minSdk = 25
         targetSdk = 34
-        versionCode = 17
-        versionName = "2.0.2"
+        versionCode = 1
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

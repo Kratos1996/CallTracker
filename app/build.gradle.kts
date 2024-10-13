@@ -16,11 +16,11 @@ hilt {
     enableExperimentalClasspathAggregation = true
 }
 android {
-    namespace = "com.ishant.calltracker"
+    namespace = "com.ishant.callsoftware"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ishant.calltracker"
+        applicationId = "com.ishant.callsoftware"
         minSdk = 25
         targetSdk = 34
         versionCode = 17
@@ -34,7 +34,7 @@ android {
         this.outputs.all {
             if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
                 this.outputFileName =
-                    "WebBlasterAI${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
+                    "CallSoftware${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
             }
         }
     }

@@ -16,11 +16,11 @@ hilt {
     enableExperimentalClasspathAggregation = true
 }
 android {
-    namespace = "com.ishant.LKing"
+    namespace = "com.ishant.boomblaster"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ishant.LKing"
+        applicationId = "com.ishant.boomblaster"
         minSdk = 25
         targetSdk = 34
         versionCode = 1
@@ -34,7 +34,7 @@ android {
         this.outputs.all {
             if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
                 this.outputFileName =
-                    "LKing${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
+                    "boomblaster${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
             }
         }
     }

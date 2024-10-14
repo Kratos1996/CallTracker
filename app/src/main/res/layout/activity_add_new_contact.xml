@@ -45,7 +45,7 @@
             </LinearLayout>
 
             <ImageView
-                android:layout_width="140dp"
+                android:layout_width="wrap_content"
                 android:layout_height="140dp"
                 android:src="@drawable/logo"
                 android:scaleType="centerCrop"

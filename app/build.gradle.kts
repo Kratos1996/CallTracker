@@ -16,11 +16,11 @@ hilt {
     enableExperimentalClasspathAggregation = true
 }
 android {
-    namespace = "com.ishant.callsoftware"
+    namespace = "com.ishant.LKing"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ishant.callsoftware"
+        applicationId = "com.ishant.LKing"
         minSdk = 25
         targetSdk = 34
         versionCode = 1
@@ -34,7 +34,7 @@ android {
         this.outputs.all {
             if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
                 this.outputFileName =
-                    "CallSoftware${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
+                    "LKing${variant.buildType.name}_${formattedDate}_v${defaultConfig.versionName}.apk"
             }
         }
     }

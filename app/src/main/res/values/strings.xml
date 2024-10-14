@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Call Software</string>
+    <string name="app_name">LKing</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_mobile">Mobile</string>
     <string name="prompt_password">Password</string>

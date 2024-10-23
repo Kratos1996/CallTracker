@@ -171,8 +171,7 @@ fun Context.sendSms(phoneNumber: String, msgStr: String) {
             toast("Please set your desired message to send from the dashboard")
             return
         }
-        val smsManager: SmsManager =
-            getSystemService(SmsManager::class.java)
+        val smsManager: SmsManager = getSystemService(SmsManager::class.java)
         smsManager.sendTextMessage(phoneNumber, null, msgStr, null, null)
 
         toast("SMS sent successfully")
@@ -188,21 +187,19 @@ fun Context.startWorkManager(viewLifecycleOwner: LifecycleOwner) {
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
-    val periodicWorkRequest = PeriodicWorkRequestBuilder<ServiceCheckWorker>(
-        15, TimeUnit.MINUTES
-    ).setConstraints(constraints).build()
+    val periodicWorkRequest = PeriodicWorkRequestBuilder<ServiceCheckWorker>(15, TimeUnit.MINUTES).setConstraints(constraints).build()
     WorkManager.getInstance(applicationContext).enqueue(periodicWorkRequest)
 // Optional: Observe the result of the worker
     WorkManager.getInstance(applicationContext)
         .getWorkInfoByIdLiveData(periodicWorkRequest.id)
-        .observe(viewLifecycleOwner, Observer { workInfo ->
+        .observe(viewLifecycleOwner) { workInfo ->
             if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
                 Log.e(
                     ServiceRestarterService.TAG,
                     "CallTracker : HomeActivity > ServiceCheckWorker > doWork > CallService service is running...."
                 )
             }
-        })
+        }
 }
 
 fun Context.startAlarmManager() {

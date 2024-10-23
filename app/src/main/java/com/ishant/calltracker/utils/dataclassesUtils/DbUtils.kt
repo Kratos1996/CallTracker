@@ -1,4 +1,4 @@
-package com.ishant.calltracker.utils
+package com.ishant.calltracker.utils.dataclassesUtils
 
 import android.content.Context
 import android.service.notification.StatusBarNotification
@@ -6,6 +6,7 @@ import com.ishant.calltracker.database.room.MessageLogDB
 import com.ishant.calltracker.database.room.messageLogTables.AppPackage
 import com.ishant.calltracker.database.room.messageLogTables.MessageLogs
 import com.ishant.calltracker.database.room.messageLogTables.ReplyLogs
+import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Utils.getCurrentDate
 
 

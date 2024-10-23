@@ -58,10 +58,7 @@ class KeepAliveService : Service() {
             val mServiceIntent = Intent(this, CallService::class.java)
             startService(mServiceIntent)
         }
-//        if (!isServiceRunning(NotificationReaderService::class.java)) {
-//                val mServiceIntent = Intent(this, NotificationReaderService::class.java)
-//                startService(mServiceIntent)
-//        }
+
     }
 
     private val isMyServiceRunning: Boolean

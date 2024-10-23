@@ -1,4 +1,4 @@
-package com.ishant.calltracker.utils
+package com.ishant.calltracker.utils.constant
 
 object Constant {
     var DEFAULT_TELEPHONY_MANAGER_STRING_VALUE: String =""

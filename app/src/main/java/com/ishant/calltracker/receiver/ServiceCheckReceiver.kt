@@ -25,7 +25,7 @@ class ServiceCheckReceiver : BroadcastReceiver() {
             context.navToCallService()
         }
         else{
-            Log.e(ServiceRestarterService.TAG, "CallTracker : ServiceCheckReceiver > ServiceAlive > onReceive > ServiceAlive service is running....")
+            Log.e(ServiceRestarterService.TAG, "CallTracker : ServiceCheckReceiver > ServiceAlive > onReceive > KeepServiceAlive service is running....")
         }
     }
 }

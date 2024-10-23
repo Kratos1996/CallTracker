@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.ContextCompat.getString
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
@@ -46,6 +47,7 @@ import com.ishant.calltracker.utils.sendWhatsAppMessage
 import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
+import com.ishant.corelibcompose.toolkit.colors.text_third_color
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
 import com.ishant.corelibcompose.toolkit.constant.AppConst
@@ -56,8 +58,8 @@ import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.imageLib.MultiMediaView
 import com.ishant.corelibcompose.toolkit.ui.other.OtherModifiers.LineDivider
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
+import com.ishant.corelibcompose.toolkit.ui.textstyles.CoreSearchView
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
-import com.ishant.corelibcompose.toolkit.ui.textstyles.SearchViewNew
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SubHeadingText
 
 @Composable
@@ -134,9 +136,12 @@ private fun CallTab(callViewModel: CallViewModel){
 
 @Composable
 private fun SearchViewWithCheckBox(viewModel: CallViewModel) {
-    SearchViewNew(
+    val context = LocalContext.current
+    CoreSearchView(
+        contentColor = MaterialTheme.colors.text_primary,
+        hintColor = MaterialTheme.colors.text_third_color,
+        placeHolderString = "Search",
         modifier = Modifier
-            .fillMaxHeight()
             .padding(horizontal = 20.sdp, vertical = 20.sdp),
     ) {
         viewModel.searchString = (it.trim())

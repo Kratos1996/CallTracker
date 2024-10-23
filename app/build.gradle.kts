@@ -4,12 +4,12 @@ import java.util.Date
 plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.serialization.android)
     kotlin("kapt")
-    id ("org.jetbrains.kotlin.plugin.serialization")
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
-    id("com.google.devtools.ksp")
 }
 hilt {
     enableAggregatingTask = true
@@ -150,6 +150,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.composeUiTooling)
     implementation(libs.bundles.org.ishant.compose.libs )
     implementation(libs.lifecycle.viewmodel.compose)
-    implementation ("com.github.Kratos1996:corelib:1.1.0@aar")
+    implementation ("com.github.Kratos1996:corelib:1.1.6@aar")//1.1.0
     implementation(libs.bundles.image.libs)
 }

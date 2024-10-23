@@ -46,6 +46,7 @@ import com.ishant.callsoftware.utils.getActivityContext
 import com.ishant.callsoftware.utils.initiatePhoneCall
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
+import com.ishant.corelibcompose.toolkit.colors.text_third_color
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CircularBox
@@ -55,8 +56,8 @@ import com.ishant.corelibcompose.toolkit.ui.custom_pullrefresh.CustomPullToRefre
 import com.ishant.corelibcompose.toolkit.ui.other.OtherModifiers
 import com.ishant.corelibcompose.toolkit.ui.progressindicator.ProgressDialog
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
+import com.ishant.corelibcompose.toolkit.ui.textstyles.CoreSearchView
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
-import com.ishant.corelibcompose.toolkit.ui.textstyles.SearchViewNew
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SubHeadingText
 
 @Composable
@@ -148,9 +149,11 @@ private fun TabView(homeViewModel: HomeViewModel) {
 
 @Composable
 private fun SearchViewWithCheckBox(homeViewModel: HomeViewModel) {
-    SearchViewNew(
+    CoreSearchView(
+        contentColor = MaterialTheme.colors.text_primary,
+        hintColor = MaterialTheme.colors.text_third_color,
+        placeHolderString = "Search",
         modifier = Modifier
-            .fillMaxHeight()
             .padding(horizontal = 20.sdp, vertical = 20.sdp),
     ) {
         homeViewModel.searchString = (it.trim())

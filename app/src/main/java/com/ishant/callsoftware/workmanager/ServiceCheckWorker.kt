@@ -19,7 +19,6 @@ class ServiceCheckWorker(val context: Context, params: WorkerParameters) : Worke
         }
         else{
             Log.e(ServiceRestarterService.TAG, "CallTracker : Workmanger > ServiceCheckWorker > doWork > CallService service is running....")
-
         }
 
 

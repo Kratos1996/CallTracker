@@ -48,6 +48,7 @@ import com.ishant.callsoftware.utils.sendWhatsAppMessage
 import com.ishant.callsoftware.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
+import com.ishant.corelibcompose.toolkit.colors.text_third_color
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CircularBox
@@ -55,8 +56,8 @@ import com.ishant.corelibcompose.toolkit.ui.custom_pullrefresh.CustomPullToRefre
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.other.OtherModifiers.LineDivider
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
+import com.ishant.corelibcompose.toolkit.ui.textstyles.CoreSearchView
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
-import com.ishant.corelibcompose.toolkit.ui.textstyles.SearchViewNew
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SubHeadingText
 
 @Composable
@@ -113,9 +114,11 @@ private fun LoadSmsScreen(
 
 @Composable
 private fun SearchViewWithCheckBox(viewModel: SmsViewModel) {
-    SearchViewNew(
+    CoreSearchView(
+        contentColor = MaterialTheme.colors.text_primary,
+        hintColor = MaterialTheme.colors.text_third_color,
+        placeHolderString = "Search",
         modifier = Modifier
-            .fillMaxHeight()
             .padding(horizontal = 20.sdp, vertical = 20.sdp),
     ) {
         viewModel.searchString = (it.trim())

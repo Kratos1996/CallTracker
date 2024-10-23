@@ -32,7 +32,7 @@ import com.ishant.callsoftware.network.Resource
 import com.ishant.callsoftware.ui.dashboard.DashboardActivity
 
 import com.ishant.callsoftware.utils.AppPreference
-import com.ishant.callsoftware.utils.DbUtils
+import com.ishant.callsoftware.utils.dataclassesUtils.DbUtils
 import com.ishant.callsoftware.utils.convertDate
 import com.ishant.callsoftware.utils.getPhoneNumber
 import com.ishant.callsoftware.utils.getPhoneNumberByName

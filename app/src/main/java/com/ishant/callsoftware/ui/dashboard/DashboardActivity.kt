@@ -52,6 +52,7 @@ import sendSmsPermission
 import showDrawOverAlert
 import takeForegroundContactService
 import writePhoneContactPermission
+import java.util.Locale
 
 @AndroidEntryPoint
 class DashboardActivity : BaseComposeActivity() {
@@ -66,7 +67,6 @@ class DashboardActivity : BaseComposeActivity() {
                 readPhoneContactPermission(granted = {
                     viewModel.loadContactObserver(this)
                     startService(Intent(this, ContactSyncService::class.java))
-
                 }){
                     toast("Need Read Contact Service")
                 }
@@ -74,7 +74,6 @@ class DashboardActivity : BaseComposeActivity() {
         }){
             Toast.makeText(this,getString(R.string.read_write_contact_permission), Toast.LENGTH_SHORT).show()
         }
-
         val data = viewModel.managerPlus.getSimCardPhoneNumbers(this)
         takePhoneNetworkPermission()
         setContent {
@@ -84,45 +83,25 @@ class DashboardActivity : BaseComposeActivity() {
                 HomeNavHost(
                     homeViewModel = viewModel,
                     onNavigate = { nav ->
-
                     }
                 )
-                UnusedAppRestrictionsCheck()
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU  && Build.BRAND.toLowerCase(Locale.getDefault()) == "samsung") {
+                    UnusedAppRestrictionsCheck()
+                }
             }
-
         }
-
-
-
-
         viewModel.loadSimInfo(this)
         viewModel.getWhatsappList()
-//        notificationListenerUtil = NotificationListenerUtil(this)
-//        notificationListenerPermissionLauncher =
-//            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//                val granted = notificationListenerUtil.isNotificationServiceEnabled()
-//                if (granted) {
-//                    val mServiceIntent = Intent(this, NotificationReaderService::class.java)
-//
-//                    startService(mServiceIntent)
-//
-//                }
-//            }
-//        readNotificationService()
         readPostNotificationPermission(granted = {
             viewModel.notificationPermissionGranted.value = true
         }, rejected = {
             viewModel.notificationPermissionGranted.value = false
         })
-
         addAutoStartup()
         readPhoneStatePermission(granted = {
-
             readPhoneNumberPermission(granted = {
-
                 if (!isServiceRunning(KeepAliveService::class.java)) { // Replace with your service class
                     keepAliveService()
-
                     startWorkManager(this)
                     startAlarmManager()
                     viewModel.managers.value = true
@@ -132,24 +111,18 @@ class DashboardActivity : BaseComposeActivity() {
                     viewModel.callService.value = true
                 }
             })
-
-
-
         })
-        sendSmsPermission(granted = {
-            viewModel.sendSmsPermissionGranted.value = true
-        },
-            rejected = {
+        sendSmsPermission(granted = { viewModel.sendSmsPermissionGranted.value = true }, rejected = {
                 viewModel.sendSmsPermissionGranted.value = false
             })
-        if (!Settings.canDrawOverlays(this)) {
+      /*  if (!Settings.canDrawOverlays(this)) {
             showDrawOverAlert(this,){ dialog: DialogInterface, which: Int ->
                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${packageName}"))
                 startActivity(intent, )
                 dialog.dismiss()
                 }
 
-        }
+        }*/
         onBackPressedWaAppBlaster(this) {
             showAsBottomSheet { dismiss ->
                 CommonAlertBottomSheet(msg = stringResource(R.string.do_you_want_to_close_application),

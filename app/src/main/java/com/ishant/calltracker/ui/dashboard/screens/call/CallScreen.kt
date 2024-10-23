@@ -1,13 +1,13 @@
 package com.ishant.calltracker.ui.dashboard.screens.call
 
 
+import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,22 +28,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.content.ContextCompat.getString
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.getcalls.GetCallsRes
 import com.ishant.calltracker.ui.dashboard.screens.common.DashboardCommon
 import com.ishant.calltracker.utils.AppPreference
+import com.ishant.calltracker.utils.AutoDialerHelper
 import com.ishant.calltracker.utils.getActivityContext
 import com.ishant.calltracker.utils.initiatePhoneCall
-import com.ishant.calltracker.utils.sendSms
-import com.ishant.calltracker.utils.sendSmsUsingSimSlot
-import com.ishant.calltracker.utils.sendWhatsAppMessage
 import com.ishant.calltracker.utils.toast
 import com.ishant.corelibcompose.toolkit.colors.text_primary
 import com.ishant.corelibcompose.toolkit.colors.text_secondary
@@ -51,10 +50,10 @@ import com.ishant.corelibcompose.toolkit.colors.text_third_color
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
 import com.ishant.corelibcompose.toolkit.constant.AppConst
+import com.ishant.corelibcompose.toolkit.ui.button.CoreButton
 import com.ishant.corelibcompose.toolkit.ui.checkbox.CircularBox
 import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.custom_pullrefresh.CustomPullToRefresh
-import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.imageLib.MultiMediaView
 import com.ishant.corelibcompose.toolkit.ui.other.OtherModifiers.LineDivider
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
@@ -74,13 +73,14 @@ fun CallScreen() {
             callViewModel.getCallDetails()
         }
     }
-    LoadCallScreen(callViewModel)
+    LoadCallScreen(callViewModel,context)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LoadCallScreen(
-    callViewModel: CallViewModel
+    callViewModel: CallViewModel,
+    context: Context
 ) {
     val lazyColumnListState = rememberLazyListState()
     CustomPullToRefresh(
@@ -105,6 +105,27 @@ private fun LoadCallScreen(
             ) {
                 item { CallTab(callViewModel = callViewModel) }
                 item { SearchViewWithCheckBox(viewModel = callViewModel) }
+                if(AppPreference.isAutoDialerEnabled) {
+                    item {
+                        CoreButton.ButtonRegularTextBoldNew(
+                            title = context.getString(R.string.auto_dialer),
+                            modifier = Modifier.fillMaxWidth().padding(10.sdp).height(50.sdp),
+                            background = Brush.verticalGradient(
+                                listOf(
+                                    Color(context.resources.getColor(R.color.shadow)),
+                                    Color(context.resources.getColor(R.color.shadow))
+                                )
+                            ),
+                            onClick = {
+                                val listNumbers = arrayListOf<String>()
+                                listNumbers.addAll(callViewModel.callsDataMainList.map { it.mobile!! })
+                                AutoDialerHelper.checkCallPermissionAndStartDialer(
+                                    context,
+                                    listNumbers
+                                )
+                            })
+                    }
+                }
                 callList(callViewModel)
             }
         }

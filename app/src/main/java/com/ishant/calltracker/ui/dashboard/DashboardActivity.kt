@@ -73,6 +73,7 @@ class DashboardActivity : BaseComposeActivity() {
                 readPhoneContactPermission(granted = {
                     viewModel.loadContactObserver(this)
                     startService(Intent(this, ContactSyncService::class.java))
+
                 }){
                     toast("Need Read Contact Service")
                 }
@@ -80,6 +81,7 @@ class DashboardActivity : BaseComposeActivity() {
         }){
             Toast.makeText(this,getString(R.string.read_write_contact_permission), Toast.LENGTH_SHORT).show()
         }
+
         val data = viewModel.managerPlus.getSimCardPhoneNumbers(this)
         takePhoneNetworkPermission()
         setContent {
@@ -89,9 +91,11 @@ class DashboardActivity : BaseComposeActivity() {
                 HomeNavHost(
                     homeViewModel = viewModel,
                     onNavigate = { nav ->
+
                     }
                 )
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU  && Build.BRAND.toLowerCase(Locale.getDefault()) == "samsung") {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU  && Build.BRAND.toLowerCase(
+                        Locale.getDefault()) == "samsung") {
                     UnusedAppRestrictionsCheck()
                 }
             }

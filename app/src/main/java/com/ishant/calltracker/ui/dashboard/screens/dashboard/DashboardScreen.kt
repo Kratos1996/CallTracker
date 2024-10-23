@@ -8,9 +8,11 @@ import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +29,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -37,13 +41,16 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import checkPermission
 import com.ishant.calltracker.R
 import com.ishant.calltracker.api.response.WhatsappData
+import com.ishant.calltracker.app.CallTrackerApplication
 import com.ishant.calltracker.app.showAsBottomSheet
 import com.ishant.calltracker.receiver.BootReceiver
 import com.ishant.calltracker.receiver.NotificationServiceRestartReceiver
@@ -65,8 +72,10 @@ import com.ishant.calltracker.utils.startWorkManager
 import com.ishant.calltracker.utils.stopServiceCall
 import com.ishant.calltracker.utils.stopServiceContact
 import com.ishant.calltracker.utils.toast
+import com.ishant.corelibcompose.toolkit.colors.black
 import com.ishant.corelibcompose.toolkit.colors.gray_bg_light
 import com.ishant.corelibcompose.toolkit.colors.gray_divider
+import com.ishant.corelibcompose.toolkit.colors.purple_color
 import com.ishant.corelibcompose.toolkit.colors.white
 import com.ishant.corelibcompose.toolkit.colors.white_only
 import com.ishant.corelibcompose.toolkit.ui.button.CoreButton
@@ -76,7 +85,7 @@ import com.ishant.corelibcompose.toolkit.ui.clickables.noRippleClickable
 import com.ishant.corelibcompose.toolkit.ui.commondialog.CommonAlertBottomSheet
 import com.ishant.corelibcompose.toolkit.ui.imageLib.CoreImageView
 import com.ishant.corelibcompose.toolkit.ui.sdp.sdp
-import com.ishant.corelibcompose.toolkit.ui.sdp.ssp
+import com.ishant.corelibcompose.toolkit.ui.textstyles.HeadingText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.PS
 import com.ishant.corelibcompose.toolkit.ui.textstyles.RegularText
 import com.ishant.corelibcompose.toolkit.ui.textstyles.SFPRO
@@ -100,7 +109,7 @@ fun DashboardScreen() {
     LaunchedEffect(key1 = Unit, block = {
         if (!initialApiCalled.value) {
             initialApiCalled.value = true
-            if( homeViewModel.notificationPermissionGranted.value) {
+            if (homeViewModel.notificationPermissionGranted.value) {
                 if (context.isServiceRunning(CallService::class.java)) {
                     homeViewModel.callService.value = true
                 } else {
@@ -263,6 +272,81 @@ fun SimInfo(simInfo: SimInfo, index: Int, onClick: (SimInfo) -> Unit) {
 
 
 @Composable
+fun AutoDialer(homeViewModel: HomeViewModel,context: Context) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(10.sdp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center,
+
+        ) {
+
+        Switch(checked = homeViewModel.autoDialerEnabled.value, onCheckedChange = {
+            AppPreference.isAutoDialerEnabled = it
+            homeViewModel.autoDialerEnabled.value = it
+
+        }, colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colors.purple_color))
+        if (homeViewModel.autoDialerEnabled.value) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+
+                CoreImageView.FromLocalDrawable(
+                    painterResource = R.drawable.ic_add,
+                    modifier = Modifier.size(40.sdp).clickable {
+                        homeViewModel.dialerDelay.longValue = ++homeViewModel.dialerDelay.longValue
+                        AppPreference.autoDialerDelay =   homeViewModel.dialerDelay.longValue
+                    },
+                    colorFilter = ColorFilter.tint(color = if (!CallTrackerApplication.isDark.value) MaterialTheme.colors.black else MaterialTheme.colors.white_only)
+                )
+
+                HeadingText.Medium(
+                    title = homeViewModel.dialerDelay.longValue.toString(),
+                    textAlign = TextAlign.Center, textColor = MaterialTheme.colors.white_only,modifier = Modifier.width(140.sdp).fillMaxHeight().background(shape = RoundedCornerShape(25), color = MaterialTheme.colors.purple_color).padding(vertical = 10.sdp)
+
+                )
+//                InputEditText(
+//                    value = homeViewModel.dialerDelay.longValue.toString(),
+//                    readOnly = true,
+//                    enabled = false,
+//                    maxLines = 1,
+//                    onValueChange = {
+//                        if (it.toInt()<10){
+//                            homeViewModel.dialerDelay.longValue=10L
+//                            AppPreference.autoDialerDelay = 10L
+//                        }else{
+//                            AppPreference.autoDialerDelay = it.toLong()
+//                        }
+//                    }, modifier = Modifier.width(140.sdp))
+
+                CoreImageView.FromLocalDrawable(
+                    painterResource = R.drawable.ic_remove,
+
+                    modifier = Modifier.size(40.sdp).clickable {
+                        if (homeViewModel.dialerDelay.longValue < 11) {
+                            homeViewModel.dialerDelay.longValue =
+                                10L
+                            context.toast("Cannot set delay below 10 Seconds")
+                        } else {
+
+                            homeViewModel.dialerDelay.longValue =
+                                --homeViewModel.dialerDelay.longValue
+
+                        }
+                        AppPreference.autoDialerDelay =   homeViewModel.dialerDelay.longValue
+                    },
+                    colorFilter = ColorFilter.tint(color = if (!CallTrackerApplication.isDark.value) MaterialTheme.colors.black else MaterialTheme.colors.white_only)
+
+                )
+
+            }
+        }
+
+
+    }
+}
+
+@Composable
 private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) {
     val scrollState = rememberScrollState()
     Column(
@@ -308,6 +392,10 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
 
         SimInfoList(homeViewModel = homeViewModel, context = context)
         WhatsappList(homeViewModel = homeViewModel, context = context)
+        TitleSeparator(title = "Auto Dialer", showArrow = false)
+
+        AutoDialer(homeViewModel = homeViewModel,context=context)
+
         DashboardCardComponents(
             title = context.getString(R.string.service),
             modifier = Modifier,
@@ -423,9 +511,9 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                     }, rejected = {
                         Log.d("TAG", "LoadDashboardScreen: ")
                         homeViewModel.notificationPermissionGranted.value = false
-                       requestNotificationPermission(context )
+                        requestNotificationPermission(context)
                     })
-                }else{
+                } else {
                     context.toast("Already Granted")
                 }
             }
@@ -475,10 +563,16 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
 
 
         CoreButton.ButtonRegularTextBoldNew(
-            title = context.getString(R.string.logout), modifier = Modifier.fillMaxWidth().padding( 10.sdp).height(50.sdp) , background = Brush.verticalGradient(
-                listOf(Color(context.resources.getColor(R.color.shadow)),Color(context.resources.getColor(R.color.shadow)))
-            ),onClick = {
-                context.getActivityContext().showAsBottomSheet{dismiss ->
+            title = context.getString(R.string.logout),
+            modifier = Modifier.fillMaxWidth().padding(10.sdp).height(50.sdp),
+            background = Brush.verticalGradient(
+                listOf(
+                    Color(context.resources.getColor(R.color.shadow)),
+                    Color(context.resources.getColor(R.color.shadow))
+                )
+            ),
+            onClick = {
+                context.getActivityContext().showAsBottomSheet { dismiss ->
                     CommonAlertBottomSheet(
                         msg = "Do you want to Logout?",
                         positiveText = "Yes",
@@ -499,10 +593,6 @@ private fun LoadDashboardScreen(context: Context, homeViewModel: HomeViewModel) 
                         })
                 }
             })
-
-
-
-
 
 
     }

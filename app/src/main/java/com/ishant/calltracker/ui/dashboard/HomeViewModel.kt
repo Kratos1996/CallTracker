@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Handler
 import android.util.Log
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -27,6 +28,8 @@ import com.ishant.calltracker.utils.AppPreference
 import com.ishant.calltracker.utils.Response
 import com.ishant.calltracker.utils.SimInfo
 import com.ishant.calltracker.utils.TelephonyManagerPlus
+import com.ishant.calltracker.utils.constant.Constant.DEFALT_AUTO_DIALER_DELAY
+import com.ishant.calltracker.utils.helper.Constants
 import com.ishant.calltracker.utils.isPackageInstalled
 import com.ishant.calltracker.utils.showSimInfo
 import com.ishant.corelibcompose.toolkit.ui.text.InputWrapper
@@ -67,6 +70,8 @@ class HomeViewModel @Inject constructor(
     val sendSmsPermissionGranted = mutableStateOf(false)
     val callService = mutableStateOf(false)
     val managers = mutableStateOf(false)
+    val autoDialerEnabled = mutableStateOf(AppPreference.isAutoDialerEnabled)
+    val dialerDelay = mutableLongStateOf(if(AppPreference.autoDialerDelay==0L) DEFALT_AUTO_DIALER_DELAY else AppPreference.autoDialerDelay)
 
     val allContactSelected = mutableStateOf(true)
     val ristrictedContact = mutableStateOf(false)

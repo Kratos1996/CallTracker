@@ -55,29 +55,16 @@ class PhoneCallReceiver : BroadcastReceiver() {
             when (intent.getStringExtra(TelephonyManager.EXTRA_STATE)) {
 
                 TelephonyManager.EXTRA_STATE_IDLE -> {
-                    Log.d("TAG", "onReceive: ")
-                    Log.d("TAG", "onReceive: ")
+
                     if (!intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER).isNullOrEmpty()) {
-                        /*if (AppPreference.isUserLoggedIn) {
-                            context.sendSmsUsingSimSlot(
-                                AppPreference.simSlot,
-                                AppPreference.lastIncommingNum,
-                                AppPreference.replyMsg
-                            )
-                            context.sendWhatsAppMessage(AppPreference.lastIncommingNum,AppPreference.replyMsg)
-                            AppPreference.isServiceEnabled = true
-
-
-
-                        }*/
-
-
+                        Log.d("TAG", "onReceive: ")
+                      serviceScope.launch { getSms(context) }
                     }
 
                     if (!context.isServiceRunning(CallService::class.java)) {
                         // Replace with your service class
 
-                        handleCallData(intent, context)
+//                       handleCallData(intent, context)
                         Log.e(
                             ServiceRestarterService.TAG,
                             "PhoneCallReceiver : Receiver > PhoneCallReceiver > startServiceMonitoring > CallService is not running. Restarting..."
@@ -122,7 +109,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
 
 
                     response.data?.let {
-                        sendMessages(it.sendSmsData.filter { it.status != 1 } as ArrayList<SendSmsRes.SendSmsData>,
+                        sendMessages(it.sendSmsData,
                         it.smsdata?:AppPreference.replyMsg,
                             context)
                     }
@@ -161,7 +148,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
             val item = smsList.first()
             context.sendSmsUsingSimSlot(
                 AppPreference.simSlot,
-                item.mobile ?: "",
+                item.mobile?: "",
                 smsData ?: AppPreference.replyMsg
             )
             context.sendWhatsAppMessage(
@@ -220,7 +207,7 @@ class PhoneCallReceiver : BroadcastReceiver() {
                         delay(1000)
                         CallTrackerApplication.isRefreshUi.value = true
                         delay(2000)
-                        serviceScope.launch { getSms(context) }
+
                     }
                 }
             }.launchIn(

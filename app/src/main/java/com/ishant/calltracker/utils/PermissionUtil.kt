@@ -33,6 +33,14 @@ fun Context.readPhoneStatePermission(granted:()->Unit, rejected:(() -> Unit)? = 
         rejected =rejected
     )
 }
+fun Context.readCallPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
+    takePermissions(
+        permissions = Manifest.permission.CALL_PHONE,
+        title = getString(R.string.call_permission),
+        granted = granted,
+        rejected =rejected
+    )
+}
 fun Context.readPostNotificationPermission(granted:()->Unit, rejected:(() -> Unit)? = null){
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         takePermissions(

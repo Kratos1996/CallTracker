@@ -13,5 +13,6 @@ object Constant {
     const val TELEPHONY_MANAGER_IMEI = "getDeviceId"
     const val TELEPHONY_MANAGER_SUBSCRIBERID = "getSubscriberId"
     const val DEFAULT_GSM_CELL_ID_VALUE: Int = -1
+    const val DEFALT_AUTO_DIALER_DELAY: Long = 10000L
 
 }

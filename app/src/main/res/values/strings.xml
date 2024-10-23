@@ -14,6 +14,7 @@
     <string name="required_permission">Required Permission</string>
     <string name="over_lay_permission">Need Overlay Permission</string>
     <string name="phone_state_permission">Phone State</string>
+    <string name="call_permission">Initiate Call</string>
     <string name="phone_message_permission">Send SMS</string>
     <string name="phone_foreground_permission">Foreground Service</string>
     <string name="phone_number_permission">Phone Number</string>
@@ -92,6 +93,7 @@
         Notification Listener Service. Enable it now?"
     </string>
     <string name="logout">Logout</string>
+    <string name="auto_dialer">Start Auto Dialer</string>
     <string name="service">Services</string>
     <string name="sim">Sim</string>
     <string name="selected">Selected</string>

@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
 
     <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
     <uses-permission android:name="android.permission.WHITELIST_AUTO_REVOKE_PERMISSIONS" />
@@ -31,18 +31,20 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
 
     <uses-permission android:name="android.permission.SEND_SMS" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="*" />
         </intent>
-        <package android:name="com.whatsapp"/>
-        <package android:name="com.facebook.orca"/>
-        <package android:name="com.whatsapp.w4b"/>
+
+        <package android:name="com.whatsapp" />
+        <package android:name="com.facebook.orca" />
+        <package android:name="com.whatsapp.w4b" />
     </queries>
 
     <application
@@ -59,27 +61,27 @@
         tools:targetApi="31">
         <activity
             android:name=".ui.dashboard.DashboardActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait"
+            android:exported="false"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:singleUser="true"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.dashboard.screens.contact.newcontact.AddNewContact"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan|adjustResize"
+            android:screenOrientation="portrait"
 
-            android:screenOrientation="portrait" />
+            android:windowSoftInputMode="adjustPan|adjustResize" />
         <activity
             android:name=".ui.logs.CallLogsActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan|adjustResize"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
         <activity
             android:name=".ui.callupdatecenter.CallUploadCenterActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan|adjustResize"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
 
         <activity
             android:name=".ui.login.ui.login.LoginActivity"
@@ -103,7 +105,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-       <!-- Receivers-->
+        <!-- Receivers-->
         <receiver
             android:name=".receiver.BootReceiver"
             android:directBootAware="true"
@@ -136,20 +138,20 @@
             android:enabled="true"
             android:exported="false" />
         <receiver
-        android:name=".receiver.NotificationServiceRestartReceiver"
-        android:enabled="true"
-        android:exported="true"
-        android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-        <intent-filter>
-            <action android:name="android.intent.action.BOOT_COMPLETED" />
+            android:name=".receiver.NotificationServiceRestartReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
 
-            <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
 
-            <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-            <!-- For HTC devices -->
-            <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
-        </intent-filter>
-    </receiver>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <!-- For HTC devices -->
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
         <!--Service-->
         <service
             android:name=".service.CallService"
@@ -180,17 +182,20 @@
             android:foregroundServiceType="phoneCall"
             android:priority="1000"
             android:stopWithTask="false" /> <!-- https://techstop.github.io/android-broadcastreceiver/ -->
-
         <service
-            android:name=".service.NotificationReaderService"
-            android:label="WappBlaster AI"
-            android:exported="true"
-            android:foregroundServiceType="phoneCall"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-            <intent-filter>
-                <action android:name="android.service.notification.NotificationListenerService"/>
-            </intent-filter>
-        </service>
+            android:name=".service.AutoDialerService"
+            android:enabled="true"
+            android:exported="false" />
+        <!--        <service-->
+        <!--            android:name=".service.NotificationReaderService"-->
+        <!--            android:label="WappBlaster AI"-->
+        <!--            android:exported="true"-->
+        <!--            android:foregroundServiceType="phoneCall"-->
+        <!--            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="android.service.notification.NotificationListenerService"/>-->
+        <!--            </intent-filter>-->
+        <!--        </service>-->
 
     </application>
 

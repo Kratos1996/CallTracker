@@ -31,6 +31,8 @@ object AppPreference {
     private const val SERVICE_ENABLED = "service_enabled"
     private const val IS_FROM_SERVICE = "is_from_service"
     private const val WHATSAPP_PACKAGE = "whatsapp_package"
+    private const val AUTO_DIALER_ENABLED = "auto_dialer_enabled"
+    private const val AUTO_DIALER_DELAY = "auto_dialer_delay"
     private val KEY_PURGE_MESSAGE_LOGS_LAST_TIME = "pref_purge_message_logs_last_time"
     private val KEY_AUTO_REPLY_THROTTLE_TIME_MS = "pref_auto_reply_throttle_time_ms"
     private val KEY_AUTO_REPLY_THROTTLE_DAYS = "pref_auto_reply_throttle_days"
@@ -45,6 +47,16 @@ object AppPreference {
         editor.apply()
     }
 
+    var isAutoDialerEnabled: Boolean
+        get() = getDataBoolean(AUTO_DIALER_ENABLED)
+        set(autoDialerEnabled) {
+            setDataBoolean(AUTO_DIALER_ENABLED, autoDialerEnabled)
+        }
+    var autoDialerDelay: Long
+        get() = getDataLong(AUTO_DIALER_DELAY)
+        set(delay) {
+            setDataLong(AUTO_DIALER_DELAY, delay)
+        }
     var isDarkModeEnable: Boolean
         get() = getDataBoolean(DARK_MODE)
         set(darkmode) {

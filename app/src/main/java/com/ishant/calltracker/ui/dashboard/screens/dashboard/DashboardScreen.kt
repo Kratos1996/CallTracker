@@ -100,7 +100,14 @@ fun DashboardScreen() {
     LaunchedEffect(key1 = Unit, block = {
         if (!initialApiCalled.value) {
             initialApiCalled.value = true
-
+            if( homeViewModel.notificationPermissionGranted.value) {
+                if (context.isServiceRunning(CallService::class.java)) {
+                    homeViewModel.callService.value = true
+                } else {
+                    context.toast("Call Service started....")
+                    context.navToCallService()
+                }
+            }
         }
         CoroutineScope(Dispatchers.Main).launch {
             AppLifecycleCallback.lifecycleCallback.collectLatest { lifecycle ->
@@ -109,8 +116,6 @@ fun DashboardScreen() {
                 when (lifecycle) {
 
                     "Resumed" -> {
-
-
                         homeViewModel.contactPermissionGranted.value =
                             !context.checkPermission(Manifest.permission.READ_CONTACTS)
                         homeViewModel.phoneLogsPermissionGranted.value =
